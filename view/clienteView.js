@@ -4,7 +4,11 @@ const router = express.Router();
 const clienteController = new ClienteController();
 
 router.post('/', (req, res) => {
-    clienteController.createCliente();
+    console.log(req.dody);
+    //clienteController.createCliente();
 });
+
+
+
 
 module.exports = router; // Exporta o roteador de usuários

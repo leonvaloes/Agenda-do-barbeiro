@@ -4,7 +4,7 @@ class ClienteController {
     constructor() {
         const databaseManager = DatabaseManager.getInstance();
         this.sequelize = databaseManager.getSequelize();
-        this.Cliente = require('../models/Cliente')(this.sequelize);
+        this.Cliente = require('../model/cliente')(this.sequelize);
     }
 
     async criarCliente(dados) {

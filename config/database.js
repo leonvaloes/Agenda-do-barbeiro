@@ -1,41 +1,49 @@
-// config/database.js
 const { Sequelize } = require('sequelize');
 
 class DatabaseManager {
     static instance;
-    sequelize;
 
-    constructor(config) {
+    static dbConfig = {
+        database: 'meubanco',
+        user: 'user',
+        password: 'userpassword',
+        host: '127.0.0.1'
+    };
+
+    constructor(config = DatabaseManager.dbConfig) { // Usa o dbConfig padrão se não for passado
         this.config = config;
+        this.sequelize = null;
     }
 
-    static getInstance(config) {
+
+    static getInstance() {
         if (!DatabaseManager.instance) {
-            DatabaseManager.instance = new DatabaseManager(config);
+            DatabaseManager.instance = new DatabaseManager();
         }
         return DatabaseManager.instance;
     }
 
     async connect() {
-        try {
-            this.sequelize = new Sequelize(
-                this.config.database,
-                this.config.user,
-                this.config.password,
-                {
-                    dialect: 'mysql',
-                    host: this.config.host,
-                    logging: false
-                }
-            );
+        if (!this.sequelize) {
+            try {
+                this.sequelize = new Sequelize(
+                    this.config.database,
+                    this.config.user,
+                    this.config.password,
+                    {
+                        dialect: 'mysql',
+                        host: this.config.host,
+                        logging: false
+                    }
+                );
 
-            await this.sequelize.authenticate();
-            console.log('Conectado ao banco de dados MySQL');
-            
-            return true;
-        } catch (error) {
-            console.error('Erro ao conectar ao banco:', error);
-            throw error;
+                await this.sequelize.authenticate();
+                console.log('Conectado ao banco de dados MySQL');
+            } catch (error) {
+                console.error('Erro ao conectar ao banco:', error);
+                this.sequelize = null;
+                throw error;
+            }
         }
     }
 
@@ -43,6 +51,7 @@ class DatabaseManager {
         if (this.sequelize) {
             await this.sequelize.close();
             console.log('Desconectado do banco de dados');
+            this.sequelize = null;
         }
     }
 
@@ -52,6 +61,9 @@ class DatabaseManager {
         }
         return this.sequelize;
     }
+
+
+    
 }
 
 module.exports = DatabaseManager;
