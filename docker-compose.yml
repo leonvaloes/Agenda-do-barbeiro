@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0   # Usando a imagem oficial do MySQL
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  # Senha do root do MySQL
+      MYSQL_DATABASE: meubanco          # Nome do banco de dados a ser criado
+      MYSQL_USER: user                 # Usuário do banco
+      MYSQL_PASSWORD: userpassword     # Senha do usuário
+    ports:
+      - "3306:3306"   # Mapeia a porta 3306 do contêiner para a porta 3306 da máquina host
+    volumes:
+      - mysql_data:/var/lib/mysql   # Persiste os dados entre reinicializações do contêiner
+
+volumes:
+  mysql_data:   # Cria um volume persistente para armazenar dados do MySQL
