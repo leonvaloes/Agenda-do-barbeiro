@@ -16,7 +16,7 @@ class Routes {
         
         this.app.use('/cliente', require('../view/clienteView'));
 
-        
+        this.app.use('/atendente', require('../view/atendenteView'));
     }
 }
 

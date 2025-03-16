@@ -7,7 +7,6 @@ class ClienteController {
         this.Cliente = require('../model/cliente')(this.sequelize);
     }
 
-
     async criarCliente(dados) {
         const transaction = await this.sequelize.transaction();
         try {
@@ -29,8 +28,6 @@ class ClienteController {
         }
     }
     
-
-
     async atualizarCliente(id, dados) {
         const transaction = await this.sequelize.transaction();
         try {
@@ -47,7 +44,6 @@ class ClienteController {
             throw error;
         }
     }
-
 
     async deletarCliente(id) {
         const transaction = await this.sequelize.transaction();
@@ -66,13 +62,11 @@ class ClienteController {
         }
     }
 
-
     async listarClientes() {
         try {
             const clientes = await this.Cliente.findAll();
             let data=[];
             clientes.map((cliente)=>{data.push(cliente.dataValues)});
-            console.log(data);
             return data;
             
         } catch (error) {
