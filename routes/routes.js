@@ -13,7 +13,10 @@ class Routes {
         this.app.get('/about', (req, res) => {
             res.send('About Page');
         });
+        
         this.app.use('/cliente', require('../view/clienteView'));
+
+        
     }
 }
 

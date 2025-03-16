@@ -7,17 +7,29 @@ class ClienteController {
         this.Cliente = require('../model/cliente')(this.sequelize);
     }
 
+
     async criarCliente(dados) {
         const transaction = await this.sequelize.transaction();
         try {
+            const clienteExistente = await this.Cliente.findOne({ 
+                where: { cpf: dados.cpf }, transaction 
+            });
+    
+            if (clienteExistente) {
+                throw new Error('400');
+            }
+    
             const cliente = await this.Cliente.create(dados, { transaction });
             await transaction.commit();
-            return cliente.getDadosFormatados();
+            return cliente;
+    
         } catch (error) {
             await transaction.rollback();
-            throw error;
+            throw error; // Lançando erro, que será capturado na rota
         }
     }
+    
+
 
     async atualizarCliente(id, dados) {
         const transaction = await this.sequelize.transaction();
@@ -29,12 +41,13 @@ class ClienteController {
 
             await cliente.update(dados, { transaction });
             await transaction.commit();
-            return cliente.getDadosFormatados();
+            return cliente;
         } catch (error) {
             await transaction.rollback();
             throw error;
         }
     }
+
 
     async deletarCliente(id) {
         const transaction = await this.sequelize.transaction();
@@ -49,6 +62,20 @@ class ClienteController {
             return true;
         } catch (error) {
             await transaction.rollback();
+            throw error;
+        }
+    }
+
+
+    async listarClientes() {
+        try {
+            const clientes = await this.Cliente.findAll();
+            let data=[];
+            clientes.map((cliente)=>{data.push(cliente.dataValues)});
+            console.log(data);
+            return data;
+            
+        } catch (error) {
             throw error;
         }
     }

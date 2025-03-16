@@ -33,12 +33,15 @@ class DatabaseManager {
                     {
                         dialect: 'mysql',
                         host: this.config.host,
-                        logging: false
+                        logging: true
                     }
                 );
 
                 await this.sequelize.authenticate();
+
                 console.log('Conectado ao banco de dados MySQL');
+                await this.sequelize.sync();
+                console.log('Modelos sincronizados com o banco de dados');
             } catch (error) {
                 console.error('Erro ao conectar ao banco:', error);
                 this.sequelize = null;

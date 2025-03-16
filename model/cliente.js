@@ -1,22 +1,30 @@
 // models/Cliente.js
 const { Model, DataTypes } = require('sequelize');
 
+
 class Cliente extends Model {}
 
 module.exports = (sequelize) => {
+
     Cliente.init({
+        id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+        },
         nome: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        email: {
+        cpf: {
             type: DataTypes.STRING,
-            unique: true
+            unique:true,
         },
-        telefone: {
-            type: DataTypes.STRING
+        senha:{
+            type: DataTypes.STRING,
+            allowNull: false,
         },
-        endereco: {
+        cidade: {
             type: DataTypes.TEXT
         }
     }, {
@@ -24,17 +32,5 @@ module.exports = (sequelize) => {
         modelName: 'Cliente',
         freezeTableName: true
     });
-
-    // Método personalizado para formatar dados
-    Cliente.prototype.getDadosFormatados = function() {
-        return {
-            id: this.id,
-            nome: this.nome,
-            email: this.email,
-            telefone: this.telefone,
-            endereco: this.endereco
-        };
-    };
-
     return Cliente;
 };
