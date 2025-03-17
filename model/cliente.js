@@ -1,8 +1,27 @@
-// models/Cliente.js
 const { Model, DataTypes } = require('sequelize');
 
+class Cliente extends Model {
 
-class Cliente extends Model {}
+    async criarCliente(dados, transaction) {
+        try {
+            const clienteExistente = await this.Cliente.findOne({
+                where: { cpf: dados.cpf }, transaction
+            });
+
+            if (clienteExistente) {
+                throw new Error('400');
+            }
+
+            return await this.Cliente.create(dados, { transaction });
+
+        }catch(e){
+            throw error(e);
+        } 
+    }
+
+    
+
+}
 
 module.exports = (sequelize) => {
 
@@ -18,9 +37,10 @@ module.exports = (sequelize) => {
         },
         cpf: {
             type: DataTypes.STRING,
-            unique:true,
+            unique: true,
+
         },
-        senha:{
+        senha: {
             type: DataTypes.STRING,
             allowNull: false,
         },

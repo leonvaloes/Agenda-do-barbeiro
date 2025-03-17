@@ -1,4 +1,5 @@
 const DatabaseManager = require('../config/database');
+const cliente = require('../model/cliente');
 
 class ClienteController {
     constructor() {
@@ -10,18 +11,10 @@ class ClienteController {
     async criarCliente(dados) {
         const transaction = await this.sequelize.transaction();
         try {
-            const clienteExistente = await this.Cliente.findOne({ 
-                where: { cpf: dados.cpf }, transaction 
-            });
-    
-            if (clienteExistente) {
-                throw new Error('400');
-            }
-    
-            const cliente = await this.Cliente.create(dados, { transaction });
+            cliente.criarCliente(dados, transaction)
             await transaction.commit();
             return cliente;
-    
+
         } catch (error) {
             await transaction.rollback();
             throw error; // Lançando erro, que será capturado na rota
