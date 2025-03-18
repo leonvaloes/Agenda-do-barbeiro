@@ -1,6 +1,4 @@
-const express = require('express');
 const ClienteController = require('../controller/clienteController');
-const router = express.Router();
 const clienteController = new ClienteController();
 
 router.post('/', async (req, res) => {

@@ -22,6 +22,21 @@ class AtendenteController {
             throw error;
         }
     }
+
+    async atualizaAtendente(id, dados){
+        try{
+            const transaction= await this.sequelize.transaction();
+            const atendente= await this.atendente.findByPk(id, {transaction})
+            if(!atendente)
+                throw new Error("Cliente não encontrado");
+            
+            atendente.update(dados,{transaction})
+            transaction.commit();
+            return atendente;
+        }catch(e){
+            throw e;
+        }
+    }
 }
 
 export default AtendenteController;

@@ -3,8 +3,6 @@ const AtendenteController= require("../controller/atendenteController");
 const router=express.Router();
 const atendenteController= AtendenteController;
 
-console.log("entra view");
-
 router.post('/', async (req,res)=>{
     try{
         await atendenteController.createAtendente(req.body);
@@ -14,9 +12,25 @@ router.post('/', async (req,res)=>{
         if(e.message==='400')
             res.status(400).send("Atendente já cadastrado!");
         else 
-            res.status(500).send("Errono servidor interno");
+            res.status(500).send("Erro no servidor interno");
     }
 });
+
+router.get('/', async (req, res)=>{
+    try{
+        await atendenteController.listarAtendentes();
+        res.status(200).send("Atendente listado com sucesso!");
+    }catch(e){
+        res.status(500).send("Erro no servidor interno");
+    }
+});
+
+
+router.put('/', async (req, res)=>{
+    try{
+        await atendenteController.atua
+    }
+})
 
 module.exports = router;
 
