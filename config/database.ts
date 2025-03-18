@@ -1,5 +1,4 @@
 import { Sequelize } from 'sequelize';
-import { inicializaAtendente } from '../model/atendente';
 
 class DatabaseManager {
     private static instance: DatabaseManager;
@@ -38,8 +37,7 @@ class DatabaseManager {
             await this.sequelize.authenticate();
             console.log('✅ Conectado ao banco de dados MySQL');
 
-            inicializaAtendente(this.sequelize);
-            await this.sequelize.sync({ alter: true });
+            await this.sequelize.sync();
 
             console.log('✅ Modelos sincronizados com o banco de dados');
         } catch (error) {
