@@ -1,5 +1,6 @@
 import { Sequelize, DataTypes, Model, InferAttributes, InferCreationAttributes } from 'sequelize';
-
+import DatabaseManager from '../config/database';
+const sequelize = DatabaseManager.getInstance().getSequelize();
 class Atendente extends Model<InferAttributes<Atendente>, InferCreationAttributes<Atendente>> {
     declare id: number;
     declare nome: string;
@@ -7,7 +8,6 @@ class Atendente extends Model<InferAttributes<Atendente>, InferCreationAttribute
     declare senha: string;
 }
 
-export const inicializaAtendente= (sequelize:Sequelize)=>{
     Atendente.init(
         {
             id: {
@@ -33,7 +33,6 @@ export const inicializaAtendente= (sequelize:Sequelize)=>{
             tableName: 'atendente',
         }
     );
-}
 
 
 

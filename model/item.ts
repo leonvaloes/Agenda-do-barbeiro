@@ -1,27 +1,28 @@
-import { DataTypes, Model, Sequelize } from "sequelize";
+import { Sequelize, DataTypes, Model, InferAttributes, InferCreationAttributes } from 'sequelize';
+import DatabaseManager from '../config/database';
+const sequelize = DatabaseManager.getInstance().getSequelize();
 
-
-type ItemAttributes = {
-    id: number;
-    dataHora: Date;
+class Item extends Model<InferAttributes<Item>, InferCreationAttributes<Item>> {
+    public id: number;
+    public nome: string;
 }
 
-class Item extends Model<ItemAttributes> {
-    static initItemModel = (sequelize:Sequelize) => {
-        Item.init({
+    Item.init(
+        {
             id: {
                 type: DataTypes.INTEGER,
                 autoIncrement: true,
-                primaryKey: true
+                primaryKey: true,
             },
-            dataHora: {
-                type: DataTypes.DATE,
-                allowNull: false
-            }
-        }, {
+            nome: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+        },
+        {
             sequelize,
-            tableName: 'item'
-        });
-    }
-}
+            tableName: "item",
+        }
+    );
+    
 export default Item;

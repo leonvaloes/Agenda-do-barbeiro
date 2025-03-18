@@ -1,4 +1,6 @@
 import { Sequelize, DataTypes, Model, InferAttributes, InferCreationAttributes } from 'sequelize';
+import DatabaseManager from '../config/database';
+const sequelize = DatabaseManager.getInstance().getSequelize();
 
 class Cliente extends Model<InferAttributes<Cliente>, InferCreationAttributes<Cliente>> {
 
@@ -9,8 +11,6 @@ class Cliente extends Model<InferAttributes<Cliente>, InferCreationAttributes<Cl
     declare cidade: string;
 
 }
-
-export const inicializaCliente = (sequelize:Sequelize) => {
 
     Cliente.init({
         id: {
@@ -36,10 +36,7 @@ export const inicializaCliente = (sequelize:Sequelize) => {
         }
     }, {
         sequelize,
-        modelName: 'Cliente',
-        freezeTableName: true
+        tableName: 'cliente'
     });
-    return Cliente;
-};
 
 export default Cliente;

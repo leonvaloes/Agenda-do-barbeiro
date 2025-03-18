@@ -2,8 +2,6 @@ import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, 
 import DatabaseManager from "config/database";
 const sequelize = DatabaseManager.getInstance().getSequelize();
 
-
-
 class Empresa extends Model<InferAttributes<Empresa>, InferCreationAttributes<Empresa>> {
     declare id: CreationOptional<number>;
     declare nome: string;
