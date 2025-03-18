@@ -1,77 +1,59 @@
-// config/database.ts
-import { inicializaAtendente } from '../model/atendente';
-import Empresa from '../model/empresa';
 import { Sequelize } from 'sequelize';
-
+import { inicializaAtendente } from '../model/atendente';
 
 class DatabaseManager {
-    static instance: DatabaseManager;
-    sequelize: Sequelize | null = null;
-    config: any;
+    private static instance: DatabaseManager;
+    private sequelize: Sequelize;
 
-    static dbConfig = {
+    private static dbConfig = {
         database: 'meubanco',
-        user: 'user',
+        username: 'user',
         password: 'userpassword',
-        host: '127.0.0.1'
+        host: '127.0.0.1',
+        dialect: 'mysql' as const
     };
 
-    constructor(config = DatabaseManager.dbConfig) {
-        this.config = config;
+    private constructor() {
+        this.sequelize = new Sequelize(
+            DatabaseManager.dbConfig.database,
+            DatabaseManager.dbConfig.username,
+            DatabaseManager.dbConfig.password,
+            {
+                dialect: DatabaseManager.dbConfig.dialect,
+                host: DatabaseManager.dbConfig.host,
+                logging: false // Pode ativar se quiser logs detalhados
+            }
+        );
     }
 
-    static getInstance() {
+    public static getInstance(): DatabaseManager {
         if (!DatabaseManager.instance) {
             DatabaseManager.instance = new DatabaseManager();
         }
         return DatabaseManager.instance;
     }
 
-    async createTable(sequelize:any){
-        inicializaAtendente(sequelize);
-        
-    }
+    public async connect(): Promise<void> {
+        try {
+            await this.sequelize.authenticate();
+            console.log('✅ Conectado ao banco de dados MySQL');
 
-    async connect() {
-        if (!this.sequelize) {
-            try {
-                this.sequelize = new Sequelize(
-                    this.config.database,
-                    this.config.user,
-                    this.config.password,
-                    {
-                        dialect: 'mysql',
-                        host: this.config.host,
-                        logging: true
-                    }
-                );
+            inicializaAtendente(this.sequelize);
+            await this.sequelize.sync({ alter: true });
 
-                await this.sequelize.authenticate();
-                console.log('Conectado ao banco de dados MySQL');
-                await this.createTable(this.sequelize);
-                await this.sequelize.sync({ force: true });
-                
-                console.log('Modelos sincronizados com o banco de dados');
-            } catch (error) {
-                console.error('Erro ao conectar ao banco:', error);
-                this.sequelize = null;
-                throw error;
-            }
+            console.log('✅ Modelos sincronizados com o banco de dados');
+        } catch (error) {
+            console.error('❌ Erro ao conectar ao banco:', error);
+            throw error;
         }
     }
 
-    async disconnect() {
-        if (this.sequelize) {
-            await this.sequelize.close();
-            console.log('Desconectado do banco de dados');
-            this.sequelize = null;
-        }
+    public async disconnect(): Promise<void> {
+        await this.sequelize.close();
+        console.log('🔌 Desconectado do banco de dados');
     }
 
-    getSequelize(): Sequelize {
-        if (!this.sequelize) {
-            throw new Error('Banco de dados não conectado');
-        }
+    public getSequelize(): Sequelize {
         return this.sequelize;
     }
 }
