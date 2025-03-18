@@ -1,8 +1,14 @@
-const { Model, DataTypes } = require('sequelize');
+import { Sequelize, DataTypes, Model, InferAttributes, InferCreationAttributes } from 'sequelize';
 
-class Servicos extends Model {}
+class Servicos extends Model<InferAttributes<Servicos>, InferCreationAttributes<Servicos>> {
+    declare id: number;
+    declare nome: string;
+    declare descricao: string;
+    declare valor: number;
+    declare tempoMedio: number;
+}
 
-module.exports = (sequelize) => {
+export const inicializaServicos = (sequelize:Sequelize) => {
     Servicos.init({
         id: {
             type: DataTypes.INTEGER,

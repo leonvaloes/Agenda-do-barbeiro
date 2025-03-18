@@ -1,30 +1,36 @@
 const DatabaseManager = require('../config/database');
-const cliente = require('../model/cliente');
+import Cliente from '../model/cliente';
 
 class ClienteController {
+
+    sequelize: any;
+    cliente: typeof Cliente;
+
     constructor() {
         const databaseManager = DatabaseManager.getInstance();
         this.sequelize = databaseManager.getSequelize();
-        this.Cliente = require('../model/cliente')(this.sequelize);
+        this.cliente = require('../model/cliente')(this.sequelize);
     }
 
     async criarCliente(dados) {
         const transaction = await this.sequelize.transaction();
+
         try {
-            cliente.criarCliente(dados, transaction)
+            const newCliente= await this.cliente.create(dados, {transaction})
             await transaction.commit();
-            return cliente;
+
+            return newCliente;
 
         } catch (error) {
             await transaction.rollback();
-            throw error; // Lançando erro, que será capturado na rota
+            throw error;
         }
     }
     
     async atualizarCliente(id, dados) {
         const transaction = await this.sequelize.transaction();
         try {
-            const cliente = await this.Cliente.findByPk(id, { transaction });
+            const cliente = await this.cliente.findByPk(id, { transaction });
             if (!cliente) {
                 throw new Error('Cliente não encontrado');
             }
@@ -41,7 +47,7 @@ class ClienteController {
     async deletarCliente(id) {
         const transaction = await this.sequelize.transaction();
         try {
-            const cliente = await this.Cliente.findByPk(id, { transaction });
+            const cliente = await this.cliente.findByPk(id, { transaction });
             if (!cliente) {
                 throw new Error('Cliente não encontrado');
             }
@@ -57,7 +63,7 @@ class ClienteController {
 
     async listarClientes() {
         try {
-            const clientes = await this.Cliente.findAll();
+            const clientes = await this.cliente.findAll();
             let data=[];
             clientes.map((cliente)=>{data.push(cliente.dataValues)});
             return data;

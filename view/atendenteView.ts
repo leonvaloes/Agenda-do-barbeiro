@@ -1,11 +1,13 @@
 const express=require('express');
 const AtendenteController= require("../controller/atendenteController");
 const router=express.Router();
-const atendenteController= new AtendenteController;
+const atendenteController= AtendenteController;
+
+console.log("entra view");
 
 router.post('/', async (req,res)=>{
     try{
-        await atendenteController.criarAtendente(req.body);
+        await atendenteController.createAtendente(req.body);
         res.status(201).send("Atendente criado com sucesso!");
     }catch(e){
         
@@ -16,11 +18,5 @@ router.post('/', async (req,res)=>{
     }
 });
 
-router.get('/', async(req,res)=>{
-    try{
-        await atendenteController.listarAtendentes();
-        req.status(200).json(data).send();
-    }catch(e){
-        res.status(500).send();
-    }
-})
+module.exports = router;
+

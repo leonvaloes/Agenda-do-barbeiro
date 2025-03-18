@@ -1,29 +1,16 @@
-const { Model, DataTypes } = require('sequelize');
+import { Sequelize, DataTypes, Model, InferAttributes, InferCreationAttributes } from 'sequelize';
 
-class Cliente extends Model {
+class Cliente extends Model<InferAttributes<Cliente>, InferCreationAttributes<Cliente>> {
 
-    async criarCliente(dados, transaction) {
-        try {
-            const clienteExistente = await this.Cliente.findOne({
-                where: { cpf: dados.cpf }, transaction
-            });
-
-            if (clienteExistente) {
-                throw new Error('400');
-            }
-
-            return await this.Cliente.create(dados, { transaction });
-
-        }catch(e){
-            throw error(e);
-        } 
-    }
-
-    
+    declare id: number;
+    declare nome: string;
+    declare cpf: string;
+    declare senha: string;
+    declare cidade: string;
 
 }
 
-module.exports = (sequelize) => {
+export const inicializaCliente = (sequelize:Sequelize) => {
 
     Cliente.init({
         id: {
@@ -54,3 +41,5 @@ module.exports = (sequelize) => {
     });
     return Cliente;
 };
+
+export default Cliente;

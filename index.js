@@ -1,5 +1,5 @@
 const express = require('express');
-const DatabaseManager = require('./config/database');
+const DatabaseManager = require('./config/database').default;
 const Routes = require('./routes/routes'); // Corrigido: importando corretamente a classe Routes
 
 class Server {

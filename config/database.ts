@@ -1,7 +1,13 @@
-const { Sequelize } = require('sequelize');
+// config/database.ts
+import { inicializaAtendente } from '../model/atendente';
+import Empresa from '../model/empresa';
+import { Sequelize } from 'sequelize';
+
 
 class DatabaseManager {
-    static instance;
+    static instance: DatabaseManager;
+    sequelize: Sequelize | null = null;
+    config: any;
 
     static dbConfig = {
         database: 'meubanco',
@@ -10,17 +16,20 @@ class DatabaseManager {
         host: '127.0.0.1'
     };
 
-    constructor(config = DatabaseManager.dbConfig) { // Usa o dbConfig padrão se não for passado
+    constructor(config = DatabaseManager.dbConfig) {
         this.config = config;
-        this.sequelize = null;
     }
-
 
     static getInstance() {
         if (!DatabaseManager.instance) {
             DatabaseManager.instance = new DatabaseManager();
         }
         return DatabaseManager.instance;
+    }
+
+    async createTable(sequelize:any){
+        inicializaAtendente(sequelize);
+        
     }
 
     async connect() {
@@ -38,9 +47,10 @@ class DatabaseManager {
                 );
 
                 await this.sequelize.authenticate();
-
                 console.log('Conectado ao banco de dados MySQL');
-                await this.sequelize.sync();
+                await this.createTable(this.sequelize);
+                await this.sequelize.sync({ force: true });
+                
                 console.log('Modelos sincronizados com o banco de dados');
             } catch (error) {
                 console.error('Erro ao conectar ao banco:', error);
@@ -58,15 +68,12 @@ class DatabaseManager {
         }
     }
 
-    getSequelize() {
+    getSequelize(): Sequelize {
         if (!this.sequelize) {
             throw new Error('Banco de dados não conectado');
         }
         return this.sequelize;
     }
-
-
-    
 }
 
-module.exports = DatabaseManager;
+export default DatabaseManager;
