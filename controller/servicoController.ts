@@ -1,5 +1,5 @@
 const DatabaseManager = require('../config/database')
-import Servico from '../model/item'
+import Servico from '../models/item'
 
 class ServicoController{
     sequelize: any;

@@ -1,5 +1,5 @@
 const DatabaseManager = require('../config/database');
-import Cliente from '../model/cliente';
+import Cliente from '../models/cliente';
 
 class ClienteController {
 

@@ -40,7 +40,7 @@ router.get('/', async (req,res)=>{
 });
 
 
-router.update('/', async (req, res)=>{
+router.update('/:id', async (req, res)=>{
     try{
         const empresa= await empresaController.atualizarEmpresa(req.body);
         if(empresa)

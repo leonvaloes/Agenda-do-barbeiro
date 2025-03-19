@@ -18,17 +18,41 @@ router.post('/', async (req,res)=>{
 
 router.get('/', async (req, res)=>{
     try{
-        await atendenteController.listarAtendentes();
-        res.status(200).send("Atendente listado com sucesso!");
+      const atendentes=  await atendenteController.listarAtendentes();
+        res.status(200).send(atendentes);
     }catch(e){
         res.status(500).send("Erro no servidor interno");
     }
 });
 
 
-router.put('/', async (req, res)=>{
+router.put('/:id', async (req, res)=>{
     try{
-        await atendenteController.atua
+       const updateAtend= await atendenteController.atualizaAtendente(req.params.id,req.body);
+        if(!updateAtend)
+            return res.status(404).send('Atendente não encontrado');
+
+        res.status(201).send("Atendente Atualizado Com sucesso!")
+    }catch(e){
+        console.log(e)
+        if(e==="Atendente não encontrado")
+            return res.status(404).send(e.message);
+        res.status(500).send('Erro inteno do servidor')
+    }
+})
+
+router.delete('/:id',async(req,res)=>{
+    try{
+        const deletedAtend=await atendenteController.deletarAtendente(req.params.id)
+        if(!deletedAtend)
+            return res.status(404).send('Atendente não encontrado');
+
+        res.status(201).send("Atendente Deletado Com sucesso!")
+    }catch(e){
+        console.log(e)
+        if(e==="Atendente não encontrado")
+            return res.status(404).send(e.message);
+        res.status(500).send('Erro inteno do servidor')
     }
 })
 

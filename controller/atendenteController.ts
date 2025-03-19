@@ -1,5 +1,5 @@
 import DatabaseManager from '../config/database';
-import Atendente from '../model/atendente'; // Importando corretamente a classe Atendente
+import Atendente from '../models/atendente'; // Importando corretamente a classe Atendente
 
 class AtendenteController {
     sequelize: any;
@@ -37,6 +37,22 @@ class AtendenteController {
             throw e;
         }
     }
+
+    async deletarAtendente(id){
+        const transaction=await this.sequelize.transaction();
+        try{
+            const atendente= await this.atendente.findByPk(id,{transaction})
+            if(!atendente)
+                throw new Error("Atendente Não encontrado");
+            await atendente.destroy({transaction})
+            await transaction.commit();
+            return true;
+        }catch(error){
+            await transaction.rollback();
+            throw error;
+        }
+    }
+
 }
 
 export default AtendenteController;

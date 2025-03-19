@@ -7,6 +7,9 @@ class Routes {
     // Método para definir as rotas
     setupRoutes() {
         this.app.use('/atendente', require('../view/atendenteView'));
+        this.app.use('/cliente',require('../view/clienteView'));
+        this.app.use('/empresa',require('../view/empresaView'));
+        this.app.use('/servicos',require('../view/servicoView'))
     }
 }
 

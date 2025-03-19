@@ -1,5 +1,5 @@
 const DatabaseManager= require('../config/database');
-import Empresa from '../model/empresa';
+import Empresa from '../models/empresa';
 
 class EmpresaController {
 
