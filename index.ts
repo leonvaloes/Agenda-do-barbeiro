@@ -1,15 +1,15 @@
 const express = require('express');
-const DatabaseManager = require('./config/database').default;
-const Routes = require('./routes/routes'); // Corrigido: importando corretamente a classe Routes
+const Routes = require('./routes/routes');
+const DatabaseManager = require('./config/database');
 
 class Server {
+    app: any;
     constructor() {
         this.app = express();
         this.connectdatabase();
         this.setupMiddlewares(); // Configura os middlewares
         this.setupRoutes(); // Configura as rotas
     }
-
 
     async connectdatabase() {
         try {
@@ -36,7 +36,6 @@ class Server {
 
     // Método para configurar as rotas
     setupRoutes() {
-        // Aqui criamos a instância de Routes e passamos o app
         new Routes(this.app);
     }
 

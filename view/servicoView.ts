@@ -1,5 +1,6 @@
 const ServicoController=require("../controller/servicoController")
 const servicoController=ServicoController;
+const router = require('express').Router();
 
 router.post('/',async(req,res)=>{
     try{
@@ -51,3 +52,4 @@ router.delete('/:id',async(req,res)=>{
     }
 })
 
+export = router;

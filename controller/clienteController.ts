@@ -1,5 +1,4 @@
-const DatabaseManager = require('../config/database');
-import Cliente from '../models/cliente';
+import Cliente from "models/cliente";
 
 class ClienteController {
 
@@ -74,4 +73,4 @@ class ClienteController {
     }
 }
 
-module.exports = ClienteController;
+export = ClienteController;

@@ -1,7 +1,6 @@
-const express=require('express');
-const AtendenteController= require("../controller/atendenteController");
-const router=express.Router();
-const atendenteController= AtendenteController;
+const AtendenteController = require("../controller/atendenteController");
+const atendenteController = AtendenteController;
+const router = require('express').Router();
 
 router.post('/', async (req,res)=>{
     try{
@@ -56,5 +55,5 @@ router.delete('/:id',async(req,res)=>{
     }
 })
 
-module.exports = router;
+export = router;
 

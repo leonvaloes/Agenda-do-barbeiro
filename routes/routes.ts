@@ -1,4 +1,6 @@
+
 class Routes {
+    app: any;
     constructor(app) {
         this.app = app; // O app Express é passado para o construtor
         this.setupRoutes(); // Configura as rotas
@@ -13,4 +15,4 @@ class Routes {
     }
 }
 
-module.exports = Routes; // Exporta a classe Routes
+export = Routes;

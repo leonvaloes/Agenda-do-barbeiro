@@ -1,7 +1,5 @@
-const EmpresaController = require('../controller/empresaController')
-
-const empresaController= EmpresaController;
-
+const empresaController= require('../controller/empresaController');
+const router = require('express').Router();
 
 router.post('/', async (req,res)=>{
     try{
@@ -40,7 +38,7 @@ router.get('/', async (req,res)=>{
 });
 
 
-router.update('/:id', async (req, res)=>{
+router.put('/:id', async (req, res)=>{
     try{
         const empresa= await empresaController.atualizarEmpresa(req.body);
         if(empresa)
@@ -51,3 +49,5 @@ router.update('/:id', async (req, res)=>{
         res.status(500).send("Erro no servidor interno");
     }
 })
+
+export = router;

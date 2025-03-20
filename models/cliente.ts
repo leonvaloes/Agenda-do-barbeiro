@@ -39,4 +39,4 @@ class Cliente extends Model<InferAttributes<Cliente>, InferCreationAttributes<Cl
         tableName: 'cliente'
     });
 
-export default Cliente;
+export = Cliente;
