@@ -1,58 +1,55 @@
 import DatabaseManager from '../config/database';
-import Atendente from '../models/atendente'; // Importando corretamente a classe Atendente
+import Atendente from '../models/atendente';
 
 class AtendenteController {
-    sequelize: any;
-    atendente: typeof Atendente; // Definindo o tipo corretamente
+    atendente: typeof Atendente;
 
     constructor() {
-        const databaseManager = DatabaseManager.getInstance();
-        this.sequelize = databaseManager.getSequelize();
-        this.atendente = Atendente; // Atribuindo a classe Atendente
+        this.atendente = Atendente;
     }
 
     async createAtendente(atendenteData: any) {
+        const connection = DatabaseManager.getInstance().getConnection();
+        const query = `
+            INSERT INTO atendente (nome, cpf, senha)
+            VALUES (?, ?, ?)
+        `;
         try {
-
-            const transaction = await this.sequelize.transaction();
-            const newAtendente = await this.atendente.create(atendenteData,{transaction}); // Usando o método create corretamente
-
-            return newAtendente;
+            const [result] = await connection.execute(query, [
+                atendenteData.nome, 
+                atendenteData.cpf, 
+                atendenteData.senha
+            ]);
+            return { id: result.insertId, ...atendenteData };
         } catch (error) {
+            console.error('Erro ao criar atendente:', error);
             throw error;
+        } finally {
+            connection.end();  // Agora o método `end()` da conexão é chamado corretamente
         }
     }
 
-    async atualizaAtendente(id, dados){
-        try{
-            const transaction= await this.sequelize.transaction();
-            const atendente= await this.atendente.findByPk(id, {transaction})
-            if(!atendente)
-                throw new Error("Cliente não encontrado");
+    async atualizaAtendente(id, dados) {
+        try {
             
-            atendente.update(dados,{transaction})
-            transaction.commit();
-            return atendente;
-        }catch(e){
+        } catch (e) {
             throw e;
         }
     }
 
-    async deletarAtendente(id){
-        const transaction=await this.sequelize.transaction();
-        try{
-            const atendente= await this.atendente.findByPk(id,{transaction})
-            if(!atendente)
-                throw new Error("Atendente Não encontrado");
-            await atendente.destroy({transaction})
-            await transaction.commit();
+    async deletarAtendente(id) {
+        const connection = DatabaseManager.getInstance().getConnection();
+        try {
+            const query = `DELETE FROM atendente WHERE id = ${id}`;
+            await connection.execute(query, [id]);
             return true;
-        }catch(error){
-            await transaction.rollback();
+        } catch (error) {
+            console.error('Erro ao deletar atendente:', error);
             throw error;
+        } finally {
+            connection.end();  // Fechando a conexão
         }
     }
-
 }
 
 export default AtendenteController;

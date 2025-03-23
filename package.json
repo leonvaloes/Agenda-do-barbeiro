@@ -11,10 +11,13 @@
   "description": "",
   "dependencies": {
     "express": "^4.21.2",
-    "mysql2": "^3.13.0",
-    "sequelize": "^6.37.6"
+    "mysql2": "^3.14.0",
+    "reflect-metadata": "^0.2.2",
+    "sequelize": "^6.37.6",
+    "typeorm": "^0.3.21"
   },
   "devDependencies": {
+    "@types/node": "^22.13.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
   }

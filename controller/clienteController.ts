@@ -1,74 +1,78 @@
 import Cliente from "models/cliente";
+import DatabaseManager from "../config/database";
 
 class ClienteController {
 
-    sequelize: any;
     cliente: typeof Cliente;
 
     constructor() {
         const databaseManager = DatabaseManager.getInstance();
-        this.sequelize = databaseManager.getSequelize();
-        this.cliente = require('../model/cliente')(this.sequelize);
+        this.cliente = require('../model/cliente'); // Ajuste aqui caso precise fazer algo específico com a classe Cliente
     }
 
     async criarCliente(dados) {
-        const transaction = await this.sequelize.transaction();
+        const connection = DatabaseManager.getInstance().getConnection();
+        const query = `INSERT INTO cliente (nome, telefone, email) VALUES (?, ?, ?)`;
 
         try {
-            const newCliente= await this.cliente.create(dados, {transaction})
-            await transaction.commit();
-
-            return newCliente;
-
+            const [results] = await connection.execute(query, [dados.nome, dados.telefone, dados.email]);
+            return { id: results.insertId, ...dados }; // Retorna o ID do cliente recém-criado
         } catch (error) {
-            await transaction.rollback();
+            console.error('Erro ao criar cliente:', error);
             throw error;
+        } finally {
+            connection.end();
         }
     }
-    
+
     async atualizarCliente(id, dados) {
-        const transaction = await this.sequelize.transaction();
+        const connection = DatabaseManager.getInstance().getConnection();
+        const query = `UPDATE cliente SET nome = ?, telefone = ?, email = ? WHERE id = ?`;
+
         try {
-            const cliente = await this.cliente.findByPk(id, { transaction });
-            if (!cliente) {
+            const [result] = await connection.execute(query, [dados.nome, dados.telefone, dados.email, id]);
+            if (result.affectedRows === 0) {
                 throw new Error('Cliente não encontrado');
             }
-
-            await cliente.update(dados, { transaction });
-            await transaction.commit();
-            return cliente;
+            return { id, ...dados };
         } catch (error) {
-            await transaction.rollback();
+            console.error('Erro ao atualizar cliente:', error);
             throw error;
+        } finally {
+            connection.end();
         }
     }
 
     async deletarCliente(id) {
-        const transaction = await this.sequelize.transaction();
+        const connection = DatabaseManager.getInstance().getConnection();
+        const query = `DELETE FROM cliente WHERE id = ?`;
+
         try {
-            const cliente = await this.cliente.findByPk(id, { transaction });
-            if (!cliente) {
+            const [result] = await connection.execute(query, [id]);
+            if (result.affectedRows === 0) {
                 throw new Error('Cliente não encontrado');
             }
-
-            await cliente.destroy({ transaction });
-            await transaction.commit();
             return true;
         } catch (error) {
-            await transaction.rollback();
+            console.error('Erro ao deletar cliente:', error);
             throw error;
+        } finally {
+            connection.end();
         }
     }
 
     async listarClientes() {
+        const connection = DatabaseManager.getInstance().getConnection();
+        const query = `SELECT * FROM cliente`;
+
         try {
-            const clientes = await this.cliente.findAll();
-            let data=[];
-            clientes.map((cliente)=>{data.push(cliente.dataValues)});
-            return data;
-            
+            const [clientes] = await connection.execute(query);
+            return clientes;
         } catch (error) {
+            console.error('Erro ao listar clientes:', error);
             throw error;
+        } finally {
+            connection.end();
         }
     }
 }

@@ -1,72 +1,80 @@
-const DatabaseManager = require('../config/database')
-import Servico from '../models/item'
+import DatabaseManager from "../config/database";
+import Servico from '../models/item';
 
-class ServicoController{
-    sequelize: any;
+class ServicoController {
+
     servico: typeof Servico;
 
     constructor() {
         const databaseManager = DatabaseManager.getInstance();
-        this.sequelize = databaseManager.getSequelize();
-        this.servico = require('../model/item')(this.sequelize);
+        this.servico = require('../model/item'); // Ajuste caso precise fazer algo específico com a classe Servico
     }
 
     async criarServico(dados) {
-        const transaction = await this.sequelize.transaction();
+        const connection = DatabaseManager.getInstance().getConnection();
+        const query = `INSERT INTO servico (nome, descricao, preco) VALUES (?, ?, ?)`;
 
         try {
-            const newServico= await this.servico.create(dados, {transaction})
-            await transaction.commit();
-
-            return newServico;
-
+            const [result] = await connection.execute(query, [dados.nome, dados.descricao, dados.preco]);
+            return { id: result.insertId, ...dados }; // Retorna o ID do serviço recém-criado
         } catch (error) {
-            await transaction.rollback();
+            console.error('Erro ao criar serviço:', error);
             throw error;
+        } finally {
+            connection.end();
         }
     }
-    
+
     async atualizarServico(id, dados) {
-        const transaction = await this.sequelize.transaction();
+        const connection = DatabaseManager.getInstance().getConnection();
+        const query = `UPDATE servico SET nome = ?, descricao = ?, preco = ? WHERE id = ?`;
+
         try {
-            const servico = await this.servico.findByPk(id, { transaction });
-            if (!servico) {
+            const [result] = await connection.execute(query, [dados.nome, dados.descricao, dados.preco, id]);
+            if (result.affectedRows === 0) {
                 throw new Error('Serviço não encontrado');
             }
-
-            await servico.update(dados, { transaction });
-            await transaction.commit();
-            return servico;
+            return { id, ...dados };
         } catch (error) {
-            await transaction.rollback();
+            console.error('Erro ao atualizar serviço:', error);
             throw error;
+        } finally {
+            connection.end();
         }
     }
 
     async deletarServico(id) {
-        const transaction = await this.sequelize.transaction();
+        const connection = DatabaseManager.getInstance().getConnection();
+        const query = `DELETE FROM servico WHERE id = ?`;
+
         try {
-            const servico = await this.servico.findByPk(id, { transaction });
-            await servico.destroy({ transaction });
-            await transaction.commit();
-            return servico;
+            const [result] = await connection.execute(query, [id]);
+            if (result.affectedRows === 0) {
+                throw new Error('Serviço não encontrado');
+            }
+            return true;
         } catch (error) {
-            await transaction.rollback();
+            console.error('Erro ao deletar serviço:', error);
             throw error;
+        } finally {
+            connection.end();
         }
     }
 
-    async listarServicos(){
-        try{
-            const servicos= await this.servico.findAll();
-            let data=[];
-            servicos.map((servico)=>{data.push(servico.dataValues)});
-            return data;
-            
-        }catch(e){
-            throw e;
+    async listarServicos() {
+        const connection = DatabaseManager.getInstance().getConnection();
+        const query = `SELECT * FROM servico`;
+
+        try {
+            const [servicos] = await connection.execute(query);
+            return servicos;
+        } catch (error) {
+            console.error('Erro ao listar serviços:', error);
+            throw error;
+        } finally {
+            connection.end();
         }
     }
 }
 
-module.exports= ServicoController;
+module.exports = ServicoController;

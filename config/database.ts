@@ -1,59 +1,57 @@
-import { Sequelize } from 'sequelize';
+// src/config/database.ts
+
+import mysql from 'mysql2';
 
 class DatabaseManager {
-    private static instance: DatabaseManager;
-    private sequelize: Sequelize;
+  private static instance: DatabaseManager;
+  private connection;
 
-    private static dbConfig = {
-        database: 'meubanco',
-        username: 'user',
-        password: 'userpassword',
-        host: '127.0.0.1',
-        dialect: 'mysql' as const
-    };
+  private constructor() {
+    // Cria a conexão com o banco de dados
+    this.connection = mysql.createConnection({
+      host: 'localhost',
+      user: 'root',
+      database: 'meubanco',
+      password:'rootpassword'
+    });
+  }
 
-    private constructor() {
-        this.sequelize = new Sequelize(
-            DatabaseManager.dbConfig.database,
-            DatabaseManager.dbConfig.username,
-            DatabaseManager.dbConfig.password,
-            {
-                dialect: DatabaseManager.dbConfig.dialect,
-                host: DatabaseManager.dbConfig.host,
-                logging: false // Pode ativar se quiser logs detalhados
-            }
-        );
+  // Método para pegar a instância do DatabaseManager
+  public static getInstance(): DatabaseManager {
+    if (!DatabaseManager.instance) {
+      DatabaseManager.instance = new DatabaseManager();
     }
+    return DatabaseManager.instance;
+  }
 
-    public static getInstance(): DatabaseManager {
-        if (!DatabaseManager.instance) {
-            DatabaseManager.instance = new DatabaseManager();
+  // Método para pegar a conexão
+  public getConnection() {
+    return this.connection;
+  }
+
+  // Método para executar uma consulta SQL
+  public execute(query: string, params: any[] = []) {
+    return new Promise<any[]>((resolve, reject) => {
+      this.connection.execute(query, params, (err, rows) => {
+        if (err) {
+          reject(err); // Se houver erro, rejeita a promise
+        } else {
+          resolve(rows); // Se sucesso, resolve com os dados
         }
-        return DatabaseManager.instance;
-    }
+      });
+    });
+  }
 
-    public async connect(): Promise<void> {
-        try {
-            await this.sequelize.authenticate();
-            console.log('✅ Conectado ao banco de dados MySQL');
-
-            await this.sequelize.sync();
-
-            console.log('✅ Modelos sincronizados com o banco de dados');
-        } catch (error) {
-            console.error('❌ Erro ao conectar ao banco:', error);
-            throw error;
-        }
-    }
-
-    public async disconnect(): Promise<void> {
-        await this.sequelize.close();
-        console.log('🔌 Desconectado do banco de dados');
-    }
-
-    public getSequelize(): Sequelize {
-        return this.sequelize;
-    }
+  // Método para fechar a conexão
+  public closeConnection() {
+    this.connection.end((err) => {
+      if (err) {
+        console.error('Erro ao fechar a conexão:', err);
+      } else {
+        console.log('Conexão fechada com sucesso');
+      }
+    });
+  }
 }
 
-export = DatabaseManager;
+export default DatabaseManager;
