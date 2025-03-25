@@ -3,6 +3,9 @@
 import mysql from 'mysql2';
 
 class DatabaseManager {
+  static getConnection() {
+      throw new Error('Method not implemented.');
+  }
   private static instance: DatabaseManager;
   private connection;
 
@@ -49,7 +52,6 @@ class DatabaseManager {
     });
   }
 
-
   public commitTransaction() {
     return new Promise<void>((resolve, reject) => {
       this.connection.commit((err) => {
@@ -71,7 +73,6 @@ class DatabaseManager {
     });
   }
 
-
   public beginTransaction() {
     return new Promise<void>((resolve, reject) => {
       this.connection.beginTransaction((err) => {
@@ -83,8 +84,5 @@ class DatabaseManager {
       });
     });
   }
-
-
 }
-
 export default DatabaseManager;
