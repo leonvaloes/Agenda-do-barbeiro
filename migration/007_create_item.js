@@ -7,9 +7,6 @@ class create_item {
                 atendente_id INT NOT NULL,
                 data_hora DATETIME NOT NULL,
                 agendamento_id INT NOT NULL,
-                FOREIGN KEY (serv_id) REFERENCES servicos(id) ON DELETE CASCADE,
-                FOREIGN KEY (atendente_id) REFERENCES atendente(id) ON DELETE CASCADE,
-                FOREIGN KEY (agendamento_id) REFERENCES agendamento(id) ON DELETE CASCADE
             )
         `);
         console.log('Tabela item criada!');

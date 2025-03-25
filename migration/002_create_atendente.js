@@ -29,18 +29,6 @@ class create_atendente {
             console.error('Erro ao excluir tabela empresa:', error);
         }
     }
-
-    async relaction(connection) {
-        try {
-            await connection.execute(`
-            ALTER TABLE atendente ADD COLUMN empresa_id INT;
-            ALTER TABLE atendente ADD FOREIGN KEY (empresa_id) REFERENCES empresa(id);
-        `);
-            console.log('Relação adicionada com sucesso!');
-        } catch (error) {
-            console.error('Erro ao adicionar relação:', error);
-        }
-    }
 }
 
 export default create_atendente;

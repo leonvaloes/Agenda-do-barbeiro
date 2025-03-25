@@ -18,8 +18,10 @@ class Migrations {
             await new createCliente().up(connection);
             await new createServicos().up(connection);
             await new createAtendenteServ().up(connection);
-            await new createAgendamento().up(connection);
             await new createItem().up(connection);
+
+            //await new createAgendamento().up(connection);
++        
 
             console.log('Migrations finished!');
         } catch (error) {
