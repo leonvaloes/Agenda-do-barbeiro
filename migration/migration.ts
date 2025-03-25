@@ -3,7 +3,9 @@ import createEmpresa from './001_create_empresa.js';
 import createAtendente from './002_create_atendente.js';
 import createServicos from './004_create_servico.js';
 import createAtendenteServ from './005_create_atendente_serv.js';
-
+import createCliente from './003_create_cliente.js';
+import createItem from './007_create_item.js';
+import createAgendamento from './006_create_agendamento.js';
 class Migrations {
     async up() {
         console.log('Migrations running...');
@@ -13,8 +15,11 @@ class Migrations {
             connection = Database.getInstance().getConnection(); 
             await new createEmpresa().up(connection);
             await new createAtendente().up(connection);
+            await new createCliente().up(connection);
             await new createServicos().up(connection);
             await new createAtendenteServ().up(connection);
+            await new createAgendamento().up(connection);
+            await new createItem().up(connection);
 
             console.log('Migrations finished!');
         } catch (error) {
