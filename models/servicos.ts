@@ -12,6 +12,9 @@ class Servicos{
         this.valor = valor;
         this.tempoMedio = tempoMedio;
     }
+
+    
+
 }
 
 export default Servicos;

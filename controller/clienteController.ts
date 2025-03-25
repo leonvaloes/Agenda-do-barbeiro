@@ -1,4 +1,4 @@
-import Cliente from "models/cliente";
+import Cliente from "../models/cliente";
 import DatabaseManager from "../config/database";
 
 class ClienteController {
@@ -6,35 +6,39 @@ class ClienteController {
     cliente: typeof Cliente;
 
     constructor() {
-        const databaseManager = DatabaseManager.getInstance();
-        this.cliente = require('../model/cliente'); // Ajuste aqui caso precise fazer algo específico com a classe Cliente
+        this.cliente = Cliente; 
     }
 
-    async criarCliente(dados) {
+    async createCliente(clienteData: any) {
         const connection = DatabaseManager.getInstance().getConnection();
-        const query = `INSERT INTO cliente (nome, telefone, email) VALUES (?, ?, ?)`;
-
         try {
-            const [results] = await connection.execute(query, [dados.nome, dados.telefone, dados.email]);
-            return { id: results.insertId, ...dados }; // Retorna o ID do cliente recém-criado
+            connection.beginTransaction();
+            const cliente= new Cliente( clienteData.nome, clienteData.cpf, clienteData.senha, clienteData.cidade);
+            await cliente.create(cliente, clienteData);
+            connection.commitTransaction();
         } catch (error) {
-            console.error('Erro ao criar cliente:', error);
+
+            connection.rollbackTransaction();
+            console.error('Erro ao criar atendente:', error);
             throw error;
-        } finally {
+        }finally{
             connection.end();
         }
     }
 
-    async atualizarCliente(id, dados) {
+
+    async atualizarCliente(id, data) {
         const connection = DatabaseManager.getInstance().getConnection();
         const query = `UPDATE cliente SET nome = ?, telefone = ?, email = ? WHERE id = ?`;
-
+        const values= [data.nome, data.cpf, data.senha, data.cidade];
         try {
-            const [result] = await connection.execute(query, [dados.nome, dados.telefone, dados.email, id]);
-            if (result.affectedRows === 0) {
-                throw new Error('Cliente não encontrado');
-            }
-            return { id, ...dados };
+            connection.beginTransaction(); 
+            const clienteModel = new Cliente("", "", "", "");
+            const clienteExistente = await clienteModel.buscaCliente(id, connection);
+
+            const result = await connection.execute(query,values);
+            return result;
+
         } catch (error) {
             console.error('Erro ao atualizar cliente:', error);
             throw error;
@@ -42,6 +46,7 @@ class ClienteController {
             connection.end();
         }
     }
+
 
     async deletarCliente(id) {
         const connection = DatabaseManager.getInstance().getConnection();
@@ -61,12 +66,13 @@ class ClienteController {
         }
     }
 
+
     async listarClientes() {
         const connection = DatabaseManager.getInstance().getConnection();
         const query = `SELECT * FROM cliente`;
 
         try {
-            const [clientes] = await connection.execute(query);
+            const clientes = await connection.execute(query);
             return clientes;
         } catch (error) {
             console.error('Erro ao listar clientes:', error);
@@ -75,6 +81,9 @@ class ClienteController {
             connection.end();
         }
     }
+
+
+
 }
 
 export = ClienteController;

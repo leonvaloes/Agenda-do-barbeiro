@@ -16,7 +16,6 @@ class DatabaseManager {
     });
   }
 
-  // Método para pegar a instância do DatabaseManager
   public static getInstance(): DatabaseManager {
     if (!DatabaseManager.instance) {
       DatabaseManager.instance = new DatabaseManager();
@@ -24,25 +23,22 @@ class DatabaseManager {
     return DatabaseManager.instance;
   }
 
-  // Método para pegar a conexão
   public getConnection() {
     return this.connection;
   }
 
-  // Método para executar uma consulta SQL
   public execute(query: string, params: any[] = []) {
     return new Promise<any[]>((resolve, reject) => {
       this.connection.execute(query, params, (err, rows) => {
         if (err) {
-          reject(err); // Se houver erro, rejeita a promise
+          reject(err);
         } else {
-          resolve(rows); // Se sucesso, resolve com os dados
+          resolve(rows); 
         }
       });
     });
   }
 
-  // Método para fechar a conexão
   public closeConnection() {
     this.connection.end((err) => {
       if (err) {
@@ -52,6 +48,43 @@ class DatabaseManager {
       }
     });
   }
+
+
+  public commitTransaction() {
+    return new Promise<void>((resolve, reject) => {
+      this.connection.commit((err) => {
+        if (err) {
+          reject(err); // Se houver erro no commit
+        } else {
+          resolve(); // Sucesso no commit
+        }
+      });
+    });
+  }
+
+  // Método para desfazer a transação (rollback)
+  public rollbackTransaction() {
+    return new Promise<void>((resolve, reject) => {
+      this.connection.rollback(() => {
+        resolve();
+      });
+    });
+  }
+
+
+  public beginTransaction() {
+    return new Promise<void>((resolve, reject) => {
+      this.connection.beginTransaction((err) => {
+        if (err) {
+          reject(err); // Se houver erro ao iniciar a transação
+        } else {
+          resolve(); // Sucesso ao iniciar a transação
+        }
+      });
+    });
+  }
+
+
 }
 
 export default DatabaseManager;
