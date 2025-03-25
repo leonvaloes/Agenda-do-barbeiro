@@ -1,11 +1,6 @@
-// src/config/database.ts
-
 import mysql from 'mysql2';
 
 class DatabaseManager {
-  static getConnection() {
-      throw new Error('Method not implemented.');
-  }
   private static instance: DatabaseManager;
   private connection;
 
@@ -15,10 +10,11 @@ class DatabaseManager {
       host: 'localhost',
       user: 'root',
       database: 'meubanco',
-      password:'rootpassword'
+      password: 'rootpassword'
     });
   }
 
+  // Método para obter a instância única de DatabaseManager
   public static getInstance(): DatabaseManager {
     if (!DatabaseManager.instance) {
       DatabaseManager.instance = new DatabaseManager();
@@ -26,6 +22,7 @@ class DatabaseManager {
     return DatabaseManager.instance;
   }
 
+  // Método para obter a conexão ativa
   public getConnection() {
     return this.connection;
   }
@@ -64,7 +61,6 @@ class DatabaseManager {
     });
   }
 
-  // Método para desfazer a transação (rollback)
   public rollbackTransaction() {
     return new Promise<void>((resolve, reject) => {
       this.connection.rollback(() => {
@@ -85,4 +81,5 @@ class DatabaseManager {
     });
   }
 }
+
 export default DatabaseManager;
