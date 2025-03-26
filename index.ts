@@ -31,7 +31,6 @@ class Server {
             next();
         });
     }
-
     // Método para configurar as rotas
     setupRoutes() {
         new Routes(this.app); // Chamando as rotas

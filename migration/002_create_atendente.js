@@ -11,9 +11,9 @@ class create_atendente {
                 senha VARCHAR(255) NOT NULL
             )
             `);
-            console.log('Tabela empresa criada!');
+            console.log('Tabela atendente criada!');
         } catch (error) {
-            console.error('Erro ao criar tabela empresa:', error);
+            console.error('Erro ao criar tabela atendente:', error);
         }
 
         console.log('Tabela atendente criada!');
@@ -22,11 +22,11 @@ class create_atendente {
     async down(connection) {
         try {
             await connection.execute(`
-            DROP TABLE IF EXISTS empresa;
+            DROP TABLE IF EXISTS atendente;
         `);
-            console.log("Tabela empresa excluida");
+            console.log("Tabela atendente excluida");
         } catch (error) {
-            console.error('Erro ao excluir tabela empresa:', error);
+            console.error('Erro ao excluir tabela atendente:', error);
         }
     }
 }

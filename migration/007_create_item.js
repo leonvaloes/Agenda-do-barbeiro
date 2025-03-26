@@ -6,8 +6,9 @@ class create_item {
                 serv_id INT NOT NULL,
                 atendente_id INT NOT NULL,
                 data_hora DATETIME NOT NULL,
-                agendamento_id INT NOT NULL,
+                agendamento_id INT NOT NULL
             )
+
         `);
         console.log('Tabela item criada!');
     }

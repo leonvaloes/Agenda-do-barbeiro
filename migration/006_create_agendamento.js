@@ -2,7 +2,7 @@ class create_agendamento {
     async up(connection) {
         await connection.execute(`
             CREATE TABLE IF NOT EXISTS agendamento (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id INT AUTO_INCREMENT PRIMARY KEY
             )
         `);
         console.log('Tabela agendamento criada!');

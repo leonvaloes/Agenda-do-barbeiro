@@ -12,14 +12,14 @@ class create_servico {
             )
         `);
         
-        console.log('Tabela atendente criada!');
+        console.log('Tabela servicos criada!');
     }
 
     async down(connection) {
         await connection.execute(`
-            DROP TABLE IF EXISTS atendente;
+            DROP TABLE IF EXISTS servicos;
         `);
-        console.log("Tabela atendente excluida");
+        console.log("Tabela servicos excluida");
     }
 }
 
