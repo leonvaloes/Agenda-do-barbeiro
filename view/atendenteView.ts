@@ -1,5 +1,5 @@
-const AtendenteController = require("../controller/atendenteController");
-const atendenteController = AtendenteController;
+import AtendenteController from '../controller/atendenteController'
+const atendenteController = new AtendenteController();
 const router = require('express').Router();
 
 router.post('/', async (req,res)=>{
@@ -40,11 +40,13 @@ router.put('/:id', async (req, res)=>{
     }
 })
 
-router.delete('/:id',async(req,res)=>{
+router.delete('/:id', async(req,res)=>{
     try{
-        const deletedAtend=await atendenteController.deletarAtendente(req.params.id)
-        if(!deletedAtend)
+        const deletedAtend=await atendenteController.deletarAtendente(req.params.id);
+
+        if(!deletedAtend){
             return res.status(404).send('Atendente não encontrado');
+        }
 
         res.status(201).send("Atendente Deletado Com sucesso!")
     }catch(e){

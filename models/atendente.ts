@@ -10,17 +10,17 @@ class Atendente{
         this.senha = senha;
     }
     
-    async create(data:Atendente , connection: any) {
+    static async create(connection: any, data: Atendente) {
         const query = `INSERT INTO atendente (nome, cpf, senha) VALUES (?, ?, ?)`;
         try {
             const result = await connection.execute(query, [data.nome, data.cpf, data.senha]);
             return result;
-
         } catch (error) {
             console.error('Erro ao inserir atendente:', error);
             throw error;
         }
     }
+    
 
     async delete(id: number, connection: any) {
         const query = `DELETE FROM atendente WHERE id = ?`;
@@ -53,9 +53,20 @@ class Atendente{
         const query = `SELECT * FROM atendente WHERE id = ?`;
         try {
             const result: any = await connection.execute(query, [id]);
-            return result;
+            return result[0];
         } catch (error) {
             console.error('Erro ao buscar atendente:', error);
+            throw error;
+        }
+    }
+
+    static async listarAtendentes(connection: any){
+        const query = `SELECT * FROM atendente`;
+        try {
+            const result: any = await connection.execute(query);
+            return result[0];
+        } catch (error) {
+            console.error('Erro ao listar atendentes:', error);
             throw error;
         }
     }

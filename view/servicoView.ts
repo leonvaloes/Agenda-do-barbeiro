@@ -1,11 +1,11 @@
-const ServicoController=require("../controller/servicoController")
-const servicoController=ServicoController;
+import ServicoController from "../controller/servicoController";
+const servicoController=new ServicoController();
 const router = require('express').Router();
 
 router.post('/',async(req,res)=>{
     try{
-        await servicoController.criarServico(req.body)
-        res.status(201).send("Serviço criado com sucesso")
+        await servicoController.criarServico(req.body);
+        res.status(201).send("Serviço criado com sucesso");
     }catch(e){
         if(e.message==='400')
             res.status(400).send("Serviço já cadastrado!");
@@ -29,7 +29,7 @@ router.put('/:id',async(req,res)=>{
     }
 })
 
-router.get('/',async(res)=>{
+router.get('/',async(req,res)=>{
     try{
         const servicos=await servicoController.listarServicos()
         res.status(200).send(servicos);

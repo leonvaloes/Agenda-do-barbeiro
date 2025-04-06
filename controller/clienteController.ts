@@ -10,75 +10,76 @@ class ClienteController {
     }
 
     async createCliente(clienteData: any) {
-        const connection = DatabaseManager.getInstance().getConnection();
+        const connection =await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-            const cliente= new Cliente( clienteData.nome, clienteData.cpf, clienteData.senha, clienteData.cidade);
-            await cliente.create(cliente, clienteData);
-            connection.commitTransaction();
+            await Cliente.createCliente(clienteData, connection);
+            connection.commit();
         } catch (error) {
 
-            connection.rollbackTransaction();
+            connection.rollback();
             console.error('Erro ao criar atendente:', error);
             throw error;
         }finally{
-            connection.end();
+            connection.release();
         }
     }
 
 
     async atualizarCliente(id, data) {
-        const connection = DatabaseManager.getInstance().getConnection();
-        const query = `UPDATE cliente SET nome = ?, telefone = ?, email = ? WHERE id = ?`;
-        const values= [data.nome, data.cpf, data.senha, data.cidade];
+        const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction(); 
             const clienteModel = new Cliente("", "", "", "");
             const clienteExistente = await clienteModel.buscaCliente(id, connection);
-
-            const result = await connection.execute(query,values);
-            return result;
-
+            if(!clienteExistente.length)
+                throw new Error("Cliente não encontrado.");
+            const clienteAtualizado= await clienteModel.update(id, data, connection);
+            return clienteAtualizado;
         } catch (error) {
             console.error('Erro ao atualizar cliente:', error);
             throw error;
         } finally {
-            connection.end();
+            connection.release();
         }
     }
 
 
-    async deletarCliente(id) {
-        const connection = DatabaseManager.getInstance().getConnection();
-        const query = `DELETE FROM cliente WHERE id = ?`;
-
+    async deletarCliente(id:number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const [result] = await connection.execute(query, [id]);
-            if (result.affectedRows === 0) {
-                throw new Error('Cliente não encontrado');
+            connection.beginTransaction();
+            const clienteModel = new Cliente("", "", "", "");
+            const clienteExistente = await clienteModel.buscaCliente(id, connection);
+            if (!clienteExistente.length) {
+                throw new Error("Cliente não encontrado.");
             }
-            return true;
+            const clienteExcluido= await clienteModel.delete(id, connection);
+            connection.commit();
+            return clienteExcluido;
         } catch (error) {
+            connection.rollback();
             console.error('Erro ao deletar cliente:', error);
             throw error;
         } finally {
-            connection.end();
+            connection.release();
         }
     }
 
 
     async listarClientes() {
-        const connection = DatabaseManager.getInstance().getConnection();
-        const query = `SELECT * FROM cliente`;
-
+        const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const clientes = await connection.execute(query);
+            const clientes= await Cliente.listarClientes(connection);
+            if (!clientes.length) {
+                throw new Error("Nenhum cliente encontrado.");
+            }            
             return clientes;
         } catch (error) {
             console.error('Erro ao listar clientes:', error);
             throw error;
         } finally {
-            connection.end();
+            connection.release();
         }
     }
 

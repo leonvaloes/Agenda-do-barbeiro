@@ -1,20 +1,18 @@
-import mysql from 'mysql2';
+import mysql, { Pool, PoolConnection } from 'mysql2/promise';
 
 class DatabaseManager {
   private static instance: DatabaseManager;
-  private connection;
+  private pool: Pool;
 
   private constructor() {
-    // Cria a conexão com o banco de dados
-    this.connection = mysql.createConnection({
+    this.pool = mysql.createPool({
       host: 'localhost',
       user: 'root',
       database: 'meubanco',
-      password: 'rootpassword'
+      password: 'rootpassword',
     });
   }
 
-  // Método para obter a instância única de DatabaseManager
   public static getInstance(): DatabaseManager {
     if (!DatabaseManager.instance) {
       DatabaseManager.instance = new DatabaseManager();
@@ -22,63 +20,23 @@ class DatabaseManager {
     return DatabaseManager.instance;
   }
 
-  // Método para obter a conexão ativa
-  public getConnection() {
-    return this.connection;
+  public async getConnection(): Promise<PoolConnection> {
+    return await this.pool.getConnection();
   }
 
-  public execute(query: string, params: any[] = []) {
-    return new Promise<any[]>((resolve, reject) => {
-      this.connection.execute(query, params, (err, rows) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(rows); 
-        }
-      });
-    });
+  public async execute(query: string, params: any[] = []): Promise<any> {
+    const connection = await this.getConnection();
+    try {
+      const [rows] = await connection.execute(query, params);
+      return rows;
+    } finally {
+      connection.release();
+    }
   }
 
-  public closeConnection() {
-    this.connection.end((err) => {
-      if (err) {
-        console.error('Erro ao fechar a conexão:', err);
-      } else {
-        console.log('Conexão fechada com sucesso');
-      }
-    });
-  }
-
-  public commitTransaction() {
-    return new Promise<void>((resolve, reject) => {
-      this.connection.commit((err) => {
-        if (err) {
-          reject(err); // Se houver erro no commit
-        } else {
-          resolve(); // Sucesso no commit
-        }
-      });
-    });
-  }
-
-  public rollbackTransaction() {
-    return new Promise<void>((resolve, reject) => {
-      this.connection.rollback(() => {
-        resolve();
-      });
-    });
-  }
-
-  public beginTransaction() {
-    return new Promise<void>((resolve, reject) => {
-      this.connection.beginTransaction((err) => {
-        if (err) {
-          reject(err); // Se houver erro ao iniciar a transação
-        } else {
-          resolve(); // Sucesso ao iniciar a transação
-        }
-      });
-    });
+  public async closePool(): Promise<void> {
+    await this.pool.end();
+    console.log('Conexões do pool fechadas');
   }
 }
 

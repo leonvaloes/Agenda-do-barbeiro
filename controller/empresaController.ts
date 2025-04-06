@@ -6,63 +6,71 @@ class EmpresaController {
     empresa: typeof Empresa;
 
     constructor() {
-        const databaseManager = DatabaseManager.getInstance();
-        this.empresa = require('../model/empresa'); // Ajuste caso precise fazer algo específico com a classe Empresa
+        this.empresa = Empresa;
     }
 
     async criarEmpresa(dados) {
-        const connection = DatabaseManager.getInstance().getConnection();
-        const query = `INSERT INTO empresa (nome, cnpj, endereco) VALUES (?, ?, ?)`;
-
+        const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const [result] = await connection.execute(query, [dados.nome, dados.cnpj, dados.endereco]);
-            return { id: result.insertId, ...dados }; // Retorna o ID da empresa recém-criada
+            await connection.beginTransaction();
+            await Empresa.create(dados, connection);
+            connection.commit();
         } catch (error) {
             console.error('Erro ao criar empresa:', error);
+            connection.rollback();
             throw error;
         } finally {
-            connection.end();
+            connection.release();
         }
     }
 
-    async atualizarEmpresa(id, dados) {
-        const connection = DatabaseManager.getInstance().getConnection();
-        const query = `UPDATE empresa SET nome = ?, cnpj = ?, endereco = ? WHERE id = ?`;
-
+    async atualizarEmpresa(id:number, dados:any) {
+        const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const [result] = await connection.execute(query, [dados.nome, dados.cnpj, dados.endereco, id]);
-            if (result.affectedRows === 0) {
-                throw new Error('Empresa não encontrada');
+            connection.beginTransaction();
+
+            const empresaModel = new Empresa("", "", "", "", "", "", "", "");
+            const empresaExistente = await empresaModel.buscaEmpresa(id, connection);
+
+            if (!empresaExistente.length) {
+                throw new Error("Empresa não encontrada.");
             }
-            return { id, ...dados };
+
+            const empresaAtualizada = await Empresa.update(id, dados, connection);
+
+            connection.commit();
+            return empresaAtualizada;
         } catch (error) {
             console.error('Erro ao atualizar empresa:', error);
+            connection.rollback();
             throw error;
         } finally {
-            connection.end();
+            connection.release();
         }
     }
 
-    async deletarEmpresa(id) {
-        const connection = DatabaseManager.getInstance().getConnection();
-        const query = `DELETE FROM empresa WHERE id = ?`;
-
+    async deletarEmpresa(id: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const [result] = await connection.execute(query, [id]);
-            if (result.affectedRows === 0) {
-                throw new Error('Empresa não encontrada');
+            const empresaModel= new Empresa("", "", "", "", "", "", "", "");
+            const empresaExistente = await empresaModel.buscaEmpresa(id, connection);
+            if (!empresaExistente.length) {
+                throw new Error("Empresa não encontrada.");
             }
-            return true;
+            const empresaExcluida = await Empresa.delete(id, connection);
+            connection.commit();
+            return empresaExcluida;
         } catch (error) {
             console.error('Erro ao deletar empresa:', error);
+            connection.rollback();
             throw error;
         } finally {
-            connection.end();
+            connection.release();
         }
     }
 
     async listarEmpresas() {
-        const connection = DatabaseManager.getInstance().getConnection();
+        const connection = await DatabaseManager.getInstance().getConnection();
         const query = `SELECT * FROM empresa`;
 
         try {
@@ -72,9 +80,9 @@ class EmpresaController {
             console.error('Erro ao listar empresas:', error);
             throw error;
         } finally {
-            connection.end();
+            connection.release();
         }
     }
 }
 
-module.exports = EmpresaController;
+export default EmpresaController;

@@ -9,75 +9,83 @@ class AtendenteController {
     }
 
     async createAtendente(atendenteData: any) {
-        const connection = DatabaseManager.getInstance().getConnection();
+        const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            connection.beginTransaction();
-            const atendenteModel= new Atendente( atendenteData.nome, atendenteData.cpf, atendenteData.senha);
-            await atendenteModel.create( atendenteModel , atendenteData);
-            connection.commitTransaction();
-        } catch (error) {
+            await connection.beginTransaction();
+            const retorno = await Atendente.create(connection, atendenteData);
+            if (retorno)
+                await connection.commit();
 
-            connection.rollbackTransaction();
-            console.error('Erro ao criar atendente:', error);
+        } catch (error) {
+            console.error("Erro ao criar atendente:", error);
+            await connection.rollback();
             throw error;
-        }finally{
-            connection.end();
+        } finally {
+            connection.release;
         }
     }
 
+    async listarAtendentes() {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            const atendentes = await Atendente.listarAtendentes(connection);
+            return atendentes;
+        } catch (error) {
+            console.error('Erro ao listar atendentes:', error);
+            throw error;
+        } finally {
+            connection.release();
+        }
+    }
+
+
     async atualizaAtendente(id: number, dados: any) {
-        const connection = DatabaseManager.getInstance().getConnection();
-    
+        const connection = await DatabaseManager.getInstance().getConnection();
+
         try {
             connection.beginTransaction();
-            
+
             const atendenteModel = new Atendente("", "", "");
             const atendenteExistente = await atendenteModel.buscaAtendente(id, connection);
-    
+
             if (!atendenteExistente.length) {
                 throw new Error("Atendente não encontrado.");
             }
             // Atualiza os dados do atendente
             const atendenteAtualizado = await atendenteModel.update(id, connection, dados);
-            
-            connection.commitTransaction();
+
+            connection.commit();
             return atendenteAtualizado;
         } catch (error) {
-            connection.rollbackTransaction();
+            connection.rollback();
             console.error('Erro ao atualizar atendente:', error);
             throw error;
         } finally {
-            connection.end();
+            connection.release();
         }
     }
-    
 
-    async deletarAtendente(id:number) {
-        const connection = DatabaseManager.getInstance().getConnection();
+
+    async deletarAtendente(id: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
             const atendenteModel = new Atendente("", "", "");
             const atendenteExistente = await atendenteModel.buscaAtendente(id, connection);
-
-            if(!atendenteExistente.length){
+            if (!atendenteExistente.length) {
                 throw new Error("Atendente não encontrado.");
             }
-
-            const atendenteExcluido=await atendenteModel.delete(id, connection);
-            connection.commitTransaction();
+            const atendenteExcluido = await atendenteModel.delete(id, connection);
+            connection.commit();
             return atendenteExcluido;
-
         } catch (error) {
-            connection.rollbackTransaction();
+            connection.rollback();
             console.error('Erro ao deletar atendente:', error);
             throw error;
-
         } finally {
-            connection.end(); 
+            connection.release();
         }
     }
-
-
 }
 
 export default AtendenteController;

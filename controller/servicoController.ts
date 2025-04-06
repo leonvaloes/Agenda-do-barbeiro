@@ -1,80 +1,87 @@
 import DatabaseManager from "../config/database";
-import Servico from '../models/item';
+import Servico from '../models/servicos';
 
 class ServicoController {
 
     servico: typeof Servico;
 
     constructor() {
-        const databaseManager = DatabaseManager.getInstance();
-        this.servico = require('../model/item'); // Ajuste caso precise fazer algo específico com a classe Servico
+        this.servico = Servico;
     }
 
-    async criarServico(dados) {
-        const connection = DatabaseManager.getInstance().getConnection();
-        const query = `INSERT INTO servico (nome, descricao, preco) VALUES (?, ?, ?)`;
-
+    async criarServico(dados:any) {
+        const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const [result] = await connection.execute(query, [dados.nome, dados.descricao, dados.preco]);
-            return { id: result.insertId, ...dados }; // Retorna o ID do serviço recém-criado
+            await connection.beginTransaction();
+            const retorno= await Servico.create(connection,dados);
+            if(retorno)
+                await connection.commit();
+
         } catch (error) {
+            await connection.rollback();
             console.error('Erro ao criar serviço:', error);
             throw error;
         } finally {
-            connection.end();
+            connection.release();
         }
     }
 
-    async atualizarServico(id, dados) {
-        const connection = DatabaseManager.getInstance().getConnection();
-        const query = `UPDATE servico SET nome = ?, descricao = ?, preco = ? WHERE id = ?`;
-
+    async atualizarServico(id:number, dados:number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const [result] = await connection.execute(query, [dados.nome, dados.descricao, dados.preco, id]);
-            if (result.affectedRows === 0) {
-                throw new Error('Serviço não encontrado');
+            connection.beginTransaction();
+
+            const servicoModel = new Servico("","",0,0);
+            const servico= await servicoModel.buscaServico(id, connection);
+            if(!servico){
+                throw new Error("Serviço não encontrado.");
             }
-            return { id, ...dados };
+            const retorno = await servico.update(connection, dados, id);
+            connection.commit();
+            return retorno;
         } catch (error) {
             console.error('Erro ao atualizar serviço:', error);
+            connection.rollback();
             throw error;
         } finally {
-            connection.end();
+            connection.release();
         }
     }
 
     async deletarServico(id) {
-        const connection = DatabaseManager.getInstance().getConnection();
-        const query = `DELETE FROM servico WHERE id = ?`;
-
+        const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const [result] = await connection.execute(query, [id]);
-            if (result.affectedRows === 0) {
-                throw new Error('Serviço não encontrado');
+            connection.beginTransaction();
+            const servicoModel = new Servico("", "", 0, 0);
+            const servico= await servicoModel.buscaServico(id, connection);
+            if(!servico){
+                throw new Error("Serviço não encontrado.");
             }
-            return true;
+            const retorno = await servico.delete(connection, id);
+            connection.commit();
+            return retorno;
+           
         } catch (error) {
             console.error('Erro ao deletar serviço:', error);
+            connection.rollback();
             throw error;
         } finally {
-            connection.end();
+            connection.release();
         }
     }
 
     async listarServicos() {
-        const connection = DatabaseManager.getInstance().getConnection();
-        const query = `SELECT * FROM servico`;
-
+        const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const [servicos] = await connection.execute(query);
+            const servicos= await Servico.listarServicos(connection);
             return servicos;
         } catch (error) {
             console.error('Erro ao listar serviços:', error);
             throw error;
         } finally {
-            connection.end();
+            connection.release();
         }
     }
 }
 
-module.exports = ServicoController;
+export default ServicoController;

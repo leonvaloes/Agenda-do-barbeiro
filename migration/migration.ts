@@ -1,4 +1,4 @@
-import Database from '../config/database'; 
+import Database from '../config/database';
 import createEmpresa from './001_create_empresa.js';
 import createAtendente from './002_create_atendente.js';
 import createServicos from './004_create_servico.js';
@@ -25,7 +25,7 @@ class Migrations {
         let connection;
         try {
             console.log('Attempting to connect to the database...');
-            connection = Database.getInstance().getConnection(); 
+            connection = Database.getInstance().getConnection();
 
             await new createEmpresa().up(connection);
             await new createAtendente().up(connection);
@@ -34,7 +34,7 @@ class Migrations {
             await new createAtendenteServ().up(connection);
             await new createAgendamento().up(connection);
             await new createItem().up(connection);
-            
+
             await new alterItem().up(connection);
             await new alterAtendente().up(connection);
             await new alterAgendamento().up(connection);
@@ -63,11 +63,11 @@ class Migrations {
         let connection;
         try {
             console.log('Attempting to connect to the database...');
-            connection = Database.getInstance().getConnection();
+            connection = await Database.getInstance().getConnection();
             console.log('Connected to the database.');
 
-            //await new alterUserEmpresa().down(connection);
-            //await new alterUserCliente().down(connection);
+            await new alterUserEmpresa().down(connection);
+            await new alterUserCliente().down(connection);
             await new alterUserAtendente().down(connection);
             await new alterUserNotificacao().down(connection);
             await new createUser().down(connection);
@@ -83,19 +83,19 @@ class Migrations {
             await new createCliente().down(connection);
             await new createAtendente().down(connection);
             await new createEmpresa().down(connection);
-            
-            
-            
 
-            
-           
-            
+
+
+
+
+
+
             console.log('Migrations finished!');
         } catch (error) {
             console.error('Error during migrations:', error);
         } finally {
             if (connection) {
-                await connection.end(); // Fecha a conexão ao final
+                await connection.release(); // Fecha a conexão ao final
                 console.log('Connection closed.');
             }
         }

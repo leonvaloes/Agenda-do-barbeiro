@@ -1,4 +1,5 @@
-const empresaController= require('../controller/empresaController');
+import EmpresaController from '../controller/empresaController'
+const empresaController= new EmpresaController();
 const router = require('express').Router();
 
 router.post('/', async (req,res)=>{
@@ -16,7 +17,7 @@ router.post('/', async (req,res)=>{
 
 router.delete('/:id', async (req, res)=>{
     try{
-        const id= req.body.id;
+        const id= req.params.id;
         const result= await empresaController.deletarEmpresa(id);
         if(result)
             res.status(200).send("Empresa deletada com sucesso!");
@@ -40,7 +41,7 @@ router.get('/', async (req,res)=>{
 
 router.put('/:id', async (req, res)=>{
     try{
-        const empresa= await empresaController.atualizarEmpresa(req.body);
+        const empresa= await empresaController.atualizarEmpresa(req.params.id, req.body);
         if(empresa)
             res.status(200).send("Empresa atualizada com sucesso!");
         else

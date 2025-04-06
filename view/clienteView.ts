@@ -1,15 +1,13 @@
-const ClienteController = require('../controller/clienteController');
-const clienteController = ClienteController;
+import ClienteController from '../controller/clienteController';
+const clienteController = new ClienteController;
 const router = require('express').Router();
 
 router.post('/', async (req, res) => {
     try {
-        await clienteController.criarCliente(req.body);
+        await clienteController.createCliente(req.body);
         res.status(201).send('Cliente criado com sucesso!');
     } catch (e) {
-        console.error(e);
 
-        // Verifica se o erro é relacionado ao cliente já cadastrado
         if (e.message === '400') {
             res.status(400).send('Erro: Cliente já cadastrado.');
         } else {
