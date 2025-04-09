@@ -29,7 +29,7 @@ class Servicos{
     }
     
 
-    async buscaServico(id: number, connection: any){
+    static async getServicoById(id: number, connection: any){
         const query = `SELECT * FROM servicos WHERE id = ?`;
         try {
             const result: any = await connection.execute(query, [id]);

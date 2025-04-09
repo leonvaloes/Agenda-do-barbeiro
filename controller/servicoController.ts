@@ -37,7 +37,7 @@ class ServicoController {
             connection.beginTransaction();
 
             const servicoModel = new Servico("","",0,0);
-            const servico= await servicoModel.buscaServico(id, connection);
+            const servico= await Servico.getServicoById(id, connection);
             if(!servico){
                 throw new Error("Serviço não encontrado.");
             }
@@ -58,7 +58,7 @@ class ServicoController {
         try {
             connection.beginTransaction();
             const servicoModel = new Servico("", "", 0, 0);
-            const servico= await servicoModel.buscaServico(id, connection);
+            const servico= await Servico.getServicoById(id, connection);
             if(!servico){
                 throw new Error("Serviço não encontrado.");
             }

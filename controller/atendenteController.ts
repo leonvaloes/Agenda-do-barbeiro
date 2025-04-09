@@ -47,7 +47,7 @@ class AtendenteController {
             connection.beginTransaction();
 
             const atendenteModel = new Atendente("", "", "");
-            const atendenteExistente = await atendenteModel.buscaAtendente(id, connection);
+            const atendenteExistente = await Atendente.getAtendenteById(id, connection);
 
             if (!atendenteExistente.length) {
                 throw new Error("Atendente não encontrado.");
@@ -72,7 +72,7 @@ class AtendenteController {
         try {
             connection.beginTransaction();
             const atendenteModel = new Atendente("", "", "");
-            const atendenteExistente = await atendenteModel.buscaAtendente(id, connection);
+            const atendenteExistente = await Atendente.getAtendenteById(id, connection);
             if (!atendenteExistente.length) {
                 throw new Error("Atendente não encontrado.");
             }

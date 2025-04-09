@@ -49,7 +49,7 @@ class Atendente{
         }
     }
     
-    async buscaAtendente(id: number, connection: any){
+    static async getAtendenteById(id: number, connection: any){
         const query = `SELECT * FROM atendente WHERE id = ?`;
         try {
             const result: any = await connection.execute(query, [id]);

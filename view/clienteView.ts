@@ -66,4 +66,17 @@ router.get('/', async (req, res) => {
     }
 });
 
+
+router.post('/agendar', async (req, res) => {
+    try {
+        const { cliente_id, atendente_id, serv_id, data_hora } = req.body;
+        
+        await clienteController.Agendar(cliente_id, atendente_id, serv_id, data_hora);
+        res.status(201).send('Agendamento criado com sucesso!');
+    } catch (e) {
+        console.log(e);
+        res.status(500).send('Erro interno do servidor');
+    }
+});
+
 module.exports = router; // Exporta o roteador de usuários
