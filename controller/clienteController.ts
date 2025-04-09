@@ -7,6 +7,7 @@ import DatabaseManager from "../config/database";
 import { AgendamentoSubject } from '../Observer/AgendamentoSubject';
 import { LoggerObserver } from '../Observer/LoggerObserver';
 import { NotificarAtendenteObserver } from '../Observer/NotificarAtendenteObserver';
+import User from "../models/user";
 
 
 const subject = new AgendamentoSubject();
@@ -15,7 +16,6 @@ subject.adicionar(new NotificarAtendenteObserver());
 class ClienteController {
 
     cliente: typeof Cliente;
-
     constructor() {
         this.cliente = Cliente;
     }
@@ -24,7 +24,9 @@ class ClienteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-            await Cliente.createCliente(clienteData, connection);
+            const cliente = new Cliente(clienteData.nome, clienteData.cpf, clienteData.senha, clienteData.cidade);
+            await cliente.cadastrarUser(connection);
+            await cliente.createCliente(connection); // Cadastra no 'cliente'
             connection.commit();
         } catch (error) {
 
@@ -82,12 +84,9 @@ class ClienteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             const clientes = await Cliente.listarClientes(connection);
-            if (!clientes.length) {
-                throw new Error("Nenhum cliente encontrado.");
-            }
             return clientes;
         } catch (error) {
-            console.error('Erro ao listar clientes:', error);
+            console.error('Erro ao lisar clientets:', error);
             throw error;
         } finally {
             connection.release();

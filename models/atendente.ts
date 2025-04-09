@@ -1,13 +1,11 @@
-class Atendente{
-    id: number;
-    nome: string;
-    cpf: string;
-    senha: string;
+import User from "./user";
 
-    constructor( nome: string, cpf: string, senha: string){
-        this.nome = nome;
-        this.cpf = cpf;
-        this.senha = senha;
+class Atendente extends User {
+    cpf: string;
+  
+    constructor(nome: string, cpf: string, senha: string) {
+      super(nome, senha);
+      this.cpf = cpf;
     }
     
     static async create(connection: any, data: Atendente) {

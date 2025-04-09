@@ -13,10 +13,10 @@ import createUserNotificacao from './012_create_user_notificacao.js';
 import alterItem from './008_alter_item';
 import alterAtendente from './009_alter_atendente';
 import alterAgendamento from './010_alter_agendamento';
-import alterUserAtendente from './015_alter_user_atendente';
 import alterUserCliente from './016_alter_user_cliente';
-import alterUserEmpresa from './017_alter_user_empresa';
 import alterUserNotificacao from './014_alter_user_notificacao';
+import alterUserAtendente from './015_alter_user_atendente';
+import alterUserEmpresa from './017_alter_user_empresa';
 
 class Migrations {
     async up() {
@@ -33,18 +33,16 @@ class Migrations {
             await new createAtendenteServ().up(connection);
             await new createAgendamento().up(connection);
             await new createItem().up(connection);
+            await new createUser().up(connection);
+            await new createNotificacao().up(connection);
+            await new createUserNotificacao().up(connection);
 
+            await new alterUserCliente().up(connection);
             await new alterItem().up(connection);
             await new alterAtendente().up(connection);
             await new alterAgendamento().up(connection);
-
-            await new createNotificacao().up(connection);
-            await new createUserNotificacao().up(connection);
-            await new createUser().up(connection);
-
             await new alterUserAtendente().up(connection);
-            //await new alterUserCliente().up(connection);
-            //await new alterUserEmpresa().up(connection);
+            await new alterUserEmpresa().up(connection);
 
             console.log('Migrations finished!');
             connection.release();
@@ -61,9 +59,7 @@ class Migrations {
             const connection = await db.getConnection();
             console.log('Connected to the database.');
 
-            await new alterUserEmpresa().down(connection);
             await new alterUserCliente().down(connection);
-            await new alterUserAtendente().down(connection);
             await new alterUserNotificacao().down(connection);
             await new createUser().down(connection);
             await new createUserNotificacao().down(connection);
@@ -78,7 +74,9 @@ class Migrations {
             await new createCliente().down(connection);
             await new createAtendente().down(connection);
             await new createEmpresa().down(connection);
-
+            await new alterUserAtendente().down(connection)
+            await new alterUserEmpresa().down(connection)
+            
             console.log('Migrations finished!');
             connection.release();
         } catch (error) {

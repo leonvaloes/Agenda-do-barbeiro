@@ -1,10 +1,10 @@
-class alter_user_atendente {
+class alterUserAtendente {
     async up(connection) {
         try {
             await connection.execute(`
-                ALTER TABLE user 
-                ADD COLUMN user_atendente_id INT,
-                ADD CONSTRAINT fk_user_atendente FOREIGN KEY (user_atendente_id) REFERENCES atendente(id)
+                ALTER TABLE atendente 
+                ADD COLUMN atendente_user_id INT,
+                ADD FOREIGN KEY (atendente_user_id) REFERENCES user(id);
             `);
             console.log('Relação adicionada com sucesso!');
         } catch (error) {
@@ -15,9 +15,9 @@ class alter_user_atendente {
     async down(connection) {
         try {
             await connection.execute(`
-                ALTER TABLE user
-                DROP FOREIGN KEY fk_user_atendente,
-                DROP COLUMN user_atendente_id;
+                ALTER TABLE atendente
+                DROP FOREIGN KEY atendente_user_id,
+                DROP COLUMN atendente_user_id;
             `);
             console.log('Relação removida com sucesso!');
         } catch (error) {
@@ -25,4 +25,4 @@ class alter_user_atendente {
         }
     }
 }
-export default alter_user_atendente;
+export default alterUserAtendente;

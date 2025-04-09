@@ -1,10 +1,10 @@
-class alter_user_cliente {
+class alterUserCliente {
     async up(connection) {
         try {
             await connection.execute(`
-                ALTER TABLE user 
-                ADD COLUMN user_cliente_id INT,
-                ADD CONSTRAINT fk_user_cliente FOREIGN KEY (user_cliente_id) REFERENCES cliente(id)
+                ALTER TABLE cliente 
+                ADD COLUMN cliente_user_id INT,
+                ADD FOREIGN KEY (cliente_user_id) REFERENCES user(id);
             `);
             console.log('Relação adicionada com sucesso!');
         } catch (error) {
@@ -14,9 +14,11 @@ class alter_user_cliente {
 
     async down(connection) {
         try {
-            await connection.execute(`ALTER TABLE user DROP FOREIGN KEY fk_user_cliente;`);
-            await connection.execute(`ALTER TABLE user DROP COLUMN user_cliente_id;`);
-            await connection.execute(`DROP TABLE IF EXISTS cliente;`);
+            await connection.execute(`
+                ALTER TABLE cliente
+                DROP FOREIGN KEY cliente_user_id,
+                DROP COLUMN cliente_user_id;
+            `);
             console.log('Relação e tabela removidas com sucesso!');
         } catch (error) {
             console.error('Erro ao remover relação ou tabela:', error);
@@ -24,4 +26,4 @@ class alter_user_cliente {
     }
     
 }
-export default alter_user_cliente;
+export default alterUserCliente;

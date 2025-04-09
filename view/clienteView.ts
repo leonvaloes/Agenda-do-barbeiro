@@ -62,7 +62,7 @@ router.get('/', async (req, res) => {
         res.status(200).json(data).send();
     } catch (e) {
         console.log(e);
-        res.status(500).send();
+        res.status(200).json([]).send();
     }
 });
 

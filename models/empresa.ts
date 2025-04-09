@@ -1,23 +1,21 @@
-class Empresa {
-    id: number;
-    nome: string;
+import User from "./user";
+
+class Empresa extends User {
     email: string;
     cnpj: string;
     cidade: string;
     endereco: string;
     estado: string;
     telefone: string;
-    senha: string;
-
+  
     constructor(nome: string, email: string, cnpj: string, cidade: string, endereco: string, estado: string, telefone: string, senha: string) {
-        this.nome = nome;
-        this.email = email;
-        this.cnpj = cnpj;
-        this.cidade = cidade;
-        this.endereco = endereco;
-        this.estado = estado;
-        this.telefone = telefone;
-        this.senha = senha;
+      super(nome, senha);
+      this.email = email;
+      this.cnpj = cnpj;
+      this.cidade = cidade;
+      this.endereco = endereco;
+      this.estado = estado;
+      this.telefone = telefone;
     }
 
     static async create (data: Empresa, connection:any){

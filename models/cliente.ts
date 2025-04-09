@@ -1,21 +1,18 @@
-class Cliente {
+import User from "./user";
 
-    id: number;
-    nome: string;
+class Cliente extends User {
     cpf: string;
-    senha: string;
     cidade: string;
 
     constructor(nome: string, cpf: string, senha: string, cidade: string) {
-        this.nome = nome;
+        super(nome, senha);
         this.cpf = cpf;
-        this.senha = senha;
         this.cidade = cidade;
-    }
+      }
 
-    static async createCliente(data: Cliente, connection: any) {
+      async createCliente(connection: any) {
         const query = `INSERT INTO cliente (nome, cpf, senha, cidade) VALUES (?, ?, ?, ?)`;
-        const values = [data.nome, data.cpf, data.senha, data.cidade];
+        const values = [this.nome, this.cpf, this.senha, this.cidade];
         try {
             const result = await connection.execute(query, values);
             return result;
@@ -24,6 +21,7 @@ class Cliente {
             throw error;
         }
     }
+    
 
     async delete(id: number, connection: any) {
         const query = `DELETE FROM cliente WHERE id = ?`;

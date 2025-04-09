@@ -10,7 +10,9 @@
   "keywords": [],
   "description": "",
   "dependencies": {
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
     "migrate": "^2.1.0",
     "mysql2": "^3.14.0",
     "reflect-metadata": "^0.2.2",

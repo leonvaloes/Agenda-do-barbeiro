@@ -1,10 +1,10 @@
-class alter_user_empresa {
+class alterUserEmpresa {
     async up(connection) {
         try {
             await connection.execute(`
-                ALTER TABLE user 
-                ADD COLUMN user_empresa_id INT,
-                ADD CONSTRAINT fk_user_empresa FOREIGN KEY (user_empresa_id) REFERENCES empresa(id)
+                ALTER TABLE empresa
+                ADD COLUMN empresa_user_id INT,
+                ADD FOREIGN KEY (empresa_user_id) REFERENCES user(id);
             `);
             console.log('Relação adicionada com sucesso!');
         } catch (error) {
@@ -15,14 +15,15 @@ class alter_user_empresa {
     async down(connection) {
         try {
             await connection.execute(`
-                ALTER TABLE user
-                DROP FOREIGN KEY fk_user_empresa,
-                DROP COLUMN user_empresa_id;
+                ALTER TABLE empresa
+                DROP FOREIGN KEY empresa_user_id,
+                DROP COLUMN empresa_user_id;
             `);
-            console.log('Relação removida com sucesso!');
+            console.log('Relação e tabela removidas com sucesso!');
         } catch (error) {
-            console.error('Erro ao remover relação:', error);
+            console.error('Erro ao remover relação ou tabela:', error);
         }
     }
+    
 }
-export default alter_user_empresa;
+export default alterUserEmpresa;
