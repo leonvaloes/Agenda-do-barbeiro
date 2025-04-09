@@ -14,10 +14,8 @@ class EmpresaController {
         try {
             await connection.beginTransaction();
             await Empresa.create(dados, connection);
-            connection.commit();
         } catch (error) {
             console.error('Erro ao criar empresa:', error);
-            connection.rollback();
             throw error;
         } finally {
             connection.release();
@@ -35,14 +33,10 @@ class EmpresaController {
             if (!empresaExistente.length) {
                 throw new Error("Empresa não encontrada.");
             }
-
             const empresaAtualizada = await Empresa.update(id, dados, connection);
-
-            connection.commit();
             return empresaAtualizada;
         } catch (error) {
             console.error('Erro ao atualizar empresa:', error);
-            connection.rollback();
             throw error;
         } finally {
             connection.release();
@@ -58,11 +52,9 @@ class EmpresaController {
                 throw new Error("Empresa não encontrada.");
             }
             const empresaExcluida = await Empresa.delete(id, connection);
-            connection.commit();
             return empresaExcluida;
         } catch (error) {
             console.error('Erro ao deletar empresa:', error);
-            connection.rollback();
             throw error;
         } finally {
             connection.release();
@@ -78,6 +70,20 @@ class EmpresaController {
             return empresas;
         } catch (error) {
             console.error('Erro ao listar empresas:', error);
+            throw error;
+        } finally {
+            connection.release();
+        }
+    }
+
+    async adicionarFuncionario(cpf: string, empresaId: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            await connection.beginTransaction();
+            const empresaModel= new Empresa("", "", "", "", "", "", "", "");
+            empresaModel.adicionaAtendente(connection, cpf, empresaId);
+        } catch (error) {
+            console.error('Erro ao adicionar funcionário:', error);
             throw error;
         } finally {
             connection.release();

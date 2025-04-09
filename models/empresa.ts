@@ -25,8 +25,10 @@ class Empresa {
         const values = [data.nome, data.email, data.cnpj, data.cidade, data.endereco, data.estado, data.telefone, data.senha];
         try {
             const result = await connection.execute(query, values);
+            connection.commit();
             return result;
         } catch (error) {
+            connection.rollback();
             console.error('Erro ao criar empresa:', error);
             throw error;
         }
@@ -36,8 +38,10 @@ class Empresa {
         const query = `DELETE FROM empresa WHERE id = ?`;
         try {
             const result = await connection.execute(query, [id]);
+            connection.commit();
             return result;
         } catch (error) {
+            connection.rollback();
             console.error('Erro ao deletar empresa:', error);
             throw error;
         }
@@ -47,8 +51,10 @@ class Empresa {
         const query = `UPDATE empresa SET nome = ?, email = ?, cnpj = ?, cidade = ?, endereco = ?, estado = ?, telefone = ?, senha = ? WHERE id = ?`;
         try {
             await connection.execute(query, [data.nome, data.email, data.cnpj, data.cidade, data.endereco, data.estado, data.telefone, data.senha, id]);
+            connection.commit();
             return {id,...data};
         } catch (error) {
+            connection.rollback();
             console.error('Erro ao atualizar empresa:', error);
             throw error;
         }
@@ -64,6 +70,34 @@ class Empresa {
             throw error;
         }
     }
+
+
+    async adicionaAtendente(connection: any, cpf: string, empresaId: number) {
+        const queryBusca = `SELECT id FROM atendente WHERE cpf = ?`;
+        console.log("cpf: ", cpf);
+    
+        try {
+            const [rows]: any = await connection.execute(queryBusca, [cpf]);
+    
+            if (rows.length > 0) {
+                const atendente = rows[0]; // Primeiro resultado
+                console.log("Empresa: ", empresaId);
+                
+                const queryUpdate = `UPDATE atendente SET empresa_id = ? WHERE cpf = ?`;
+                await connection.execute(queryUpdate, [empresaId, cpf]);
+                await connection.commit();
+                
+                return { id: atendente.id, ...atendente };
+            } else {
+                throw new Error("Atendente não encontrado");
+            }
+        } catch (error) {
+            await connection.rollback();
+            console.error("Erro ao buscar atendente:", error);
+            throw error;
+        }
+    }
+    
 }
 
 export default Empresa;

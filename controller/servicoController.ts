@@ -9,22 +9,27 @@ class ServicoController {
         this.servico = Servico;
     }
 
-    async criarServico(dados:any) {
+    async criarServico(dados: any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            const retorno= await Servico.create(connection,dados);
-            if(retorno)
-                await connection.commit();
-
+    
+            const servicoId = await Servico.create(connection, dados);
+            if (!servicoId) {
+                throw new Error("Erro ao criar serviço");
+            }
+    
+            connection.commit();
+            return servicoId; // Retorna o ID do serviço criado
         } catch (error) {
-            await connection.rollback();
+            connection.rollback();
             console.error('Erro ao criar serviço:', error);
             throw error;
         } finally {
             connection.release();
         }
     }
+    
 
     async atualizarServico(id:number, dados:number) {
         const connection = await DatabaseManager.getInstance().getConnection();

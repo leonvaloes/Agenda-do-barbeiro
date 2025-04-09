@@ -3,10 +3,7 @@ class create_item {
         await connection.execute(`
             CREATE TABLE IF NOT EXISTS item (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                serv_id INT NOT NULL,
-                atendente_id INT NOT NULL,
-                data_hora DATETIME NOT NULL,
-                agendamento_id INT NOT NULL
+                data_hora DATETIME NOT NULL
             )
 
         `);

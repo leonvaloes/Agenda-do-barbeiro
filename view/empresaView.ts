@@ -51,4 +51,26 @@ router.put('/:id', async (req, res)=>{
     }
 })
 
+
+
+router.post('/:empresaId/funcionario', async (req, res) => {
+    try {
+        const { cpf } = req.body;
+        const empresaId = parseInt(req.params.empresaId, 10);
+
+        if (!cpf) {
+            return res.status(400).send("CPF do funcionário é obrigatório.");
+        }
+
+        await empresaController.adicionarFuncionario(cpf, empresaId);
+        res.status(200).send("Funcionário adicionado à empresa com sucesso!");
+    } catch (e) {
+        if (e.message === "Funcionário não encontrado.") {
+            res.status(404).send(e.message);
+        } else {
+            res.status(500).send("Erro no servidor interno");
+        }
+    }
+});
+
 export = router;

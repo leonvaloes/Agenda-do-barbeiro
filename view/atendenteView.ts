@@ -57,5 +57,25 @@ router.delete('/:id', async(req,res)=>{
     }
 })
 
+
+router.post('/criar-servico/:id', async (req, res) => {
+    try {
+        const atendenteId = Number(req.params.id);
+        const servicoId = await atendenteController.criarServicoEAssociar(req.body, atendenteId);
+        
+        res.status(201).send({
+            message: "Serviço criado e associado com sucesso!",
+            servicoId
+        });
+    } catch (error) {
+        console.error("Erro ao criar serviço:", error);
+        res.status(500).send({
+            message: "Erro no servidor interno",
+            error: error.message || error
+        });
+    }
+});
+
+
 export = router;
 

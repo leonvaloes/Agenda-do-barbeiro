@@ -1,5 +1,6 @@
 import DatabaseManager from '../config/database';
 import Atendente from '../models/atendente';
+import Servico from "../models/servicos";
 
 class AtendenteController {
     atendente: typeof Atendente;
@@ -86,6 +87,28 @@ class AtendenteController {
             connection.release();
         }
     }
+
+
+    async criarServicoEAssociar(data: any, atendenteId: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+    
+        try {
+            await connection.beginTransaction();
+            const AtendenteModel = new Atendente("", "", "");
+    
+            // Criando o serviço
+            const servico = await Servico.create(connection, data);    
+            await AtendenteModel.Associar(connection, servico, atendenteId);         
+            connection.commit();
+            return servico.id;
+        } catch (error) {
+            await connection.rollback();
+            console.error("Erro ao criar serviço e associar ao atendente:",error);
+            throw error;
+        }
+    }
+    
+    
 }
 
 export default AtendenteController;

@@ -15,13 +15,19 @@ class Servicos{
     static async create(connection: any, data: Servicos) {
         const query = `INSERT INTO servicos (nome, descricao, valor, tempo_medio) VALUES (?, ?, ?, ?)`;
         try {
-            const result:any = await connection.execute(query, [data.nome, data.descricao, data.valor, data.tempoMedio]);
-            return result;
+            const [result]: any = await connection.execute(query, [data.nome, data.descricao, data.valor, data.tempoMedio]);
+            
+            if (!result.insertId) {
+                throw new Error("Erro ao obter ID do serviço criado");
+            }
+    
+            return result.insertId; // Retorna apenas o ID inserido
         } catch (error) {
             console.error('Erro ao inserir serviço:', error);
             throw error;
         }
     }
+    
 
     async buscaServico(id: number, connection: any){
         const query = `SELECT * FROM servicos WHERE id = ?`;

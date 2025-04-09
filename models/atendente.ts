@@ -70,6 +70,31 @@ class Atendente{
             throw error;
         }
     }
+
+
+    async Associar(connection: any, servicoId: number, atendenteId: number) {
+        try {
+            await connection.beginTransaction();
+    
+            // Verifica se os parâmetros são válidos
+            if (!atendenteId || !servicoId) {
+                throw new Error(`Parâmetros inválidos: atendenteId=${atendenteId}, servicoId=${servicoId}`);
+            }
+    
+            // Criando a relação na tabela intermediária
+            const queryAssociacao = `INSERT INTO atendente_serv (atendente_id, serv_id) VALUES (?, ?)`;
+            await connection.execute(queryAssociacao, [atendenteId, servicoId]);
+    
+            connection.commit();
+            console.log("Serviço associado ao atendente com sucesso!");
+    
+            return servicoId;
+        } catch (error) {
+            await connection.rollback();
+            console.error("Erro ao associar serviço ao atendente:", error);
+            throw error;
+        }
+    }   
 }
 
 export default Atendente;
