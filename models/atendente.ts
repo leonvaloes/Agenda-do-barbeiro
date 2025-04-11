@@ -18,8 +18,7 @@ class Atendente extends User {
             const result = await connection.execute(query, values);
             return result;
         } catch (error) {
-            console.error('Erro ao criar atendente:', error);
-            throw error;
+            return null;
         }
 
     }
@@ -37,7 +36,7 @@ class Atendente extends User {
             };
         } catch (error) {
             console.error('Erro ao deletar atendente:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -49,7 +48,7 @@ class Atendente extends User {
             return { id, ...data };
         } catch (error) {
             console.error('Erro ao atualizar atendente:', error);
-            throw error;
+            return null;
         }
     }
     
@@ -60,7 +59,7 @@ class Atendente extends User {
             return result[0];
         } catch (error) {
             console.error('Erro ao buscar atendente:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -71,7 +70,7 @@ class Atendente extends User {
             return result[0];
         } catch (error) {
             console.error('Erro ao listar atendentes:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -89,7 +88,7 @@ class Atendente extends User {
             return servicoId;
         } catch (error) {
             console.error("Erro ao associar serviço ao atendente:", error);
-            throw error;
+            return null;
         }
     }   
 }

@@ -1,8 +1,11 @@
 import { IObservadorAgendamento } from './IObservadorAgendamento';
 import Agendamento from '../agendamento';
-
+import Notificacao from '../Notificacao';
+import Email from '../notificacaoStrategy/email';
 export class NotificacaoEmail implements IObservadorAgendamento {
   notificar(agendamento: Agendamento): void {
-    console.log(`[EMAIL] Cliente ${agendamento.clienteId} foi notificado sobre o estado: ${agendamento.estado.nome}`);
+    const notificacao = new Notificacao(`Ocorreu uma atualização sobre o estado: ${agendamento.estado.nome}`, agendamento.clienteId, new Email());
+    notificacao.enviar();
+
   }
 }

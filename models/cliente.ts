@@ -20,8 +20,7 @@ class Cliente extends User {
             const result = await connection.execute(query, values);
             return result;
         } catch (error) {
-            console.error('Erro ao criar cliente:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -37,7 +36,7 @@ class Cliente extends User {
             };
         } catch (error) {
             console.error('Erro ao deletar cliente:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -49,7 +48,7 @@ class Cliente extends User {
             return { id, ...data };
         } catch (error) {
             console.error('Erro ao atualizar cliente:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -61,7 +60,7 @@ class Cliente extends User {
             return result[0];
         } catch (error) {
             console.error('Erro ao buscar cliente:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -72,7 +71,7 @@ class Cliente extends User {
             return result[0];
         } catch (error) {
             console.error('Erro ao listar clientes:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -87,7 +86,7 @@ class Cliente extends User {
             return result[0].insertId;
         } catch (error) {
             console.error('Erro ao criar item:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -101,7 +100,7 @@ class Cliente extends User {
             return result;
         } catch (error) {
             console.error('Erro ao criar agendamento:', error);
-            throw error;
+            return null;
         }
     }
 

@@ -16,12 +16,11 @@ class AtendenteController {
 
             const atendente = new Atendente(atendenteData.nome, atendenteData.cpf, atendenteData.senha, 0);
             await atendente.createAtendente(connection);
-
             await connection.commit();
+            return atendente;
         } catch (error) {
             await connection.rollback();
-            console.error('Erro ao criar atendente:', error);
-            throw error;
+            return 'Erro ao criar atendente:';
         } finally {
             connection.release();
         }
@@ -31,10 +30,12 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             const atendentes = await Atendente.listarAtendentes(connection);
-            return atendentes;
+            if (atendentes)
+                return atendentes;
+            else
+                return null;
         } catch (error) {
-            console.error('Erro ao listar atendentes:', error);
-            throw error;
+            return "Erro ao listar atendentes";
         } finally {
             connection.release();
         }
@@ -47,21 +48,18 @@ class AtendenteController {
         try {
             connection.beginTransaction();
 
-            const atendenteModel = new Atendente("", "", "",0);
+            const atendenteModel = new Atendente("", "", "", 0);
             const atendenteExistente = await Atendente.getAtendenteById(id, connection);
 
-            if (!atendenteExistente.length) {
-                throw new Error("Atendente não encontrado.");
+            if (atendenteExistente.length && dados.nome != null && dados.cpf != null && dados.senha != null) {
+                const atendenteAtualizado = await atendenteModel.update(id, connection, dados);
+                connection.commit();
+                return atendenteAtualizado;
             }
-            // Atualiza os dados do atendente
-            const atendenteAtualizado = await atendenteModel.update(id, connection, dados);
-
-            connection.commit();
-            return atendenteAtualizado;
+            return null;
         } catch (error) {
             connection.rollback();
-            console.error('Erro ao atualizar atendente:', error);
-            throw error;
+            return 'Erro ao atualizar atendente';
         } finally {
             connection.release();
         }
@@ -74,16 +72,16 @@ class AtendenteController {
             connection.beginTransaction();
             const atendenteModel = new Atendente("", "", "", 0);
             const atendenteExistente = await Atendente.getAtendenteById(id, connection);
-            if (!atendenteExistente.length) {
-                throw new Error("Atendente não encontrado.");
-            }
+
+            if (!atendenteExistente.length)
+                return null;
+            
             const atendenteExcluido = await atendenteModel.delete(id, connection);
             connection.commit();
             return atendenteExcluido;
         } catch (error) {
             connection.rollback();
-            console.error('Erro ao deletar atendente:', error);
-            throw error;
+            return "Erro ao deletar atendente:"
         } finally {
             connection.release();
         }
@@ -92,24 +90,22 @@ class AtendenteController {
 
     async criarServicoEAssociar(data: any, atendenteId: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
-    
+
         try {
             await connection.beginTransaction();
             const AtendenteModel = new Atendente("", "", "", 0);
-    
-            // Criando o serviço
-            const servico = await Servico.create(connection, data);    
-            await AtendenteModel.Associar(connection, servico, atendenteId);         
+
+            const servico = await Servico.create(connection, data);
+            await AtendenteModel.Associar(connection, servico, atendenteId);
             connection.commit();
             return servico.id;
         } catch (error) {
             await connection.rollback();
-            console.error("Erro ao criar serviço e associar ao atendente:",error);
-            throw error;
+            return "Erro ao criar serviço e associar ao atendente";
         }
     }
-    
-    
+
+
 }
 
 export default AtendenteController;

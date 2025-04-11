@@ -24,7 +24,7 @@ class Servicos{
             return result.insertId; // Retorna apenas o ID inserido
         } catch (error) {
             console.error('Erro ao inserir serviço:', error);
-            throw error;
+            return null;
         }
     }
     
@@ -36,7 +36,7 @@ class Servicos{
             return result[0];
         } catch (error) {
             console.error('Erro ao buscar serviço:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -47,7 +47,7 @@ class Servicos{
             return result[0];
         } catch (error) {
             console.error('Erro ao listar serviços:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -58,7 +58,7 @@ class Servicos{
             return result;
         } catch (error) {
             console.error('Erro ao atualizar serviço:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -69,7 +69,7 @@ class Servicos{
             return result;
         } catch (error) {
             console.error('Erro ao deletar serviço:', error);
-            throw error;
+            return null;
         }
     }
 

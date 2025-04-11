@@ -1,5 +1,7 @@
 import AtendenteController from '../controller/atendenteController'
 import AgendamentoController from '../controller/agendamentoController';
+import NotificacaoController from '../controller/notificacaoController';
+const notificacaoController = new NotificacaoController();
 const agendamentoController = new AgendamentoController();
 const atendenteController = new AtendenteController();
 const router = require('express').Router();
@@ -84,6 +86,18 @@ router.post('/proxEstado/:id', async (req,res)=>{
 
         const result = await agendamentoController.avancarEstado(agendamentoId);
 
+        res.status(200).send(result);
+    }catch(e){
+        console.log(e)
+        res.status(500).send('Erro inteno do servidor')
+    }
+})
+
+
+
+router.post('/notificacao', async (req, res)=>{
+    try{
+        const result = await notificacaoController.SetNotificacao();
         res.status(200).send(result);
     }catch(e){
         console.log(e)

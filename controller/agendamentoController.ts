@@ -2,7 +2,7 @@ import DatabaseManager from '../config/database';
 import Agendamento from '../models/agendamento';
 import { NotificacaoEmail } from '../models/agendamentoNotificacaoObserver/notificacaoEmail';
 import { NotificacaoWhatsapp } from '../models/agendamentoNotificacaoObserver/NotificacaoWhatsapp';
-
+import Notificacao from '../models/Notificacao';
 class AgendamentoController {
 
     async avancarEstado(agendamentoId: number) {
@@ -12,12 +12,11 @@ class AgendamentoController {
             if (resultado && resultado.length > 0) {
                 const dados = resultado[0];
 
-                // ⚙️ Reconstrói o agendamento com estado atual
                 const agendamento = new Agendamento(dados.cliente_id, dados.item_id, dados.estado);
 
-                // ✅ Adiciona os observadores antes de avançar o estado
                 agendamento.adicionarObservador(new NotificacaoEmail());
                 agendamento.adicionarObservador(new NotificacaoWhatsapp());
+                
 
                 await agendamento.avancarEstado(agendamentoId, connection);
 

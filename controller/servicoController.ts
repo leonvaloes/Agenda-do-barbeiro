@@ -16,15 +16,14 @@ class ServicoController {
     
             const servicoId = await Servico.create(connection, dados);
             if (!servicoId) {
-                throw new Error("Erro ao criar serviço");
+                return null;
             }
     
             connection.commit();
             return servicoId; // Retorna o ID do serviço criado
         } catch (error) {
             connection.rollback();
-            console.error('Erro ao criar serviço:', error);
-            throw error;
+            return "Erro ao criar serviço";
         } finally {
             connection.release();
         }
@@ -36,18 +35,16 @@ class ServicoController {
         try {
             connection.beginTransaction();
 
-            const servicoModel = new Servico("","",0,0);
             const servico= await Servico.getServicoById(id, connection);
             if(!servico){
-                throw new Error("Serviço não encontrado.");
+                return null;
             }
             const retorno = await servico.update(connection, dados, id);
             connection.commit();
             return retorno;
         } catch (error) {
-            console.error('Erro ao atualizar serviço:', error);
             connection.rollback();
-            throw error;
+            return "Erro ao atualizar serviço";
         } finally {
             connection.release();
         }
@@ -57,18 +54,16 @@ class ServicoController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-            const servicoModel = new Servico("", "", 0, 0);
             const servico= await Servico.getServicoById(id, connection);
-            if(!servico){
-                throw new Error("Serviço não encontrado.");
-            }
+            if(!servico)
+                return null;
+            
             const retorno = await servico.delete(connection, id);
             connection.commit();
             return retorno;
         } catch (error) {
-            console.error('Erro ao deletar serviço:', error);
             connection.rollback();
-            throw error;
+            return "Erro ao deletar serviço";
         } finally {
             connection.release();
         }
@@ -80,8 +75,7 @@ class ServicoController {
             const servicos= await Servico.listarServicos(connection);
             return servicos;
         } catch (error) {
-            console.error('Erro ao listar serviços:', error);
-            throw error;
+            return "Erro ao listar serviços";
         } finally {
             connection.release();
         }

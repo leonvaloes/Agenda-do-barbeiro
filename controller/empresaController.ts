@@ -16,10 +16,10 @@ class EmpresaController {
             const empresaModel = new Empresa(dados.nome, dados.email, dados.cnpj, dados.cidade, dados.endereco, dados.estado, dados.telefone, dados.senha, dados.empresa_user_id);
             await empresaModel.create(connection);
             connection.commit();
+            return empresaModel;
         } catch (error) {
             connection.rollback();
-            console.error('Erro ao criar empresa2:', error);
-            throw error;
+            return "Erro ao criar empresa2"
         } finally {
             connection.release();
         }
@@ -34,15 +34,14 @@ class EmpresaController {
             const empresaExistente = await empresaModel.buscaEmpresa(id, connection);
 
             if (!empresaExistente.length) {
-                throw new Error("Empresa não encontrada.");
+                return null;
             }
             const empresaAtualizada = await Empresa.update(id, dados, connection);
             connection.commit();
             return empresaAtualizada;
         } catch (error) {
             connection.rollback();
-            console.error('Erro ao atualizar empresa:', error);
-            throw error;
+            return "Erro ao atualizar empresa";
         } finally {
             connection.release();
         }
@@ -54,15 +53,14 @@ class EmpresaController {
             const empresaModel= new Empresa("", "", "", "", "", "", "", "", 0);
             const empresaExistente = await empresaModel.buscaEmpresa(id, connection);
             if (!empresaExistente.length) {
-                throw new Error("Empresa não encontrada.");
+                return null;
             }
             const empresaExcluida = await Empresa.delete(id, connection);
             connection.commit();
             return empresaExcluida;
         } catch (error) {
             connection.rollback();
-            console.error('Erro ao deletar empresa:', error);
-            throw error;
+            return "Erro ao deletar empresa";
         } finally {
             connection.release();
         }
@@ -76,8 +74,7 @@ class EmpresaController {
             const [empresas] = await connection.execute(query);
             return empresas;
         } catch (error) {
-            console.error('Erro ao listar empresas:', error);
-            throw error;
+            return "Erro ao listar empresas";
         } finally {
             connection.release();
         }
@@ -89,12 +86,12 @@ class EmpresaController {
             await connection.beginTransaction();
 
             const empresaModel= new Empresa("", "", "", "", "", "","", "", 0);
-            empresaModel.adicionaAtendente(connection, cpf, empresaId);
+            const retorno=empresaModel.adicionaAtendente(connection, cpf, empresaId);
             connection.commit();
+            return retorno;
         } catch (error) {
             connection.rollback();
-            console.error('Erro ao adicionar funcionário:', error);
-            throw error;
+            return "Erro ao adicionar funcionário";
         } finally {
             connection.release();
         }

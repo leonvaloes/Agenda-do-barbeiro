@@ -29,7 +29,7 @@ class Empresa extends User {
             return result;
         } catch (error) {
             console.error('Erro ao criar empresa:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -40,7 +40,7 @@ class Empresa extends User {
             return result;
         } catch (error) {
             console.error('Erro ao deletar empresa:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -51,7 +51,7 @@ class Empresa extends User {
             return {id,...data};
         } catch (error) {
             console.error('Erro ao atualizar empresa:', error);
-            throw error;
+            return null;
         }
     }
 
@@ -61,8 +61,8 @@ class Empresa extends User {
             const result:any= await connection.execute(query, [id]);
             return result[0];
         } catch (error) {
-            console.error('Erro ao buscar empresa:', error);
-            throw error;
+            console.error('Erro ao buscar empresa:');
+            return null;
         }
     }
 
@@ -81,11 +81,11 @@ class Empresa extends User {
                 
                 return { id: atendente.id, ...atendente };
             } else {
-                throw new Error("Atendente não encontrado");
+                return null;
             }
         } catch (error) {
             console.error("Erro ao buscar atendente:", error);
-            throw error;
+            return null;
         }
     }
     

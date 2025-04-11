@@ -50,11 +50,8 @@ class Agendamento {
     const values=[this.estado.nome, this.clienteId, this.itemId];
     try {
       const agendamento = await connection.execute(query,values);
-      
       return agendamento;
     }catch(error){
-      console.log('Agendamento criado com sucesso estado: ', this.estado);
-      console.log("Erro ao criar agendamento");
       return null;
     }
   }
@@ -65,8 +62,7 @@ class Agendamento {
       const result = await connection.execute(query, [id]);
       return result[0];
     } catch (error) {
-      console.error('Erro ao buscar agendamento:', error);
-      throw error;
+      return null;
     }
   }
 
