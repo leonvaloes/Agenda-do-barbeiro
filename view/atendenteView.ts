@@ -8,8 +8,8 @@ const router = require('express').Router();
 
 router.post('/', async (req,res)=>{
     try{
-        await atendenteController.createAtendente(req.body);
-        res.status(201).send("Atendente criado com sucesso!");
+       const atendente = await atendenteController.createAtendente(req.body);
+        res.status(201).send(atendente);
     }catch(e){
         
         if(e.message==='400')
@@ -35,7 +35,7 @@ router.put('/:id', async (req, res)=>{
         if(!updateAtend)
             return res.status(404).send('Atendente não encontrado');
 
-        res.status(201).send("Atendente Atualizado Com sucesso!")
+        res.status(201).send(updateAtend)
     }catch(e){
         console.log(e)
         if(e==="Atendente não encontrado")
@@ -49,7 +49,7 @@ router.delete('/:id', async(req,res)=>{
         const deletedAtend=await atendenteController.deletarAtendente(req.params.id);
 
         if(!deletedAtend){
-            return res.status(404).send('Atendente não encontrado');
+            return res.status(404).send(deletedAtend);
         }
 
         res.status(201).send("Atendente Deletado Com sucesso!")
@@ -105,6 +105,4 @@ router.post('/notificacao', async (req, res)=>{
     }
 })
 
-
 export = router;
-

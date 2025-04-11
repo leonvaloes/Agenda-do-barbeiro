@@ -4,8 +4,8 @@ const router = require('express').Router();
 
 router.post('/', async (req,res)=>{
     try{
-        await empresaController.criarEmpresa(req.body);
-        res.status(201).send("Empresa criada com sucesso!");
+        const empresa = await empresaController.criarEmpresa(req.body);
+        res.status(201).send(empresa);
     }catch(e){
         
         if(e.message==='400')
@@ -20,7 +20,7 @@ router.delete('/:id', async (req, res)=>{
         const id= req.params.id;
         const result= await empresaController.deletarEmpresa(id);
         if(result)
-            res.status(200).send("Empresa deletada com sucesso!");
+            res.status(200).send(result);
         else
             res.status(404).send("Empresa não encontrada!");
     }catch(e){
@@ -43,7 +43,7 @@ router.put('/:id', async (req, res)=>{
     try{
         const empresa= await empresaController.atualizarEmpresa(req.params.id, req.body);
         if(empresa)
-            res.status(200).send("Empresa atualizada com sucesso!");
+            res.status(200).send(empresa);
         else
             res.status(404).send("Empresa não encontrada!");
     }catch(e){

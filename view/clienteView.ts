@@ -6,8 +6,8 @@ const router = require('express').Router();
 
 router.post('/', async (req, res) => {
     try {
-        await clienteController.createCliente(req.body);
-        res.status(201).send('Cliente criado com sucesso!');
+        const cliente = await clienteController.createCliente(req.body);
+        res.status(201).send(cliente);
     } catch (e) {
 
         if (e.message === '400') {
@@ -26,7 +26,7 @@ router.put('/:id', async (req, res) => {
             return res.status(404).send('Cliente não encontrado');
         }
 
-        res.status(200).send('Cliente atualizado com sucesso!');
+        res.status(200).send(updatedClient);
     } catch (e) {
         console.log(e);
         if (e.message === 'Cliente não encontrado') {
@@ -46,7 +46,7 @@ router.delete('/:id', async (req, res) => {
             return res.status(404).send('Cliente não encontrado');
         }
 
-        res.status(200).send('Cliente deletado com sucesso!');
+        res.status(200).send(deletedClient);
     } catch (e) {
         console.log(e);
         if (e.message === 'Cliente não encontrado') {
