@@ -3,12 +3,14 @@ import { Confirmacao } from './agendamentoEstados/confirmacao';
 import { Confirmado } from './agendamentoEstados/confirmado';
 import { Concluido } from './agendamentoEstados/concluido';
 import { Cancelado } from './agendamentoEstados/cancelado';
+import { IObservadorAgendamento } from './agendamentoNotificacaoObserver/IObservadorAgendamento';
 
 class Agendamento {
   id: number;
   clienteId: number;
   itemId: number;
   estado: AgendamentoEstado;
+  private observadores: IObservadorAgendamento[] = [];
 
   constructor(clienteId: number, itemId: number, estado?: string) {
     this.clienteId = clienteId;
@@ -25,14 +27,16 @@ class Agendamento {
     }
   }
 
-  async avancarEstado(agendamentoId:number, connection: any): Promise<void> {
+  async avancarEstado(agendamentoId: number, connection: any): Promise<void> {
     this.estado = this.estado.avancar();
     await this.atualizarEstado(agendamentoId, connection);
+    this.notificarTodos();
   }
 
-  async cancelarAgendamento(agendamentoId:number, connection: any): Promise<void> {
+  async cancelarAgendamento(agendamentoId: number, connection: any): Promise<void> {
     this.estado = this.estado.cancelar();
     await this.atualizarEstado(agendamentoId, connection);
+    this.notificarTodos();
   }
 
   private async atualizarEstado(id:number, connection: any): Promise<void> {
@@ -66,6 +70,17 @@ class Agendamento {
     }
   }
 
+  adicionarObservador(obs: IObservadorAgendamento) {
+    this.observadores.push(obs);
+  }
+  
+  removerObservador(obs: IObservadorAgendamento) {
+    this.observadores = this.observadores.filter(o => o !== obs);
+  }
+  
+  private notificarTodos() {
+    this.observadores.forEach(obs => obs.notificar(this));
+  }
 }
 
 export default Agendamento;
