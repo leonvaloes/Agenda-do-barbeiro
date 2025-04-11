@@ -12,7 +12,8 @@ class Agendamento {
   estado: AgendamentoEstado;
   private observadores: IObservadorAgendamento[] = [];
 
-  constructor(clienteId: number, itemId: number, estado?: string) {
+  constructor(clienteId: number, itemId: number, estado?: string, id?: number) {
+    this.id = id ?? 0;
     this.clienteId = clienteId;
     this.itemId = itemId;
     this.estado = this.mapearEstado(estado || 'confirmação');

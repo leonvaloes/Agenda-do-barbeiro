@@ -18,7 +18,7 @@ class AgendamentoController {
 
             if (resultado && resultado.length > 0) {
                 const dados = resultado[0];
-                const agendamento = new Agendamento(dados.cliente_id, dados.item_id, dados.estado);
+                const agendamento = new Agendamento(dados.cliente_id, dados.item_id, dados.estado,dados.id);
 
                 // Notifica o cliente
                 agendamento.adicionarObservador(new NotificacaoCliente());
@@ -57,7 +57,7 @@ class AgendamentoController {
             const resultado = await Agendamento.getAgendamentoById(agendamentoId, connection);
             if (resultado && resultado.length > 0) {
                 const dados = resultado[0];
-                const agendamento = new Agendamento(dados.cliente_id, dados.item_id, dados.estado);
+                const agendamento = new Agendamento(dados.cliente_id, dados.item_id, dados.estado, dados.id);
 
                 // Notifica o cliente
                 agendamento.adicionarObservador(new NotificacaoCliente());

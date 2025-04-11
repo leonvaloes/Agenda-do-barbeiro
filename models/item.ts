@@ -22,7 +22,7 @@ class Item {
 
     static async getAtendenteUserIdPorItem(itemId: number, connection: any): Promise<number | null> {
         const query = `
-          SELECT a.user_id
+          SELECT a.atendente_user_id
           FROM item i
           JOIN atendente a ON a.id = i.atendente_id
           WHERE i.id = ?
