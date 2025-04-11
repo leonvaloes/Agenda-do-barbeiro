@@ -47,11 +47,13 @@ class Agendamento {
   }
 
   static async validarDisponibilidade(atendenteId: number, dataHora: Date, connection: any): Promise<boolean> {
+    const dataHoraFormatada = dataHora.toISOString().slice(0, 19).replace("T", " ");
+
     const query = `
       SELECT ocupado FROM horario_atendente 
       WHERE atendente_id = ? AND data_hora = ?
     `;
-    const [rows]: any = await connection.execute(query, [atendenteId, dataHora]);
+    const [rows]: any = await connection.execute(query, [atendenteId, dataHoraFormatada]);
 
     // Se não encontrou horário ou já está ocupado, retorna falso
     if (!rows.length || rows[0].ocupado) {

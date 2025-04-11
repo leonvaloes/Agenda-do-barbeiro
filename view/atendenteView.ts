@@ -44,7 +44,7 @@ router.delete('/:id', async(req,res)=>{
             return res.status(404).send(deletedAtend);
         }
 
-        res.status(201).send("Atendente Deletado Com sucesso!")
+        res.status(201).send(deletedAtend)
     }catch(e){
         res.status(400).send(`Erro: ${e.message}`);
     }

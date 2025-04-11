@@ -73,7 +73,7 @@ router.put('/cancelarAgendamento/:id', async (req, res) => {
         const agendamento_id = req.params.id;
 
         await agendamentoController.cancelarAgendamento(agendamento_id);
-        res.status(200).send('Agendamento cancelado com sucesso!');
+        res.status(200).send(agendamento_id);
     } catch (e) {
         res.status(400).send(`Erro: ${e.message}`);
     }

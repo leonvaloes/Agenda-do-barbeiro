@@ -92,33 +92,35 @@ class ClienteController {
         }
     }
 
-    async Agendar(cliente_id: number, atendente_id: number, serv_id: number, dataEhora: Date) {
+    async Agendar(cliente_id: number, atendente_id: number, serv_id: number, dataEhora: any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-
+                dataEhora = new Date(dataEhora.replace(" ", "T") + "Z");
+    
             const servico = await Servico.getServicoById(serv_id, connection);
-            if (!servico) {  // Verifica se o serviço é null ou undefined
+            if (!servico) {
                 throw new Error("Serviço não encontrado");
             }
+    
             const horarioValido = await Agendamento.validarDisponibilidade(atendente_id, dataEhora, connection);
-
             if (!horarioValido) {
                 throw new Error("Horário indisponível para agendamento.");
             }
-
+    
+            console.log("data do criar item ",dataEhora);
             const itemId = await Cliente.createItem(atendente_id, serv_id, dataEhora, connection);
             const agendamento = new Agendamento(cliente_id, itemId);
-
+    
             agendamento.adicionarObservador(new NotificacaoEmail());
             agendamento.adicionarObservador(new NotificacaoWhatsapp());
             await agendamento.create(connection);
             await HorarioFuncionario.marcarComoOcupado(atendente_id, dataEhora, connection);
-
+    
             await connection.commit();
             console.log("Agendamento criado e notificações preparadas.");
             return agendamento;
-
+    
         } catch (error) {
             await connection.rollback();
             throw error;
@@ -126,6 +128,7 @@ class ClienteController {
             connection.release();
         }
     }
+    
 
 }
 export = ClienteController;

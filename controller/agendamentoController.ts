@@ -56,6 +56,7 @@ class AgendamentoController {
 
         try {
             const resultado = await Agendamento.getAgendamentoById(agendamentoId, connection);
+            console.log(resultado);
             if (resultado && resultado.length > 0) {
                 const dados = resultado[0];
                 const agendamento = new Agendamento(dados.cliente_id, dados.item_id, dados.estado, dados.id);
@@ -71,17 +72,16 @@ class AgendamentoController {
                 if (empresaUserId) {
                     agendamento.adicionarObservador(new NotificacaoEstabelecimento(empresaUserId));
                 }
-
+                
                 // Notifica atendente responsável
                 const atendenteUserId = await Item.getAtendenteUserIdPorItem(dados.item_id, connection);
                 if (atendenteUserId) {
                     agendamento.adicionarObservador(new NotificacaoAtendente(atendenteUserId));
                 }
-                const dataHora= await HorarioFuncionario.
+                const dataHora= await HorarioFuncionario.marcarComoLivre(agendamentoId, connection);
                 await agendamento.cancelarAgendamento(agendamentoId, connection);
-                
-                
-
+                console.log(dataHora);
+                connection.commit();
                 return agendamento;
             } else {
                 throw new Error(`Agendamento com ID ${agendamentoId} não encontrado.`);
