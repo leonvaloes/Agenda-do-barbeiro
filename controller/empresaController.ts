@@ -19,7 +19,7 @@ class EmpresaController {
             return empresaModel;
         } catch (error) {
             connection.rollback();
-            return "Erro ao criar empresa2"
+            throw error;
         } finally {
             connection.release();
         }
@@ -41,7 +41,7 @@ class EmpresaController {
             return empresaAtualizada;
         } catch (error) {
             connection.rollback();
-            return "Erro ao atualizar empresa";
+            throw error;
         } finally {
             connection.release();
         }
@@ -60,7 +60,7 @@ class EmpresaController {
             return empresaExcluida;
         } catch (error) {
             connection.rollback();
-            return "Erro ao deletar empresa";
+            throw error;
         } finally {
             connection.release();
         }
@@ -74,7 +74,7 @@ class EmpresaController {
             const [empresas] = await connection.execute(query);
             return empresas;
         } catch (error) {
-            return "Erro ao listar empresas";
+            throw new Error('Erro ao listar empresas');
         } finally {
             connection.release();
         }
@@ -91,7 +91,7 @@ class EmpresaController {
             return retorno;
         } catch (error) {
             connection.rollback();
-            return "Erro ao adicionar funcionário";
+            throw error;
         } finally {
             connection.release();
         }

@@ -20,7 +20,7 @@ class AtendenteController {
             return atendente;
         } catch (error) {
             await connection.rollback();
-            return 'Erro ao criar atendente:';
+            throw error;
         } finally {
             connection.release();
         }
@@ -33,9 +33,9 @@ class AtendenteController {
             if (atendentes)
                 return atendentes;
             else
-                return null;
+                throw new Error("Nenhum atendente encontrado");
         } catch (error) {
-            return "Erro ao listar atendentes";
+            throw error;
         } finally {
             connection.release();
         }
@@ -59,7 +59,7 @@ class AtendenteController {
             return null;
         } catch (error) {
             connection.rollback();
-            return 'Erro ao atualizar atendente';
+            throw error;
         } finally {
             connection.release();
         }
@@ -74,14 +74,14 @@ class AtendenteController {
             const atendenteExistente = await Atendente.getAtendenteById(id, connection);
 
             if (!atendenteExistente.length)
-                return null;
+                throw new Error("Atendente não encontrado");
             
             const atendenteExcluido = await atendenteModel.delete(id, connection);
             connection.commit();
             return atendenteExcluido;
         } catch (error) {
             connection.rollback();
-            return "Erro ao deletar atendente:"
+            throw error;
         } finally {
             connection.release();
         }
@@ -99,7 +99,7 @@ class AtendenteController {
             return servico.id;
         } catch (error) {
             await connection.rollback();
-            return "Erro ao criar serviço e associar ao atendente";
+            throw error;
         }
     }
 }

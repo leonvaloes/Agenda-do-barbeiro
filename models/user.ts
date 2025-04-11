@@ -24,7 +24,7 @@ abstract class User {
                 this.nome = user.nome;
                 return this.generateToken();
             } else {
-                return null;
+                throw new Error('Usuário não encontrado');
             }
         } catch (error) {
             console.error('Erro ao buscar usuário:', error);

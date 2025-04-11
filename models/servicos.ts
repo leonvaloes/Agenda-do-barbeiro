@@ -21,24 +21,23 @@ class Servicos{
                 throw new Error("Erro ao obter ID do serviço criado");
             }
     
-            return result.insertId; // Retorna apenas o ID inserido
+            return result.insertId;
         } catch (error) {
-            console.error('Erro ao inserir serviço:', error);
-            return null;
+            throw error;
         }
     }
     
 
-    static async getServicoById(id: number, connection: any){
+    static async getServicoById(id: number, connection: any) {
         const query = `SELECT * FROM servicos WHERE id = ?`;
         try {
-            const result: any = await connection.execute(query, [id]);
-            return result[0];
+            const [rows]: any = await connection.execute(query, [id]);
+            return rows.length > 0 ? rows[0] : null; // Retorna o primeiro item ou null
         } catch (error) {
-            console.error('Erro ao buscar serviço:', error);
-            return null;
+            throw error;
         }
     }
+    
 
     static async listarServicos(connection: any){
         const query = `SELECT * FROM servicos`;
@@ -46,8 +45,7 @@ class Servicos{
             const result: any = await connection.execute(query);
             return result[0];
         } catch (error) {
-            console.error('Erro ao listar serviços:', error);
-            return null;
+            throw error;
         }
     }
 
@@ -57,8 +55,7 @@ class Servicos{
             const result = await connection.execute(query, [data.nome, data.descricao, data.valor, data.tempoMedio, data.id]);
             return result;
         } catch (error) {
-            console.error('Erro ao atualizar serviço:', error);
-            return null;
+            throw error;
         }
     }
 
@@ -68,8 +65,7 @@ class Servicos{
             const result = await connection.execute(query, [id]);
             return result;
         } catch (error) {
-            console.error('Erro ao deletar serviço:', error);
-            return null;
+            throw error;
         }
     }
 

@@ -53,7 +53,7 @@ class Agendamento {
       const agendamento = await connection.execute(query,values);
       return agendamento;
     }catch(error){
-      return null;
+      throw error;
     }
   }
 
@@ -63,7 +63,7 @@ class Agendamento {
       const result = await connection.execute(query, [id]);
       return result[0];
     } catch (error) {
-      return null;
+      throw error;
     }
   }
 
