@@ -40,24 +40,40 @@ class Agendamento {
     this.notificarTodos();
   }
 
-  private async atualizarEstado(id:number, connection: any): Promise<void> {
+  private async atualizarEstado(id: number, connection: any): Promise<void> {
     const query = `UPDATE agendamento SET estado = ? WHERE id = ?`;
-    connection.execute(query, [this.estado.nome, id]);   
+    connection.execute(query, [this.estado.nome, id]);
   }
+
+  static async validarDisponibilidade(atendenteId: number, dataHora: Date, connection: any): Promise<boolean> {
+    const query = `
+      SELECT ocupado FROM horarios_funcionario 
+      WHERE atendente_id = ? AND data_hora = ?
+    `;
+    const [rows]: any = await connection.execute(query, [atendenteId, dataHora]);
+
+    // Se não encontrou horário ou já está ocupado, retorna falso
+    if (!rows.length || rows[0].ocupado) {
+      return false;
+    }
+
+    return true;
+  }
+
 
   async create(connection: any) {
 
     const query = `INSERT INTO agendamento (estado, cliente_id, item_id ) VALUES (?, ?, ?)`;
-    const values=[this.estado.nome, this.clienteId, this.itemId];
+    const values = [this.estado.nome, this.clienteId, this.itemId];
     try {
-      const agendamento = await connection.execute(query,values);
+      const agendamento = await connection.execute(query, values);
       return agendamento;
-    }catch(error){
+    } catch (error) {
       throw error;
     }
   }
 
-  static async getAgendamentoById(id: number, connection: any){
+  static async getAgendamentoById(id: number, connection: any) {
     const query = `SELECT * FROM agendamento WHERE id = ?`;
     try {
       const result = await connection.execute(query, [id]);
@@ -70,11 +86,11 @@ class Agendamento {
   adicionarObservador(obs: IObservadorAgendamento) {
     this.observadores.push(obs);
   }
-  
+
   removerObservador(obs: IObservadorAgendamento) {
     this.observadores = this.observadores.filter(o => o !== obs);
   }
-  
+
   private notificarTodos() {
     this.observadores.forEach(obs => obs.notificar(this));
   }
