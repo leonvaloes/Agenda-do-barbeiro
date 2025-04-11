@@ -1,5 +1,7 @@
+import AgendamentoController from '../controller/agendamentoController';
 import ClienteController from '../controller/clienteController';
 const clienteController = new ClienteController;
+const agendamentoController = new AgendamentoController;
 const router = require('express').Router();
 
 router.post('/', async (req, res) => {
@@ -78,5 +80,18 @@ router.post('/agendar', async (req, res) => {
         res.status(500).send('Erro interno do servidor');
     }
 });
+
+
+router.put('/cancelarAgendamento/:id', async (req, res) => {
+    try {
+        const agendamento_id = req.params.id;
+
+        await agendamentoController.cancelarAgendamento(agendamento_id);
+        res.status(200).send('Agendamento cancelado com sucesso!');
+    } catch (e) {
+        console.log(e);
+        res.status(500).send('Erro interno do servidor');
+    }
+})
 
 module.exports = router; // Exporta o roteador de usuários

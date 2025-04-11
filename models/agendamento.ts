@@ -20,7 +20,7 @@ class Agendamento {
 
   private mapearEstado(nomeEstado: string): AgendamentoEstado {
     switch (nomeEstado) {
-      case 'confirmado': console.log("Estado mapeado para 'confirmado'");return new Confirmado();
+      case 'confirmado': return new Confirmado();
       case 'concluído': return new Concluido();
       case 'cancelado': return new Cancelado();
       default: return new Confirmacao();

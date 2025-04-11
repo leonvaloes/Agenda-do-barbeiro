@@ -87,10 +87,8 @@ class AtendenteController {
         }
     }
 
-
     async criarServicoEAssociar(data: any, atendenteId: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
-
         try {
             await connection.beginTransaction();
             const AtendenteModel = new Atendente("", "", "", 0);
@@ -104,8 +102,6 @@ class AtendenteController {
             return "Erro ao criar serviço e associar ao atendente";
         }
     }
-
-
 }
 
 export default AtendenteController;

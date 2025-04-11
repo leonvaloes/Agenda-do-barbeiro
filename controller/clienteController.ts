@@ -96,10 +96,8 @@ class ClienteController {
 
             agendamento.adicionarObservador(new NotificacaoEmail());
             agendamento.adicionarObservador(new NotificacaoWhatsapp());
-
-            
             await agendamento.create(connection);
-
+            
             connection.commit();
 
             console.log("Agendamento criado e notificações preparadas.");
