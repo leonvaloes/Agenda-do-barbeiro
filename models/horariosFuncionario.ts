@@ -1,3 +1,4 @@
+import moment from "moment";
 class HorarioFuncionario {
     id?: number;
     atendente_id: number;
@@ -10,13 +11,7 @@ class HorarioFuncionario {
         this.ocupado = ocupado;
     }
 
-    static async gerarHorariosFuncionario(
-        funcionarioId: number,
-        connection: any,
-        horaInicio: string = "08:00",
-        horaFim: string = "18:00",
-        dias: number = 30
-    ) {
+    static async gerarHorariosFuncionario(funcionarioId: number, connection: any, horaInicio: string = "08:00", horaFim: string = "18:00", dias: number = 30) {
         const hoje = new Date();
         const fim = new Date();
         fim.setDate(hoje.getDate() + dias);
@@ -43,21 +38,40 @@ class HorarioFuncionario {
     }
 
     static async criarHorario(funcionarioId: number, dataHora: Date, connection: any) {
+        const dataHoraFormatada = dataHora.toISOString().slice(0, 19).replace("T", " ");
+    
         const query = `
-        INSERT INTO horarios_funcionario (atendente_id, data_hora, ocupado)
-        VALUES (?, ?, FALSE)
-        ON DUPLICATE KEY UPDATE atendente_id = atendente_id
-      `;
-        await connection.query(query, [funcionarioId, dataHora]);
+            INSERT INTO horario_atendente (atendente_id, data_hora, ocupado)
+            VALUES (?, ?, FALSE)
+            ON DUPLICATE KEY UPDATE atendente_id = atendente_id
+        `;
+    
+        console.log("funcionarioId:", funcionarioId);
+        console.log("dataHoraFormatada:", dataHoraFormatada);
+    
+        const retorno= await connection.execute(query, [funcionarioId, dataHoraFormatada]);
+        console.log("retorno:", retorno);
     }
+    
 
     static async marcarComoOcupado(funcionarioId: number, dataHora: Date, connection: any) {
         const query = `
-        UPDATE horarios_funcionario
+        UPDATE horario_atendente
         SET ocupado = TRUE
         WHERE atendente_id = ? AND data_hora = ?
       `;
-        await connection.query(query, [funcionarioId, dataHora]);
+        await connection.execute(query, [funcionarioId, dataHora]);
+    }
+
+    static async marcarComoLivre(funcionarioId: number, dataHora: Date, connection: any) {
+
+        const query = `
+        UPDATE horario_atendente
+        SET ocupado = FALSE
+        WHERE SELECT id FROM atendente JOIN agendamento
+        atendente_id = ? AND data_hora = ?
+      `;
+        await connection.execute(query, [funcionarioId, dataHora]);
     }
 
     static async listarDisponiveis(funcionarioId: number, connection: any) {
@@ -73,7 +87,7 @@ class HorarioFuncionario {
         ORDER BY data_hora ASC
       `;
 
-        const [rows] = await connection.query(query, [funcionarioId, hoje, fim]);
+        const [rows] = await connection.execute(query, [funcionarioId, hoje, fim]);
         return rows;
     }
 }

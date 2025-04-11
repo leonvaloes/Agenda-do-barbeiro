@@ -37,6 +37,7 @@ class Agendamento {
   async cancelarAgendamento(agendamentoId: number, connection: any): Promise<void> {
     this.estado = this.estado.cancelar();
     await this.atualizarEstado(agendamentoId, connection);
+    
     this.notificarTodos();
   }
 
@@ -47,7 +48,7 @@ class Agendamento {
 
   static async validarDisponibilidade(atendenteId: number, dataHora: Date, connection: any): Promise<boolean> {
     const query = `
-      SELECT ocupado FROM horarios_funcionario 
+      SELECT ocupado FROM horario_atendente 
       WHERE atendente_id = ? AND data_hora = ?
     `;
     const [rows]: any = await connection.execute(query, [atendenteId, dataHora]);

@@ -14,10 +14,14 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-
+    
             const atendente = new Atendente(atendenteData.nome, atendenteData.cpf, atendenteData.senha, 0);
-            await atendente.createAtendente(connection);
-            await HorarioFuncionario.gerarHorariosFuncionario(atendente.id!, connection)
+            const result = await atendente.createAtendente(connection);
+
+            // Garantir que o ID do usuário seja atribuído ao atendente
+            const atendente_id= result.id;
+    
+            await HorarioFuncionario.gerarHorariosFuncionario(atendente_id, connection);
             await connection.commit();
             return atendente;
         } catch (error) {
@@ -27,6 +31,7 @@ class AtendenteController {
             connection.release();
         }
     }
+    
 
     async listarAtendentes() {
         const connection = await DatabaseManager.getInstance().getConnection();

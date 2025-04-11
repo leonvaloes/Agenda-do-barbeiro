@@ -16,15 +16,13 @@ class Atendente extends User {
         const values = [this.cpf, this.atendente_user_id];
         try {
             const result = await connection.execute(query, values);
-            return result;
+            return { id: result[0].insertId, ...result[0] };
         } catch (error) {
             throw error;
         }
-
     }
     
     
-
     async delete(id: number, connection: any) {
         const query = `DELETE FROM atendente WHERE id = ?`;
         try {

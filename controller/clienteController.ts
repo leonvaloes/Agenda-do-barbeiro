@@ -5,6 +5,7 @@ import Servico from "../models/servicos";
 
 import { NotificacaoEmail } from "../models/agendamentoNotificacaoObserver/notificacaoEmail";
 import { NotificacaoWhatsapp } from "../models/agendamentoNotificacaoObserver/NotificacaoWhatsapp";
+import HorarioFuncionario from "../models/horariosFuncionario";
 
 
 
@@ -112,6 +113,7 @@ class ClienteController {
             agendamento.adicionarObservador(new NotificacaoEmail());
             agendamento.adicionarObservador(new NotificacaoWhatsapp());
             await agendamento.create(connection);
+            await HorarioFuncionario.marcarComoOcupado(atendente_id, dataEhora, connection);
 
             await connection.commit();
             console.log("Agendamento criado e notificações preparadas.");

@@ -6,6 +6,7 @@ import { NotificacaoCliente } from '../models/agendamentoNotificacaoObserver/not
 import { NotificacaoEmail } from '../models/agendamentoNotificacaoObserver/notificacaoEmail';
 import { NotificacaoEstabelecimento } from '../models/agendamentoNotificacaoObserver/notificacaoEstabelecimento';
 import { NotificacaoWhatsapp } from '../models/agendamentoNotificacaoObserver/NotificacaoWhatsapp';
+import HorarioFuncionario from '../models/horariosFuncionario';
 import Item from '../models/item';
 import Notificacao from '../models/Notificacao';
 class AgendamentoController {
@@ -76,8 +77,11 @@ class AgendamentoController {
                 if (atendenteUserId) {
                     agendamento.adicionarObservador(new NotificacaoAtendente(atendenteUserId));
                 }
-
+                const dataHora= await HorarioFuncionario.
                 await agendamento.cancelarAgendamento(agendamentoId, connection);
+                
+                
+
                 return agendamento;
             } else {
                 throw new Error(`Agendamento com ID ${agendamentoId} não encontrado.`);
