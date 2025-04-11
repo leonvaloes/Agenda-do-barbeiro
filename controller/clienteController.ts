@@ -24,7 +24,7 @@ class ClienteController {
             return cliente;
         } catch (error) {
             await connection.rollback();
-            return "Erro ao criar cliente";
+            return `Erro ao criar cliente ${error}`;
         } finally {
             connection.release();
         }

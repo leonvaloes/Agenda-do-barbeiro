@@ -1,22 +1,43 @@
 import DatabaseManager from '../config/database';
 import Agendamento from '../models/agendamento';
+import { LogEstadoSistema } from '../models/agendamentoNotificacaoObserver/logEstado';
+import { NotificacaoAtendente } from '../models/agendamentoNotificacaoObserver/notificacaoAtendente';
+import { NotificacaoCliente } from '../models/agendamentoNotificacaoObserver/notificacaoCliente';
 import { NotificacaoEmail } from '../models/agendamentoNotificacaoObserver/notificacaoEmail';
+import { NotificacaoEstabelecimento } from '../models/agendamentoNotificacaoObserver/notificacaoEstabelecimento';
 import { NotificacaoWhatsapp } from '../models/agendamentoNotificacaoObserver/NotificacaoWhatsapp';
+import Item from '../models/item';
 import Notificacao from '../models/Notificacao';
 class AgendamentoController {
 
     async avancarEstado(agendamentoId: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
+
         try {
             const resultado = await Agendamento.getAgendamentoById(agendamentoId, connection);
+
             if (resultado && resultado.length > 0) {
                 const dados = resultado[0];
                 const agendamento = new Agendamento(dados.cliente_id, dados.item_id, dados.estado);
 
-                agendamento.adicionarObservador(new NotificacaoEmail());
-                agendamento.adicionarObservador(new NotificacaoWhatsapp());
-                await agendamento.avancarEstado(agendamentoId, connection);
+                // Notifica o cliente
+                agendamento.adicionarObservador(new NotificacaoCliente());
+                // Log do sistema
+                agendamento.adicionarObservador(new LogEstadoSistema());
 
+                // Notifica empresa responsável
+                const empresaUserId = await Item.getEmpresaUserIdPorItem(dados.item_id, connection);
+                if (empresaUserId) {
+                    agendamento.adicionarObservador(new NotificacaoEstabelecimento(empresaUserId));
+                }
+
+                // Notifica atendente responsável
+                const atendenteUserId = await Item.getAtendenteUserIdPorItem(dados.item_id, connection);
+                if (atendenteUserId) {
+                    agendamento.adicionarObservador(new NotificacaoAtendente(atendenteUserId));
+                }
+
+                await agendamento.avancarEstado(agendamentoId, connection);
                 return agendamento;
             } else {
                 throw new Error(`Agendamento com ID ${agendamentoId} não encontrado.`);
@@ -29,17 +50,33 @@ class AgendamentoController {
         }
     }
 
-    
     async cancelarAgendamento(agendamentoId: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
+
         try {
             const resultado = await Agendamento.getAgendamentoById(agendamentoId, connection);
             if (resultado && resultado.length > 0) {
                 const dados = resultado[0];
                 const agendamento = new Agendamento(dados.cliente_id, dados.item_id, dados.estado);
 
-                agendamento.adicionarObservador(new NotificacaoEmail());
-                agendamento.adicionarObservador(new NotificacaoWhatsapp());
+                // Notifica o cliente
+                agendamento.adicionarObservador(new NotificacaoCliente());
+
+                // Log do sistema
+                agendamento.adicionarObservador(new LogEstadoSistema());
+
+                // Notifica empresa responsável
+                const empresaUserId = await Item.getEmpresaUserIdPorItem(dados.item_id, connection);
+                if (empresaUserId) {
+                    agendamento.adicionarObservador(new NotificacaoEstabelecimento(empresaUserId));
+                }
+
+                // Notifica atendente responsável
+                const atendenteUserId = await Item.getAtendenteUserIdPorItem(dados.item_id, connection);
+                if (atendenteUserId) {
+                    agendamento.adicionarObservador(new NotificacaoAtendente(atendenteUserId));
+                }
+
                 await agendamento.cancelarAgendamento(agendamentoId, connection);
                 return agendamento;
             } else {
@@ -52,6 +89,7 @@ class AgendamentoController {
             connection.release();
         }
     }
+
 }
 
 export default AgendamentoController;

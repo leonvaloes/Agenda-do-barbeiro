@@ -21,7 +21,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
     try {
         const updatedClient = await clienteController.atualizarCliente(req.params.id, req.body);
-        
+
         if (!updatedClient) {
             return res.status(404).send('Cliente não encontrado');
         }
@@ -72,7 +72,7 @@ router.get('/', async (req, res) => {
 router.post('/agendar', async (req, res) => {
     try {
         const { cliente_id, atendente_id, serv_id, data_hora } = req.body;
-        
+
         await clienteController.Agendar(cliente_id, atendente_id, serv_id, data_hora);
         res.status(201).send('Agendamento criado com sucesso!');
     } catch (e) {
