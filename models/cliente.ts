@@ -3,16 +3,19 @@ import User from "./user";
 class Cliente extends User {
     cpf: string;
     cidade: string;
+    cliente_user_id: number;
 
-    constructor(nome: string, cpf: string, senha: string, cidade: string) {
+    constructor(nome: string, cpf: string, senha: string, cidade: string, cliente_user_id: number) {
         super(nome, senha);
         this.cpf = cpf;
         this.cidade = cidade;
-      }
+        this.cliente_user_id = cliente_user_id;
+    }
 
-      async createCliente(connection: any) {
-        const query = `INSERT INTO cliente (nome, cpf, senha, cidade) VALUES (?, ?, ?, ?)`;
-        const values = [this.nome, this.cpf, this.senha, this.cidade];
+    async createCliente(connection: any) {
+        this.cliente_user_id = await User.cadastrarUser(this.nome, this.senha, connection);
+        const query = `INSERT INTO cliente ( cpf, cidade, cliente_user_id) VALUES (?, ?, ?)`;
+        const values = [this.cpf,  this.cidade, this.cliente_user_id];
         try {
             const result = await connection.execute(query, values);
             return result;
@@ -21,7 +24,7 @@ class Cliente extends User {
             throw error;
         }
     }
-    
+
 
     async delete(id: number, connection: any) {
         const query = `DELETE FROM cliente WHERE id = ?`;
@@ -76,13 +79,11 @@ class Cliente extends User {
 
     static async createItem(atendente_id: number, serv_id: number, dataEhora: Date, connection: any) {
         const query = `INSERT INTO item (atendente_id, serv_id, data_hora ) VALUES (?, ?, ?)`;
-
         const formattedDate = new Date(dataEhora).toISOString().slice(0, 19).replace('T', ' ');
         const values = [atendente_id, serv_id, formattedDate];
 
         try {
             const result = await connection.execute(query, values);
-            console.log("item id= ", result[0].insertId);
             return result[0].insertId;
         } catch (error) {
             console.error('Erro ao criar item:', error);

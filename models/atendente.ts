@@ -2,22 +2,28 @@ import User from "./user";
 
 class Atendente extends User {
     cpf: string;
+    atendente_user_id:number;
   
-    constructor(nome: string, cpf: string, senha: string) {
+    constructor(nome: string, cpf: string, senha: string, atendente_user_id:number) {
       super(nome, senha);
       this.cpf = cpf;
+      this.atendente_user_id= atendente_user_id;
     }
     
-    static async create(connection: any, data: Atendente) {
-        const query = `INSERT INTO atendente (nome, cpf, senha) VALUES (?, ?, ?)`;
+    async createAtendente(connection:any){
+        this.atendente_user_id = await User.cadastrarUser(this.nome, this.senha, connection);
+        const query = `INSERT INTO atendente (cpf, atendente_user_id) VALUES ( ?, ?)`;
+        const values = [this.cpf, this.atendente_user_id];
         try {
-            const result = await connection.execute(query, [data.nome, data.cpf, data.senha]);
+            const result = await connection.execute(query, values);
             return result;
         } catch (error) {
-            console.error('Erro ao inserir atendente:', error);
+            console.error('Erro ao criar atendente:', error);
             throw error;
         }
+
     }
+    
     
 
     async delete(id: number, connection: any) {
@@ -69,26 +75,19 @@ class Atendente extends User {
         }
     }
 
-
     async Associar(connection: any, servicoId: number, atendenteId: number) {
-        try {
-            await connection.beginTransaction();
-    
-            // Verifica se os parâmetros são válidos
+        try {    
             if (!atendenteId || !servicoId) {
-                throw new Error(`Parâmetros inválidos: atendenteId=${atendenteId}, servicoId=${servicoId}`);
+                return null;
             }
-    
-            // Criando a relação na tabela intermediária
+            
             const queryAssociacao = `INSERT INTO atendente_serv (atendente_id, serv_id) VALUES (?, ?)`;
             await connection.execute(queryAssociacao, [atendenteId, servicoId]);
     
-            connection.commit();
             console.log("Serviço associado ao atendente com sucesso!");
     
             return servicoId;
         } catch (error) {
-            await connection.rollback();
             console.error("Erro ao associar serviço ao atendente:", error);
             throw error;
         }

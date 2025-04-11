@@ -12,4 +12,5 @@ export class Confirmado implements AgendamentoEstado {
   cancelar(): AgendamentoEstado {
     return new Cancelado();
   }
+  
 }

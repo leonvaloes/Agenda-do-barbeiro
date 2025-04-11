@@ -7,7 +7,6 @@ abstract class User {
     id?: number;
     nome: string;
     senha: string;
-
     
     constructor(nome: string, senha: string) {
         this.nome = nome;
@@ -55,19 +54,13 @@ abstract class User {
 
     }
     
-    async cadastrarUser(connection: any): Promise<any> {
+    static async cadastrarUser(nome:string, senha:string ,connection: any): Promise<any> {
         const query = `INSERT INTO user (nome, senha) VALUES (?, ?)`;
-        const values = [this.nome, this.senha];
-
-        return new Promise((resolve, reject) => {
-            connection.query(query, values, (error: any, results: any) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(results);
-                }
-            });
-        });
+        const values = [nome, senha];
+        
+        const teste=await connection.query(query, values);
+        console.log(teste[0].insertId);
+        return teste[0].insertId;
     }
 }
 

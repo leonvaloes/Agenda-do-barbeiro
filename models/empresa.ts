@@ -7,8 +7,9 @@ class Empresa extends User {
     endereco: string;
     estado: string;
     telefone: string;
+    empresa_user_id:number;
   
-    constructor(nome: string, email: string, cnpj: string, cidade: string, endereco: string, estado: string, telefone: string, senha: string) {
+    constructor(nome: string, email: string, cnpj: string, cidade: string, endereco: string, estado: string, telefone: string, senha: string, empresa_user_id:number) {
       super(nome, senha);
       this.email = email;
       this.cnpj = cnpj;
@@ -16,17 +17,17 @@ class Empresa extends User {
       this.endereco = endereco;
       this.estado = estado;
       this.telefone = telefone;
+      this.empresa_user_id=empresa_user_id;
     }
 
-    static async create (data: Empresa, connection:any){
-        const query = `INSERT INTO empresa (nome, email, cnpj, cidade, endereco, estado, telefone, senha) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-        const values = [data.nome, data.email, data.cnpj, data.cidade, data.endereco, data.estado, data.telefone, data.senha];
+    async create (connection:any){
+        this.empresa_user_id = await User.cadastrarUser(this.nome, this.senha, connection);
+        const query = `INSERT INTO empresa (email, cnpj, cidade, endereco, estado, telefone, empresa_user_id) VALUES ( ?, ?, ?, ?, ?, ?, ?)`;
+        const values = [ this.email, this.cnpj, this.cidade, this.endereco, this.estado, this.telefone, this.empresa_user_id];
         try {
             const result = await connection.execute(query, values);
-            connection.commit();
             return result;
         } catch (error) {
-            connection.rollback();
             console.error('Erro ao criar empresa:', error);
             throw error;
         }
@@ -36,10 +37,8 @@ class Empresa extends User {
         const query = `DELETE FROM empresa WHERE id = ?`;
         try {
             const result = await connection.execute(query, [id]);
-            connection.commit();
             return result;
         } catch (error) {
-            connection.rollback();
             console.error('Erro ao deletar empresa:', error);
             throw error;
         }
@@ -49,10 +48,8 @@ class Empresa extends User {
         const query = `UPDATE empresa SET nome = ?, email = ?, cnpj = ?, cidade = ?, endereco = ?, estado = ?, telefone = ?, senha = ? WHERE id = ?`;
         try {
             await connection.execute(query, [data.nome, data.email, data.cnpj, data.cidade, data.endereco, data.estado, data.telefone, data.senha, id]);
-            connection.commit();
             return {id,...data};
         } catch (error) {
-            connection.rollback();
             console.error('Erro ao atualizar empresa:', error);
             throw error;
         }
@@ -71,9 +68,7 @@ class Empresa extends User {
 
 
     async adicionaAtendente(connection: any, cpf: string, empresaId: number) {
-        const queryBusca = `SELECT id FROM atendente WHERE cpf = ?`;
-        console.log("cpf: ", cpf);
-    
+        const queryBusca = `SELECT id FROM atendente WHERE cpf = ?`;   
         try {
             const [rows]: any = await connection.execute(queryBusca, [cpf]);
     
@@ -83,14 +78,12 @@ class Empresa extends User {
                 
                 const queryUpdate = `UPDATE atendente SET empresa_id = ? WHERE cpf = ?`;
                 await connection.execute(queryUpdate, [empresaId, cpf]);
-                await connection.commit();
                 
                 return { id: atendente.id, ...atendente };
             } else {
                 throw new Error("Atendente não encontrado");
             }
         } catch (error) {
-            await connection.rollback();
             console.error("Erro ao buscar atendente:", error);
             throw error;
         }

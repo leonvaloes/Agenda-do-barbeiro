@@ -7,9 +7,7 @@ class create_empresa {
         await connection.execute(`
         CREATE TABLE IF NOT EXISTS empresa (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            nome VARCHAR(255) NOT NULL,
             cnpj VARCHAR(20) UNIQUE,
-            senha VARCHAR(255) NOT NULL,
             cidade VARCHAR(255) NOT NULL,
             endereco VARCHAR(255) NOT NULL,
             estado VARCHAR(255) NOT NULL,

@@ -13,16 +13,17 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            const retorno = await Atendente.create(connection, atendenteData);
-            if (retorno)
-                await connection.commit();
 
+            const atendente = new Atendente(atendenteData.nome, atendenteData.cpf, atendenteData.senha, 0);
+            await atendente.createAtendente(connection);
+
+            await connection.commit();
         } catch (error) {
-            console.error("Erro ao criar atendente:", error);
             await connection.rollback();
+            console.error('Erro ao criar atendente:', error);
             throw error;
         } finally {
-            connection.release;
+            connection.release();
         }
     }
 
@@ -46,7 +47,7 @@ class AtendenteController {
         try {
             connection.beginTransaction();
 
-            const atendenteModel = new Atendente("", "", "");
+            const atendenteModel = new Atendente("", "", "",0);
             const atendenteExistente = await Atendente.getAtendenteById(id, connection);
 
             if (!atendenteExistente.length) {
@@ -71,7 +72,7 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-            const atendenteModel = new Atendente("", "", "");
+            const atendenteModel = new Atendente("", "", "", 0);
             const atendenteExistente = await Atendente.getAtendenteById(id, connection);
             if (!atendenteExistente.length) {
                 throw new Error("Atendente não encontrado.");
@@ -94,7 +95,7 @@ class AtendenteController {
     
         try {
             await connection.beginTransaction();
-            const AtendenteModel = new Atendente("", "", "");
+            const AtendenteModel = new Atendente("", "", "", 0);
     
             // Criando o serviço
             const servico = await Servico.create(connection, data);    

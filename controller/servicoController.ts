@@ -65,7 +65,6 @@ class ServicoController {
             const retorno = await servico.delete(connection, id);
             connection.commit();
             return retorno;
-           
         } catch (error) {
             console.error('Erro ao deletar serviço:', error);
             connection.rollback();

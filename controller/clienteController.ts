@@ -8,6 +8,7 @@ import { AgendamentoSubject } from '../Observer/AgendamentoSubject';
 import { LoggerObserver } from '../Observer/LoggerObserver';
 import { NotificarAtendenteObserver } from '../Observer/NotificarAtendenteObserver';
 import User from "../models/user";
+import Agendamento from "../models/agendamento";
 
 
 const subject = new AgendamentoSubject();
@@ -23,14 +24,16 @@ class ClienteController {
     async createCliente(clienteData: any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            connection.beginTransaction();
-            const cliente = new Cliente(clienteData.nome, clienteData.cpf, clienteData.senha, clienteData.cidade);
-            await cliente.cadastrarUser(connection);
-            await cliente.createCliente(connection); // Cadastra no 'cliente'
-            connection.commit();
+            await connection.beginTransaction();        
+
+            const cliente = new Cliente(clienteData.nome, clienteData.cpf, clienteData.senha, clienteData.cidade, 0);
+            await cliente.createCliente(connection); // Cadastra no 'cliente'            
+
+
+            await connection.commit();
         } catch (error) {
 
-            connection.rollback();
+            await connection.rollback();
             console.error('Erro ao criar atendente:', error);
             throw error;
         } finally {
@@ -43,13 +46,15 @@ class ClienteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-            const clienteModel = new Cliente("", "", "", "");
+            const clienteModel = new Cliente("", "", "", "",0);
             const clienteExistente = await Cliente.getClienteById(id, connection);
             if (!clienteExistente.length)
                 throw new Error("Cliente não encontrado.");
             const clienteAtualizado = await clienteModel.update(id, data, connection);
+            connection.commit();
             return clienteAtualizado;
         } catch (error) {
+            connection.rollback();
             console.error('Erro ao atualizar cliente:', error);
             throw error;
         } finally {
@@ -62,7 +67,7 @@ class ClienteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-            const clienteModel = new Cliente("", "", "", "");
+            const clienteModel = new Cliente("", "", "", "",0);
             const clienteExistente = await Cliente.getClienteById(id, connection);
             if (!clienteExistente.length) {
                 throw new Error("Cliente não encontrado.");
@@ -100,7 +105,8 @@ class ClienteController {
 
             // Criar o item e o agendamento
             const itemId = await Cliente.createItem(atendente_id, serv_id, dataEhora, connection);
-            await Cliente.createAgendamento(cliente_id, itemId, connection);
+            const agendamento = new Agendamento(cliente_id, itemId);
+            await agendamento.create(connection);
 
             // Buscar detalhes do cliente e serviço
             const cliente = await Cliente.getClienteById(cliente_id, connection);

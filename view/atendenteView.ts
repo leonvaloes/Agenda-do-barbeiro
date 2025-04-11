@@ -1,4 +1,6 @@
 import AtendenteController from '../controller/atendenteController'
+import AgendamentoController from '../controller/agendamentoController';
+const agendamentoController = new AgendamentoController();
 const atendenteController = new AtendenteController();
 const router = require('express').Router();
 
@@ -75,6 +77,19 @@ router.post('/criar-servico/:id', async (req, res) => {
         });
     }
 });
+
+router.post('/proxEstado/:id', async (req,res)=>{
+    try{
+        const agendamentoId = req.params.id;
+
+        const result = await agendamentoController.avancarEstado(agendamentoId);
+
+        res.status(200).send(result);
+    }catch(e){
+        console.log(e)
+        res.status(500).send('Erro inteno do servidor')
+    }
+})
 
 
 export = router;

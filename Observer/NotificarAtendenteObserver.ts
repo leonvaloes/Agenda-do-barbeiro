@@ -8,5 +8,4 @@ export class NotificarAtendenteObserver implements IAgendamentoObserver {
         console.log(`Serviço: ${dados.servico_nome}`);
         console.log(`Data e Hora: ${dados.data_hora}`);
       }
-      
 }

@@ -5,11 +5,7 @@ class create_user {
         CREATE TABLE IF NOT EXISTS user (
             id INT AUTO_INCREMENT PRIMARY KEY,
             nome VARCHAR(255) NOT NULL,
-            senha VARCHAR(255) NOT NULL,
-            cidade VARCHAR(255) NOT NULL,
-            estado VARCHAR(255) NOT NULL,
-            telefone VARCHAR(15),
-            email VARCHAR(255)
+            senha VARCHAR(255) NOT NULL
         )`);
         console.log('Tabela user criada!');
     }
