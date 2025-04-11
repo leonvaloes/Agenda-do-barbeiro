@@ -39,20 +39,20 @@ class HorarioFuncionario {
 
     static async criarHorario(funcionarioId: number, dataHora: Date, connection: any) {
         const dataHoraFormatada = dataHora.toISOString().slice(0, 19).replace("T", " ");
-    
+
         const query = `
             INSERT INTO horario_atendente (atendente_id, data_hora, ocupado)
             VALUES (?, ?, FALSE)
             ON DUPLICATE KEY UPDATE atendente_id = atendente_id
         `;
-    
+
         console.log("funcionarioId:", funcionarioId);
         console.log("dataHoraFormatada:", dataHoraFormatada);
-    
-        const retorno= await connection.execute(query, [funcionarioId, dataHoraFormatada]);
+
+        const retorno = await connection.execute(query, [funcionarioId, dataHoraFormatada]);
         console.log("retorno:", retorno);
     }
-    
+
 
     static async marcarComoOcupado(funcionarioId: number, dataHora: Date, connection: any) {
         const query = `
@@ -64,12 +64,16 @@ class HorarioFuncionario {
     }
 
     static async marcarComoLivre(funcionarioId: number, dataHora: Date, connection: any) {
-
         const query = `
-        UPDATE horario_atendente
+        UPDATE horarios_funcionario
         SET ocupado = FALSE
-        WHERE SELECT id FROM atendente JOIN agendamento
-        atendente_id = ? AND data_hora = ?
+        WHERE atendente_id = ?
+        AND data_hora = (
+            SELECT i.data_hora
+            FROM agendamento a
+            JOIN item i ON a.item_id = i.id
+            WHERE a.id = ?
+        );
       `;
         await connection.execute(query, [funcionarioId, dataHora]);
     }
