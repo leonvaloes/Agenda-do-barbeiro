@@ -18,7 +18,7 @@ class Atendente extends User {
             const result = await connection.execute(query, values);
             return result;
         } catch (error) {
-            return null;
+            throw error;
         }
 
     }
@@ -36,7 +36,7 @@ class Atendente extends User {
             };
         } catch (error) {
             console.error('Erro ao deletar atendente:', error);
-            return null;
+            throw error;
         }
     }
 
@@ -48,7 +48,7 @@ class Atendente extends User {
             return { id, ...data };
         } catch (error) {
             console.error('Erro ao atualizar atendente:', error);
-            return null;
+            throw error;
         }
     }
     
@@ -59,7 +59,7 @@ class Atendente extends User {
             return result[0];
         } catch (error) {
             console.error('Erro ao buscar atendente:', error);
-            return null;
+            throw error;
         }
     }
 
@@ -70,14 +70,14 @@ class Atendente extends User {
             return result[0];
         } catch (error) {
             console.error('Erro ao listar atendentes:', error);
-            return null;
+            throw error;
         }
     }
 
     async Associar(connection: any, servicoId: number, atendenteId: number) {
         try {    
             if (!atendenteId || !servicoId) {
-                return null;
+                throw new Error("ID do atendente ou serviço não fornecido.");
             }
             
             const queryAssociacao = `INSERT INTO atendente_serv (atendente_id, serv_id) VALUES (?, ?)`;
@@ -88,7 +88,7 @@ class Atendente extends User {
             return servicoId;
         } catch (error) {
             console.error("Erro ao associar serviço ao atendente:", error);
-            return null;
+            throw error;
         }
     }   
 }

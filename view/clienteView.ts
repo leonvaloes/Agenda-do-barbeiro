@@ -9,14 +9,10 @@ router.post('/', async (req, res) => {
         const cliente = await clienteController.createCliente(req.body);
         res.status(201).send(cliente);
     } catch (e) {
-
-        if (e.message === '400') {
-            res.status(400).send('Erro: Cliente já cadastrado.');
-        } else {
-            res.status(500).send('Erro interno do servidor.');
-        }
+        res.status(400).send(`Erro: ${e.message}`);
     }
 });
+
 
 router.put('/:id', async (req, res) => {
     try {
@@ -28,11 +24,7 @@ router.put('/:id', async (req, res) => {
 
         res.status(200).send(updatedClient);
     } catch (e) {
-        console.log(e);
-        if (e.message === 'Cliente não encontrado') {
-            return res.status(404).send(e.message);
-        }
-        res.status(500).send('Erro interno do servidor');
+        res.status(400).send(`Erro: ${e.message}`);
     }
 });
 
@@ -48,11 +40,7 @@ router.delete('/:id', async (req, res) => {
 
         res.status(200).send(deletedClient);
     } catch (e) {
-        console.log(e);
-        if (e.message === 'Cliente não encontrado') {
-            return res.status(404).send(e.message);
-        }
-        res.status(500).send('Erro interno do servidor');
+        res.status(400).send(`Erro: ${e.message}`);
     }
 });
 
@@ -63,8 +51,7 @@ router.get('/', async (req, res) => {
         const data = await clienteController.listarClientes();
         res.status(200).json(data).send();
     } catch (e) {
-        console.log(e);
-        res.status(200).json([]).send();
+        res.status(400).send(`Erro: ${e.message}`);
     }
 });
 
@@ -76,8 +63,7 @@ router.post('/agendar', async (req, res) => {
         await clienteController.Agendar(cliente_id, atendente_id, serv_id, data_hora);
         res.status(201).send('Agendamento criado com sucesso!');
     } catch (e) {
-        console.log(e);
-        res.status(500).send('Erro interno do servidor');
+        res.status(400).send(`Erro: ${e.message}`);
     }
 });
 
@@ -89,9 +75,8 @@ router.put('/cancelarAgendamento/:id', async (req, res) => {
         await agendamentoController.cancelarAgendamento(agendamento_id);
         res.status(200).send('Agendamento cancelado com sucesso!');
     } catch (e) {
-        console.log(e);
-        res.status(500).send('Erro interno do servidor');
+        res.status(400).send(`Erro: ${e.message}`);
     }
 })
 
-module.exports = router; // Exporta o roteador de usuários
+module.exports = router;

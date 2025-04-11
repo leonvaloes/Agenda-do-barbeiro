@@ -16,14 +16,14 @@ class ServicoController {
     
             const servicoId = await Servico.create(connection, dados);
             if (!servicoId) {
-                return null;
+                throw new Error("Erro ao criar serviço");
             }
     
             connection.commit();
             return servicoId; // Retorna o ID do serviço criado
         } catch (error) {
             connection.rollback();
-            return "Erro ao criar serviço";
+            throw error;
         } finally {
             connection.release();
         }
@@ -37,14 +37,14 @@ class ServicoController {
 
             const servico= await Servico.getServicoById(id, connection);
             if(!servico){
-                return null;
+                throw new Error("Serviço não encontrado");
             }
             const retorno = await servico.update(connection, dados, id);
             connection.commit();
             return retorno;
         } catch (error) {
             connection.rollback();
-            return "Erro ao atualizar serviço";
+            throw error;
         } finally {
             connection.release();
         }
@@ -56,14 +56,14 @@ class ServicoController {
             connection.beginTransaction();
             const servico= await Servico.getServicoById(id, connection);
             if(!servico)
-                return null;
+                throw new Error("Serviço não encontrado");
             
             const retorno = await servico.delete(connection, id);
             connection.commit();
             return retorno;
         } catch (error) {
             connection.rollback();
-            return "Erro ao deletar serviço";
+            throw error;
         } finally {
             connection.release();
         }
@@ -75,7 +75,7 @@ class ServicoController {
             const servicos= await Servico.listarServicos(connection);
             return servicos;
         } catch (error) {
-            return "Erro ao listar serviços";
+            throw error;
         } finally {
             connection.release();
         }

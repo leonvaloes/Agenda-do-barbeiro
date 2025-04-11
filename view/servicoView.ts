@@ -7,10 +7,8 @@ router.post('/',async(req,res)=>{
         const servico = await servicoController.criarServico(req.body);
         res.status(201).send(servico);
     }catch(e){
-        if(e.message==='400')
-            res.status(400).send("Serviço já cadastrado!");
-        else 
-            res.status(500).send("Erro no servidor interno");
+        res.status(400).send(`Erro: ${e.message}`);
+
     }
 })
 
@@ -22,10 +20,8 @@ router.put('/:id',async(req,res)=>{
         
         res.status(200).send("Serviço Atualizado com sucesso")
     }catch(e){
-        console.log(e)
-        if(e==="Serviço não encontrado")
-            return res.status(404).send(e.message);
-        res.status(500).send('Erro inteno do servidor')
+        res.status(400).send(`Erro: ${e.message}`);
+
     }
 })
 
@@ -34,7 +30,7 @@ router.get('/',async(req,res)=>{
         const servicos=await servicoController.listarServicos()
         res.status(200).send(servicos);
     }catch(e){
-        res.status(500).send("Erro no servidor interno");
+        res.status(400).send(`Erro: ${e.message}`);
     }
 })
 
@@ -45,10 +41,7 @@ router.delete('/:id',async(req,res)=>{
             return res.status(404).send('Serviço não encontrado')
         res.status(200).send(deletedServi)
     }catch(e){
-        console.log(e)
-        if(e==='Serviço não encontrado')
-            return res.status(404).send(e.message);
-        res.status(500).error('Erro no Servidor interno')
+        res.status(400).send(`Erro: ${e.message}`);
     }
 })
 

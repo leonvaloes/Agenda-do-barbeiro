@@ -28,8 +28,7 @@ class Empresa extends User {
             const result = await connection.execute(query, values);
             return result;
         } catch (error) {
-            console.error('Erro ao criar empresa:', error);
-            return null;
+            throw error;
         }
     }
 
@@ -39,19 +38,17 @@ class Empresa extends User {
             const result = await connection.execute(query, [id]);
             return result;
         } catch (error) {
-            console.error('Erro ao deletar empresa:', error);
-            return null;
+            throw error;
         }
     }
 
     static async update (id:number, data: Empresa, connection:any){
-        const query = `UPDATE empresa SET nome = ?, email = ?, cnpj = ?, cidade = ?, endereco = ?, estado = ?, telefone = ?, senha = ? WHERE id = ?`;
+        const query = `UPDATE empresa SET  email = ?, cnpj = ?, cidade = ?, endereco = ?, estado = ?, telefone = ? WHERE id = ?`;
         try {
-            await connection.execute(query, [data.nome, data.email, data.cnpj, data.cidade, data.endereco, data.estado, data.telefone, data.senha, id]);
+            await connection.execute(query, [data.email, data.cnpj, data.cidade, data.endereco, data.estado, data.telefone, id]);
             return {id,...data};
         } catch (error) {
-            console.error('Erro ao atualizar empresa:', error);
-            return null;
+            throw error;
         }
     }
 
@@ -61,8 +58,7 @@ class Empresa extends User {
             const result:any= await connection.execute(query, [id]);
             return result[0];
         } catch (error) {
-            console.error('Erro ao buscar empresa:');
-            return null;
+            throw error;
         }
     }
 
@@ -81,11 +77,10 @@ class Empresa extends User {
                 
                 return { id: atendente.id, ...atendente };
             } else {
-                return null;
+                throw new Error("Atendente não encontrado");
             }
         } catch (error) {
-            console.error("Erro ao buscar atendente:", error);
-            return null;
+            throw error;
         }
     }
     

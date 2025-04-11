@@ -7,11 +7,8 @@ router.post('/', async (req,res)=>{
         const empresa = await empresaController.criarEmpresa(req.body);
         res.status(201).send(empresa);
     }catch(e){
-        
-        if(e.message==='400')
-            res.status(400).send("Empresa já cadastrada!");
-        else 
-            res.status(500).send("Errono servidor interno");
+        res.status(400).send(`Erro: ${e.message}`);
+
     }
 });
 
@@ -24,7 +21,7 @@ router.delete('/:id', async (req, res)=>{
         else
             res.status(404).send("Empresa não encontrada!");
     }catch(e){
-        res.status(500).send("Errono servidor interno");
+        res.status(400).send(`Erro: ${e.message}`);
     }
 });
 
@@ -34,7 +31,7 @@ router.get('/', async (req,res)=>{
         const empresas= await empresaController.listarEmpresas();
         res.status(200).send(empresas);
     }catch(e){
-        res.status(500).send("Erro no servidor interno");
+        res.status(400).send(`Erro: ${e.message}`);
     }
 });
 
@@ -47,7 +44,7 @@ router.put('/:id', async (req, res)=>{
         else
             res.status(404).send("Empresa não encontrada!");
     }catch(e){
-        res.status(500).send("Erro no servidor interno");
+        res.status(400).send(`Erro: ${e.message}`);
     }
 })
 
@@ -65,11 +62,7 @@ router.post('/:empresaId/funcionario', async (req, res) => {
         await empresaController.adicionarFuncionario(cpf, empresaId);
         res.status(200).send("Funcionário adicionado à empresa com sucesso!");
     } catch (e) {
-        if (e.message === "Funcionário não encontrado.") {
-            res.status(404).send(e.message);
-        } else {
-            res.status(500).send("Erro no servidor interno");
-        }
+        res.status(400).send(`Erro: ${e.message}`);
     }
 });
 

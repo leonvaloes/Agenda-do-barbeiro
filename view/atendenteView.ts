@@ -11,11 +11,7 @@ router.post('/', async (req,res)=>{
        const atendente = await atendenteController.createAtendente(req.body);
         res.status(201).send(atendente);
     }catch(e){
-        
-        if(e.message==='400')
-            res.status(400).send("Atendente já cadastrado!");
-        else 
-            res.status(500).send("Erro no servidor interno");
+        res.status(400).send(`Erro: ${e.message}`);
     }
 });
 
@@ -24,8 +20,7 @@ router.get('/', async (req, res)=>{
       const atendentes=  await atendenteController.listarAtendentes();
         res.status(200).send(atendentes);
     }catch(e){
-        res.status(500).send("Erro no servidor interno");
-    }
+        res.status(400).send(`Erro: ${e.message}`);    }
 });
 
 
@@ -37,10 +32,7 @@ router.put('/:id', async (req, res)=>{
 
         res.status(201).send(updateAtend)
     }catch(e){
-        console.log(e)
-        if(e==="Atendente não encontrado")
-            return res.status(404).send(e.message);
-        res.status(500).send('Erro inteno do servidor')
+        res.status(400).send(`Erro: ${e.message}`);
     }
 })
 
@@ -54,10 +46,7 @@ router.delete('/:id', async(req,res)=>{
 
         res.status(201).send("Atendente Deletado Com sucesso!")
     }catch(e){
-        console.log(e)
-        if(e==="Atendente não encontrado")
-            return res.status(404).send(e.message);
-        res.status(500).send('Erro inteno do servidor')
+        res.status(400).send(`Erro: ${e.message}`);
     }
 })
 
@@ -71,12 +60,8 @@ router.post('/criar-servico/:id', async (req, res) => {
             message: "Serviço criado e associado com sucesso!",
             servicoId
         });
-    } catch (error) {
-        console.error("Erro ao criar serviço:", error);
-        res.status(500).send({
-            message: "Erro no servidor interno",
-            error: error.message || error
-        });
+    } catch (e) {
+        res.status(400).send(`Erro: ${e.message}`);
     }
 });
 
@@ -88,8 +73,7 @@ router.post('/proxEstado/:id', async (req,res)=>{
 
         res.status(200).send(result);
     }catch(e){
-        console.log(e)
-        res.status(500).send('Erro inteno do servidor')
+        res.status(400).send(`Erro: ${e.message}`);
     }
 })
 
@@ -100,8 +84,7 @@ router.post('/notificacao', async (req, res)=>{
         const result = await notificacaoController.SetNotificacao();
         res.status(200).send(result);
     }catch(e){
-        console.log(e)
-        res.status(500).send('Erro inteno do servidor')
+        res.status(400).send(`Erro: ${e.message}`);
     }
 })
 
