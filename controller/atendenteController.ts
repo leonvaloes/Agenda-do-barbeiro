@@ -1,5 +1,6 @@
 import DatabaseManager from '../config/database';
 import Atendente from '../models/atendente';
+import HorarioFuncionario from '../models/horariosFuncionario';
 import Servico from "../models/servicos";
 
 class AtendenteController {
@@ -16,6 +17,7 @@ class AtendenteController {
 
             const atendente = new Atendente(atendenteData.nome, atendenteData.cpf, atendenteData.senha, 0);
             await atendente.createAtendente(connection);
+            await HorarioFuncionario.gerarHorariosFuncionario(atendente.id!, connection)
             await connection.commit();
             return atendente;
         } catch (error) {

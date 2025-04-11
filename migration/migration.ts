@@ -17,6 +17,8 @@ import alterUserCliente from './016_alter_user_cliente';
 import alterUserNotificacao from './014_alter_user_notificacao';
 import alterUserAtendente from './015_alter_user_atendente';
 import alterUserEmpresa from './017_alter_user_empresa';
+import create_horario_atendente from './018_create_horario_atendente';
+import alter_horario_atendente from './019_alter_horario_atendente';
 
 class Migrations {
     async up() {
@@ -44,6 +46,8 @@ class Migrations {
             await new alterUserAtendente().up(connection);
             await new alterUserEmpresa().up(connection);
 
+            await new create_horario_atendente().up(connection)
+            await new alter_horario_atendente().up(connection)
             console.log('Migrations finished!');
             connection.release();
         } catch (error) {
@@ -76,7 +80,8 @@ class Migrations {
             await new createEmpresa().down(connection);
             await new alterUserAtendente().down(connection)
             await new alterUserEmpresa().down(connection)
-            
+            await new alter_horario_atendente().down(connection)
+            await new create_horario_atendente().down(connection)
             console.log('Migrations finished!');
             connection.release();
         } catch (error) {
