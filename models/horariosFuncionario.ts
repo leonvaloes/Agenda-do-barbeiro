@@ -66,7 +66,7 @@ class HorarioFuncionario {
         fim.setDate(hoje.getDate() + 30);
 
         const query = `
-        SELECT * FROM horarios_funcionario
+        SELECT * FROM horario_atendente
         WHERE atendente_id = ? 
           AND ocupado = FALSE
           AND data_hora BETWEEN ? AND ?
