@@ -93,7 +93,6 @@ class AgendamentoController {
             connection.release();
         }
     }
-
 }
 
 export default AgendamentoController;

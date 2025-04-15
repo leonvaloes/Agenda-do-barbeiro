@@ -86,6 +86,8 @@ router.post('/notificacao', async (req, res)=>{
     }catch(e){
         res.status(400).send(`Erro: ${e.message}`);
     }
-})
+});
+
+
 
 export = router;

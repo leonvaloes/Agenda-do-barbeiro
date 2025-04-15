@@ -30,6 +30,9 @@ class Item {
         const [rows]: any = await connection.execute(query, [itemId]);
         return rows.length > 0 ? rows[0].user_id : null;
     }
+
+    
+    
 }
 
 export default Item;

@@ -74,7 +74,7 @@ class Cliente extends User {
 
     static async createItem(atendente_id: number, serv_id: number, dataEhora: any, connection: any) {
         const dataHoraFormatada = dataEhora.toISOString().slice(0, 19).replace("T", " ");
-
+        
         const query = `INSERT INTO item (atendente_id, serv_id, data_hora) VALUES (?, ?, ?)`;
         const values = [atendente_id, serv_id, dataHoraFormatada];
     

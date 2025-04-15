@@ -88,7 +88,20 @@ class Atendente extends User {
             console.error("Erro ao associar serviço ao atendente:", error);
             throw error;
         }
-    }   
+    }
+    
+    async getAllServ(connection:any, atendente_id){
+        const query = `SELECT serv_id FROM atendente_serv WHERE atendente_id = ?`;
+        try {
+            const [result] = await connection.execute(query, [atendente_id]);
+            return result;
+        } catch (error) {
+            console.error('Erro ao buscar serviços do atendente:', error);
+            throw error;
+        }
+    }
+
+    
 }
 
 export default Atendente;
