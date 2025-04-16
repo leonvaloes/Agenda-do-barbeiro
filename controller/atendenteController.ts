@@ -1,4 +1,5 @@
 import DatabaseManager from '../config/database';
+import associarHorariosAtendenteDto from '../DTO/associarHorariosAtedentesDto';
 import Atendente from '../models/atendente';
 import HorarioFuncionario from '../models/horariosFuncionario';
 import Servico from "../models/servicos";
@@ -14,17 +15,26 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-    
             const atendente = new Atendente(atendenteData.nome, atendenteData.cpf, atendenteData.senha, 0);
-            const result = await atendente.createAtendente(connection);
-
-            // Garantir que o ID do usuário seja atribuído ao atendente
-            const atendente_id= result.id;
-            
-            await HorarioFuncionario.gerarHorariosFuncionario(atendente_id, connection);
-            console.log("teste?");
+            await atendente.createAtendente(connection);
             await connection.commit();
             return atendente;
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
+    }
+
+
+    async associarHorario(data:associarHorariosAtendenteDto) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            await connection.beginTransaction();
+            const retorno= Atendente.associarHorarioAtendente(connection, data );
+            await connection.commit();
+            return retorno;
         } catch (error) {
             await connection.rollback();
             throw error;

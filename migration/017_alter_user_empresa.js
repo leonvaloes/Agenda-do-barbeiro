@@ -4,7 +4,8 @@ class alterUserEmpresa {
             await connection.execute(`
                 ALTER TABLE empresa
                 ADD COLUMN empresa_user_id INT,
-                ADD FOREIGN KEY (empresa_user_id) REFERENCES user(id);
+                ADD FOREIGN KEY (empresa_user_id) REFERENCES user(id)
+                ON DELETE CASCADE;
             `);
             console.log('Relação adicionada com sucesso!');
         } catch (error) {

@@ -1,3 +1,4 @@
+import associarHorariosAtendenteDto from "../DTO/associarHorariosAtedentesDto";
 import User from "./user";
 
 class Atendente extends User {
@@ -97,6 +98,27 @@ class Atendente extends User {
             return result;
         } catch (error) {
             console.error('Erro ao buscar serviços do atendente:', error);
+            throw error;
+        }
+    }
+
+    static async associarHorarioAtendente(connection:any, data:associarHorariosAtendenteDto){
+        const query = `INSERT INTO horario_atendente (atendente_id, data_hora, ocupado) VALUES (?, ?, ?)`;
+        try {
+            for (const dia in data.horarios) {
+                const horariosDia = data.horarios[dia as keyof associarHorariosAtendenteDto['horarios']];
+                if (horariosDia) {
+                    const entrada = new Date(horariosDia.entrada);
+                    const saida = new Date(horariosDia.saida);
+                    const intervalo = 30 * 60 * 1000; // 30 minutos em milissegundos
+                    for (let hora = entrada; hora < saida; hora = new Date(hora.getTime() + intervalo)) {
+                        const dataHora = hora.toISOString().slice(0, 19).replace('T', ' ');
+                        await connection.execute(query, [data.idAtendente, dataHora, false]);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Erro ao associar horários ao atendente:', error);
             throw error;
         }
     }

@@ -78,9 +78,8 @@ class AgendamentoController {
                 if (atendenteUserId) {
                     agendamento.adicionarObservador(new NotificacaoAtendente(atendenteUserId));
                 }
-                const dataHora= await HorarioFuncionario.marcarComoLivre(agendamentoId, connection);
+                //const dataHora= await HorarioFuncionario.marcarComoLivre(agendamentoId, connection);
                 await agendamento.cancelarAgendamento(agendamentoId, connection);
-                console.log(dataHora);
                 connection.commit();
                 return agendamento;
             } else {

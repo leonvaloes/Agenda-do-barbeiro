@@ -52,17 +52,19 @@ class Agendamento {
     const dataHoraFormatada = formatador.FormatDate(dataHora);
 
     const query = `
-      SELECT ocupado FROM horario_atendente 
+      SELECT * 
+      FROM item 
       WHERE atendente_id = ? AND data_hora = ?
     `;
     const [rows]: any = await connection.execute(query, [atendenteId, dataHoraFormatada]);
 
     // Se não encontrou horário ou já está ocupado, retorna falso
-    if (!rows.length || rows[0].ocupado) {
-      return false;
+    if (!rows.length) {
+      console.log(rows);
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   async create(connection: any) {

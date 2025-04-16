@@ -4,8 +4,8 @@ class create_horario_atendente {
         await connection.execute(`
         CREATE TABLE IF NOT EXISTS horario_atendente (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            data_hora DATETIME,
-            ocupado BOOLEAN
+            data_hora_entrada DATETIME,
+            data_hora_saida DATETIME
         )`);
         console.log('Tabela horario_atendente criada!');
     }

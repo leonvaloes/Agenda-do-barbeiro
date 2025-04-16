@@ -12,33 +12,11 @@ class HorarioFuncionario {
         this.ocupado = ocupado;
     }
 
-    static async gerarHorariosFuncionario(funcionarioId: number, connection: any, horaInicio: string = "08:00", horaFim: string = "18:00", dias: number = 30) {
+    static async gerarHorariosFuncionario() {
         const hoje = new Date();
         const fim = new Date();
         fim.setDate(hoje.getDate() + dias);
-        console.log("teste2?");
-        for (
-            let data = new Date(hoje);
-            data <= fim;
-            data.setDate(data.getDate() + 1)
-        ) {
-            
-            const [hInicio, mInicio] = horaInicio.split(":").map(Number);
-            const [hFim, mFim] = horaFim.split(":").map(Number);
-
-            let inicio = new Date(data);
-            inicio.setHours(hInicio, mInicio, 0, 0);
-
-            const fimDia = new Date(data);
-            fimDia.setHours(hFim, mFim, 0, 0);
-
-            while (inicio <= fimDia) {console.log("teste?3");
-                await this.criarHorario(funcionarioId, new Date(inicio), connection);
-                console.log("teste?4");
-                inicio = new Date(inicio.getTime() + 15 * 60000);
-            }
-            console.log("teste12?");
-        }
+        
     }
 
     static async criarHorario(funcionarioId: number, dataHora: any, connection: any) {

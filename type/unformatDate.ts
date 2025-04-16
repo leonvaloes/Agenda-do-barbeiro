@@ -17,7 +17,6 @@ class unformatDate{
         this.dateT = `${ano}-${mes}-${dia} ${hora}:${minuto}:${segundo}`;
         return this.dateT;
     }
-    
 
     unformatDate(data:any){
         this.date= new Date(data.replace(" ", "T") + "Z");

@@ -8,8 +8,6 @@ import { NotificacaoWhatsapp } from "../models/agendamentoNotificacaoObserver/No
 import HorarioFuncionario from "../models/horariosFuncionario";
 import unformatDate from "../type/unformatDate";
 
-
-
 class ClienteController {
 
     cliente: typeof Cliente;
@@ -102,9 +100,10 @@ class ClienteController {
             if (!servico) {
                 throw new Error("Serviço não encontrado");
             }
-    
+
             const horarioValido = await Agendamento.validarDisponibilidade(atendente_id, dataEhora, connection);
             if (!horarioValido) {
+                console.log(horarioValido);
                 throw new Error("Horário indisponível para agendamento.");
             }
             
