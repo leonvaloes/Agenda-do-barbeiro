@@ -6,6 +6,7 @@ import Servico from "../models/servicos";
 import { NotificacaoEmail } from "../models/agendamentoNotificacaoObserver/notificacaoEmail";
 import { NotificacaoWhatsapp } from "../models/agendamentoNotificacaoObserver/NotificacaoWhatsapp";
 import HorarioFuncionario from "../models/horariosFuncionario";
+import unformatDate from "../type/unformatDate";
 
 
 
@@ -33,7 +34,6 @@ class ClienteController {
         }
     }
 
-
     async atualizarCliente(id: number, data: any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
@@ -43,7 +43,6 @@ class ClienteController {
 
             if (!clienteExistente)
                 throw new Error("Cliente não encontrado");
-
 
             const clienteAtualizado = await clienteModel.update(id, data, connection);
             connection.commit();
@@ -79,7 +78,6 @@ class ClienteController {
         }
     }
 
-
     async listarClientes() {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
@@ -96,7 +94,9 @@ class ClienteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-                dataEhora = new Date(dataEhora.replace(" ", "T") + "Z");
+
+            const formatador = new unformatDate();
+            dataEhora = await formatador.unformatDate(dataEhora);
     
             const servico = await Servico.getServicoById(serv_id, connection);
             if (!servico) {
@@ -107,7 +107,7 @@ class ClienteController {
             if (!horarioValido) {
                 throw new Error("Horário indisponível para agendamento.");
             }
-    
+            
             console.log("data do criar item ",dataEhora);
             const itemId = await Cliente.createItem(atendente_id, serv_id, dataEhora, connection);
             const agendamento = new Agendamento(cliente_id, itemId);
@@ -128,7 +128,6 @@ class ClienteController {
             connection.release();
         }
     }
-    
 
 }
 export = ClienteController;

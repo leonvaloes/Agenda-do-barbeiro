@@ -5,7 +5,8 @@ class alter_horario_atendente {
             await connection.execute(`
                 ALTER TABLE horario_atendente 
                 ADD COLUMN atendente_id INT,
-                ADD FOREIGN KEY (atendente_id) REFERENCES atendente(id);
+                ADD FOREIGN KEY (atendente_id) REFERENCES atendente(id)
+                ON DELETE CASCADE;
             `);
             console.log('Relação adicionada com sucesso!');
         } catch (error) {

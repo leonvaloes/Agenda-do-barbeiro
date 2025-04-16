@@ -1,3 +1,4 @@
+import unformatDate from "../type/unformatDate";
 import User from "./user";
 
 class Cliente extends User {
@@ -73,7 +74,9 @@ class Cliente extends User {
 
 
     static async createItem(atendente_id: number, serv_id: number, dataEhora: any, connection: any) {
-        const dataHoraFormatada = dataEhora.toISOString().slice(0, 19).replace("T", " ");
+        const formatador = new unformatDate();
+
+        const dataHoraFormatada = formatador.FormatDate(dataEhora);
         
         const query = `INSERT INTO item (atendente_id, serv_id, data_hora) VALUES (?, ?, ?)`;
         const values = [atendente_id, serv_id, dataHoraFormatada];

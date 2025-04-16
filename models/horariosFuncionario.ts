@@ -1,3 +1,5 @@
+import unformatDate from "../type/unformatDate";
+
 class HorarioFuncionario {
     id?: number;
     atendente_id: number;
@@ -14,12 +16,13 @@ class HorarioFuncionario {
         const hoje = new Date();
         const fim = new Date();
         fim.setDate(hoje.getDate() + dias);
-
+        console.log("teste2?");
         for (
             let data = new Date(hoje);
             data <= fim;
             data.setDate(data.getDate() + 1)
         ) {
+            
             const [hInicio, mInicio] = horaInicio.split(":").map(Number);
             const [hFim, mFim] = horaFim.split(":").map(Number);
 
@@ -29,10 +32,12 @@ class HorarioFuncionario {
             const fimDia = new Date(data);
             fimDia.setHours(hFim, mFim, 0, 0);
 
-            while (inicio <= fimDia) {
+            while (inicio <= fimDia) {console.log("teste?3");
                 await this.criarHorario(funcionarioId, new Date(inicio), connection);
+                console.log("teste?4");
                 inicio = new Date(inicio.getTime() + 15 * 60000);
             }
+            console.log("teste12?");
         }
     }
 
@@ -40,7 +45,8 @@ class HorarioFuncionario {
         if (!(dataHora instanceof Date)) {
             dataHora = new Date(dataHora);
         }
-        const dataHoraFormatada = dataHora.toISOString().slice(0, 19).replace("T", " ");
+        const formatador = new unformatDate();
+        const dataHoraFormatada = formatador.FormatDate(dataHora);
     
         const query = `
             INSERT INTO horario_atendente (atendente_id, data_hora, ocupado)
@@ -58,7 +64,8 @@ class HorarioFuncionario {
 
 
     static async marcarComoOcupado(funcionarioId: number, dataHora: Date, connection: any) {
-        const dataHoraFormatada = dataHora.toISOString().slice(0, 19).replace("T", " ");
+        const formatador= new unformatDate();
+        const dataHoraFormatada = formatador.FormatDate(dataHora);
 
         const query = `
         UPDATE horario_atendente

@@ -4,6 +4,7 @@ import { Confirmado } from './agendamentoEstados/confirmado';
 import { Concluido } from './agendamentoEstados/concluido';
 import { Cancelado } from './agendamentoEstados/cancelado';
 import { IObservadorAgendamento } from './agendamentoNotificacaoObserver/IObservadorAgendamento';
+import UnformatDate from '../type/unformatDate';
 
 class Agendamento {
   id: number;
@@ -47,8 +48,8 @@ class Agendamento {
   }
 
   static async validarDisponibilidade(atendenteId: number, dataHora: Date, connection: any): Promise<boolean> {
-    const dataHoraFormatada = dataHora.toISOString().slice(0, 19).replace("T", " ");
-
+    const formatador = new UnformatDate();
+    const dataHoraFormatada = formatador.FormatDate(dataHora);
 
     const query = `
       SELECT ocupado FROM horario_atendente 

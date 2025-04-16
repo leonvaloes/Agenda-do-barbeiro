@@ -20,8 +20,9 @@ class AtendenteController {
 
             // Garantir que o ID do usuário seja atribuído ao atendente
             const atendente_id= result.id;
-    
+            
             await HorarioFuncionario.gerarHorariosFuncionario(atendente_id, connection);
+            console.log("teste?");
             await connection.commit();
             return atendente;
         } catch (error) {
