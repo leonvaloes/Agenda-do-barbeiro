@@ -57,7 +57,7 @@ class Atendente extends User {
             const result: any = await connection.execute(query, [id]);
             return result[0];
         } catch (error) {
-            console.error('Erro ao buscar atendente:', error);
+            console.error('Erro ao buscar atendente:');
             throw error;
         }
     }

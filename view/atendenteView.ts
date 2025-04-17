@@ -92,24 +92,31 @@ router.post('/notificacao', async (req, res)=>{
 
 
 router.post('/expediente/:id', async (req, res) => {
-    console.log('Body recebido:', req.body);
-
-    const data = {
-      atendente_id: parseInt(req.params.id),
-      data_hora_entrada: req.body.entrada,
-      data_hora_saida: req.body.saida,
-      dias_semana_id: parseInt(req.body.dia_semana)
-    };
-
-    console.log('Data formatada:', data);
+    const atendente_id = parseInt(req.params.id);
+    const horarios = req.body; // vetor de dias
+  
+    console.log('Body recebido:', horarios);
+  
     try {
-      await AtendenteController.definirHorario(data);
-      res.json({ message: "Expediente e horários criados com sucesso" });
+      for (const item of horarios) {
+        const data = {
+          atendente_id,
+          data_hora_entrada: item.entrada,
+          data_hora_saida: item.saida,
+          dias_semana_id: parseInt(item.dia_semana)
+        };
+        console.log('Data formatada:', data);
+  
+        await AtendenteController.definirHorario(data);
+      }
+  
+      res.json({ message: "Expedientes e horários criados com sucesso" });
     } catch (error) {
       console.log("errou", error);
       res.status(500).json({ error: error.message });
     }
-});
+  });
+  
 
 
 

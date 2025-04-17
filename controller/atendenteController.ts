@@ -122,6 +122,14 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
+
+            const funcExiste= await Atendente.getAtendenteById(data.atendente_id, connection);
+            console.log("AQUI Ó",funcExiste);
+            if (!funcExiste || funcExiste.length === 0) {
+                throw new Error("Atendente não encontrado");
+            }
+              
+
             const horario = await HorarioFuncionario.createExpediente(connection, data);
             
             connection.commit();

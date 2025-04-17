@@ -41,9 +41,36 @@ class HorarioFuncionario {
             VALUES (?, ?, ?, ?)
         `;
         
+        connection.execute(query, [data.data_hora_entrada, data.data_hora_saida, data.atendente_id, data.dias_semana_id]);
+        
+    }
+
+
+    async gerarHorarios(data: any, connection: any) {
+        const query = `
+            INSERT INTO horario_atendente (atendente_id, data_hora, ocupado)
+            VALUES (?, ?, FALSE)
+        `;
+
         const formatador = new unformatDate();
 
-        connection.execute(query, [data.data_hora_entrada, data.data_hora_saida, data.atendente_id, data.dias_semana_id]);
+        for (const dia in data.horarios) {
+            const horariosDia = data.horarios[dia as keyof typeof data.horarios];
+            if (horariosDia) {
+                const entrada = new Date(horariosDia.entrada);
+                const saida = new Date(horariosDia.saida);
+                const intervalo = 30 * 60 * 1000; // 30 minutos em milissegundos
+
+                for (let hora = entrada; hora < saida; hora = new Date(hora.getTime() + intervalo)) {
+                    const dataHora = hora.toISOString().slice(0, 19).replace('T', ' ');
+                    await connection.execute(query, [data.idAtendente, dataHora]);
+                }
+            }
+        }
+
+
+
+        // ANTIGO ABAIXO  ###############################################################
 
         // Geração de horários disponíveis
         const diasSemanaPermitidos = [data.dias_semana_id]; 
