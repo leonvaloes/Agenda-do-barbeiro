@@ -10,8 +10,7 @@ class AtendenteController {
     constructor() {
         this.atendente = Atendente;
     }
-
-    async createAtendente(atendenteData: any) {
+    async createAtendente(atendenteData: any) { //CERTO
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
@@ -27,8 +26,7 @@ class AtendenteController {
         }
     }
 
-
-    async associarHorario(data:associarHorariosAtendenteDto) {
+    async associarHorario(data:associarHorariosAtendenteDto) { //PRECISA FAZER A CRIAÇÃO DE 15 EM 15 MINUTOS
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
@@ -42,7 +40,6 @@ class AtendenteController {
             connection.release();
         }
     }
-    
 
     async listarAtendentes() {
         const connection = await DatabaseManager.getInstance().getConnection();
@@ -59,8 +56,7 @@ class AtendenteController {
         }
     }
 
-
-    async atualizaAtendente(id: number, dados: any) {
+    async atualizaAtendente(id: number, dados: any) { // certo
         const connection = await DatabaseManager.getInstance().getConnection();
 
         try {
@@ -83,8 +79,7 @@ class AtendenteController {
         }
     }
 
-
-    async deletarAtendente(id: number) {
+    async deletarAtendente(id: number) { // CERTO
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
@@ -105,7 +100,7 @@ class AtendenteController {
         }
     }
 
-    async criarServicoEAssociar(data: any, atendenteId: number) {
+    async criarServicoEAssociar(data: any, atendenteId: number) { // CERTO
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
@@ -118,6 +113,24 @@ class AtendenteController {
         } catch (error) {
             await connection.rollback();
             throw error;
+        }finally{
+            connection.release();
+        }
+    }
+
+    static async definirHorario(data: any){
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            await connection.beginTransaction();
+            const horario = await HorarioFuncionario.createExpediente(connection, data);
+            
+            connection.commit();
+            return horario;
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        }finally{
+            connection.release();
         }
     }
 }

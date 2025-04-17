@@ -1,12 +1,11 @@
 class alter_horario_atendente {
-
     async up(connection) {
         try {
             await connection.execute(`
-                ALTER TABLE horario_atendente 
+                ALTER TABLE horario_atendente
                 ADD COLUMN atendente_id INT,
-                ADD FOREIGN KEY (atendente_id) REFERENCES atendente(id)
-                ON DELETE CASCADE;
+                ADD CONSTRAINT fk_horario_atendente_atendente_id
+                FOREIGN KEY (atendente_id) REFERENCES atendente(id) ON DELETE CASCADE
             `);
             console.log('Relação adicionada com sucesso!');
         } catch (error) {
@@ -18,8 +17,8 @@ class alter_horario_atendente {
         try {
             await connection.execute(`
                 ALTER TABLE horario_atendente
-                DROP FOREIGN KEY atendente_id,
-                DROP COLUMN atendente_id;
+                DROP FOREIGN KEY fk_horario_atendente_atendente_id,
+                DROP COLUMN atendente_id
             `);
             console.log('Relação removida com sucesso!');
         } catch (error) {

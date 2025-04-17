@@ -17,8 +17,11 @@ import alterUserCliente from './016_alter_user_cliente';
 import alterUserNotificacao from './014_alter_user_notificacao';
 import alterUserAtendente from './015_alter_user_atendente';
 import alterUserEmpresa from './017_alter_user_empresa';
-import create_horario_atendente from './018_create_horario_atendente';
-import alter_horario_atendente from './019_alter_horario_atendente';
+import create_expediente from './018_create_expediente';
+import create_dias_semana from './019_create_dias_semana';
+import alter_expediente from './020_alter_expediente';
+import create_horario_atendente from './021_create_horario_atendente';
+import alter_horario_atendente from './022_alter_horario_atendente';
 
 class Migrations {
     async up() {
@@ -46,8 +49,12 @@ class Migrations {
             await new alterUserAtendente().up(connection);
             await new alterUserEmpresa().up(connection);
 
-            await new create_horario_atendente().up(connection)
-            await new alter_horario_atendente().up(connection)
+            await new create_expediente().up(connection);
+            await new create_dias_semana().up(connection);
+            await new alter_expediente().up(connection);
+            await new create_horario_atendente().up(connection);
+            await new alter_horario_atendente().up(connection);
+
             console.log('Migrations finished!');
             connection.release();
         } catch (error) {
@@ -63,7 +70,14 @@ class Migrations {
             const connection = await db.getConnection();
             console.log('Connected to the database.');
 
+            await new alter_horario_atendente().down(connection);
+            await new create_horario_atendente().down(connection);
+            await new alter_expediente().down(connection);
+            await new create_dias_semana().down(connection);
+            await new create_expediente().down(connection);
+            await new alterUserEmpresa().down(connection);
             await new alterUserCliente().down(connection);
+            await new alterUserAtendente().down(connection)
             await new alterUserNotificacao().down(connection);
             await new createUser().down(connection);
             await new createUserNotificacao().down(connection);
@@ -78,10 +92,7 @@ class Migrations {
             await new createCliente().down(connection);
             await new createAtendente().down(connection);
             await new createEmpresa().down(connection);
-            await new alterUserAtendente().down(connection)
-            await new alterUserEmpresa().down(connection)
-            await new alter_horario_atendente().down(connection)
-            await new create_horario_atendente().down(connection)
+
             console.log('Migrations finished!');
             connection.release();
         } catch (error) {
