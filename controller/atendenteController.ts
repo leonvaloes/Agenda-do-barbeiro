@@ -137,6 +137,10 @@ class AtendenteController {
                 const dadosExpediente = {
                     atendente_id,
                     data_hora_entrada: item.entrada,
+
+                    data_hora_almoco:item.almoco || null,
+                    tempo_almoco:item.tempo_almoco || null,
+
                     data_hora_saida: item.saida,
                     dias_semana_id: item.dia_semana
                 };
@@ -157,6 +161,8 @@ class AtendenteController {
                         const dados = {
                             atendente_id,
                             data_hora_entrada: item.entrada,
+                            data_hora_almoco:item.intervalo || null,
+                            tempo_almoco:item.tempo || null,
                             data_hora_saida: item.saida,
                             dias_semana_id: item.dia_semana
                         };

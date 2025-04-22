@@ -116,8 +116,11 @@ class ClienteController {
             agendamento.adicionarObservador(new NotificacaoWhatsapp());
             await agendamento.create(connection);
 
+
+
+            
             //############ ocupar tempo de serviço
-            const tempoServico = servico.tempo_medio; // em minutos
+            const tempoServico = servico.tempo_medio;
             console.log("tempoServico:", tempoServico);
 
             let dataEhoraFim = new Date(dataEhora);

@@ -49,51 +49,79 @@ class HorarioFuncionario {
 
 
     static async gerarHorariosDiarios(connection: any, dados: any, dataAtual: Date) {
-    
+
         const atendente_id = dados.atendente_id;
-    
+
         const insertQuery = `
             INSERT INTO horario_atendente (data_hora, ocupado, atendente_id)
             VALUES (?, ?, ?)
         `;
-    
+
         if (dados.data_hora_entrada === '00:00' && dados.data_hora_saida === '00:00') {
             console.log(`Dia ${dados.dias_semana_id}: atendente não trabalha`);
             return;
         }
-    
+
+
+        let almocoHora = 0;
+        let almocoMinuto = 0;
+        let almoco = null;
+        let horarioAlmoco = "";
+        
+        if (dados.data_hora_almoco) {
+            [almocoHora, almocoMinuto] = dados.data_hora_almoco.split(':').map(Number);
+            almoco = setMinutes(setHours(new Date(dataAtual), almocoHora), almocoMinuto);
+            const formatador = new unformatDate();
+            horarioAlmoco = formatador.FormatDate(almoco);
+        }
+
         const [entradaHora, entradaMinuto] = dados.data_hora_entrada.split(':').map(Number);
         const [saidaHora, saidaMinuto] = dados.data_hora_saida.split(':').map(Number);
-    
+
         if (
             isNaN(entradaHora) || isNaN(entradaMinuto) ||
             isNaN(saidaHora) || isNaN(saidaMinuto)
         ) {
             throw new Error("Horários de entrada ou saída inválidos");
         }
-    
+
         console.log("entradaHora:", entradaHora, entradaMinuto);
         console.log("saidaHora:", saidaHora, saidaMinuto);
-    
+
         let atual = setMinutes(setHours(new Date(dataAtual), entradaHora), entradaMinuto);
         const saida = setMinutes(setHours(new Date(dataAtual), saidaHora), saidaMinuto);
+
         const formatador = new unformatDate();
-    
+
+
         while (isBefore(atual, saida)) {
-            const horarioString = formatador.FormatDate(atual);
+            let horarioString = formatador.FormatDate(atual);
             console.log("HoraString: ", horarioString);
             console.log("atendenteId: ", atendente_id);
-    
-            await connection.execute(insertQuery, [
-                horarioString,
-                false,
-                atendente_id
-            ]);
-    
-            atual = addMinutes(atual, 15);
+
+
+            if (dados.data_hora_almoco && horarioString == horarioAlmoco) {
+                for (let i = 0; i < dados.tempo_almoco; i += 15) {
+                    await connection.execute(insertQuery, [
+                        horarioString,
+                        true,
+                        atendente_id
+                    ]);
+                    atual = addMinutes(atual, 15);
+                    horarioString = formatador.FormatDate(atual)
+                }
+            } else {
+                await connection.execute(insertQuery, [
+                    horarioString,
+                    false,
+                    atendente_id
+                ]);
+
+                atual = addMinutes(atual, 15);
+            }
+
         }
     }
-
 
     static async marcarComoOcupado(funcionarioId: number, dataHora: Date, connection: any) {//certo
         const formatador = new unformatDate();

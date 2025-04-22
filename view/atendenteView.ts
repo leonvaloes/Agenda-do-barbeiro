@@ -96,7 +96,7 @@ router.post('/expediente/:id', async (req, res) => {
     const atendente_id = parseInt(req.params.id);
     const horarios = req.body; // vetor de dias
 
-    console.log('Body recebido:', horarios[0]);
+    console.log('Body recebido:', horarios);
 
     try {
         await AtendenteController.definirHorario(atendente_id, horarios);
