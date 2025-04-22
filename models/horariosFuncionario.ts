@@ -1,4 +1,7 @@
 import unformatDate from "../type/unformatDate";
+import { parse, setHours, setMinutes, addMinutes, isBefore, addDays } from 'date-fns';
+
+
 
 class HorarioFuncionario {
     id?: number;
@@ -40,83 +43,67 @@ class HorarioFuncionario {
             INSERT INTO expediente(data_hora_entrada, data_hora_saida, atendente_id, dias_semana_id)
             VALUES (?, ?, ?, ?)
         `;
-        
+
         connection.execute(query, [data.data_hora_entrada, data.data_hora_saida, data.atendente_id, data.dias_semana_id]);
-        
     }
 
 
-    async gerarHorarios(data: any, connection: any) {
-        const query = `
-            INSERT INTO horario_atendente (atendente_id, data_hora, ocupado)
-            VALUES (?, ?, FALSE)
-        `;
-
-        const formatador = new unformatDate();
-
-        for (const dia in data.horarios) {
-            const horariosDia = data.horarios[dia as keyof typeof data.horarios];
-            if (horariosDia) {
-                const entrada = new Date(horariosDia.entrada);
-                const saida = new Date(horariosDia.saida);
-                const intervalo = 30 * 60 * 1000; // 30 minutos em milissegundos
-
-                for (let hora = entrada; hora < saida; hora = new Date(hora.getTime() + intervalo)) {
-                    const dataHora = hora.toISOString().slice(0, 19).replace('T', ' ');
-                    await connection.execute(query, [data.idAtendente, dataHora]);
-                }
-            }
+    static async gerarHorariosDiarios(connection: any, dados: any, dataAtual: Date) {
+        if (!dados.data_hora_entrada || !dados.data_hora_saida) {
+            throw new Error("Horário de entrada ou saída inválido");
         }
-
-
-
-        // ANTIGO ABAIXO  ###############################################################
-
-        // Geração de horários disponíveis
-        const diasSemanaPermitidos = [data.dias_semana_id]; 
-
-        const hoje = new Date();
-        const fim = new Date();
-        fim.setMonth(fim.getMonth() + 3); // 3 meses à frente
-
-        const horariosDisponiveis = [];
-
-        for (
-            let dia = new Date(hoje);
-            dia <= fim;
-            dia.setDate(dia.getDate() + 1)
-        ) {
-            const diaSemana = dia.getDay(); // 0=Dom, 1=Seg, ..., 6=Sab
-            if (diasSemanaPermitidos.includes(diaSemana)) {
-                const entradaDia = new Date(dia);
-                entradaDia.setHours(new Date(data.data_hora_entrada).getHours(), new Date(data.data_hora_entrada).getMinutes(), 0);
-
-                const saidaDia = new Date(dia);
-                saidaDia.setHours(new Date(data.data_hora_saida).getHours(), new Date(data.data_hora_saida).getMinutes(), 0);
-
-                for (
-                    let horaAtual = new Date(entradaDia);
-                    horaAtual < saidaDia;
-                    horaAtual.setMinutes(horaAtual.getMinutes() + 15)
-                ) {
-                    const horarioFormatado = formatador.FormatDate(new Date(horaAtual));
-                    horariosDisponiveis.push([horarioFormatado, false, data.atendente_id]);
-                }
-            }
+    
+        if (!(dataAtual instanceof Date) || isNaN(dataAtual.getTime())) {
+            throw new Error("Data inválida ao gerar horários");
         }
-
+    
+        if (dados.atendente_id == null) {
+            throw new Error("ID do atendente inválido");
+        }
+    
+        const atendente_id = dados.atendente_id;
+    
         const insertQuery = `
-            INSERT INTO horario_atendente(data_hora, ocupado, atendente_id)
+            INSERT INTO horario_atendente (data_hora, ocupado, atendente_id)
             VALUES (?, ?, ?)
         `;
-
-        for (const horario of horariosDisponiveis) {
-            connection.execute(insertQuery, horario);
+    
+        if (dados.data_hora_entrada === '00:00' && dados.data_hora_saida === '00:00') {
+            console.log(`Dia ${dados.dias_semana_id}: atendente não trabalha`);
+            return;
         }
-
-        console.log("Horários disponíveis criados!");
+    
+        const [entradaHora, entradaMinuto] = dados.data_hora_entrada.split(':').map(Number);
+        const [saidaHora, saidaMinuto] = dados.data_hora_saida.split(':').map(Number);
+    
+        if (
+            isNaN(entradaHora) || isNaN(entradaMinuto) ||
+            isNaN(saidaHora) || isNaN(saidaMinuto)
+        ) {
+            throw new Error("Horários de entrada ou saída inválidos");
+        }
+    
+        console.log("entradaHora:", entradaHora, entradaMinuto);
+        console.log("saidaHora:", saidaHora, saidaMinuto);
+    
+        let atual = setMinutes(setHours(new Date(dataAtual), entradaHora), entradaMinuto);
+        const saida = setMinutes(setHours(new Date(dataAtual), saidaHora), saidaMinuto);
+        const formatador = new unformatDate();
+    
+        while (isBefore(atual, saida)) {
+            const horarioString = formatador.FormatDate(atual);
+            console.log("HoraString: ", horarioString);
+            console.log("atendenteId: ", atendente_id);
+    
+            await connection.execute(insertQuery, [
+                horarioString,
+                false,
+                atendente_id
+            ]);
+    
+            atual = addMinutes(atual, 15);
+        }
     }
-
 
 
     static async marcarComoOcupado(funcionarioId: number, dataHora: Date, connection: any) {// teoricamente certo

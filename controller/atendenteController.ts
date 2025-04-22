@@ -1,8 +1,10 @@
+import { addDays } from 'date-fns';
 import DatabaseManager from '../config/database';
 import associarHorariosAtendenteDto from '../DTO/associarHorariosAtedentesDto';
 import Atendente from '../models/atendente';
 import HorarioFuncionario from '../models/horariosFuncionario';
 import Servico from "../models/servicos";
+
 
 class AtendenteController {
     atendente: typeof Atendente;
@@ -10,6 +12,7 @@ class AtendenteController {
     constructor() {
         this.atendente = Atendente;
     }
+
     async createAtendente(atendenteData: any) { //CERTO
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
@@ -26,11 +29,11 @@ class AtendenteController {
         }
     }
 
-    async associarHorario(data:associarHorariosAtendenteDto) { //PRECISA FAZER A CRIAÇÃO DE 15 EM 15 MINUTOS
+    async associarHorario(data: associarHorariosAtendenteDto) { //PRECISA FAZER A CRIAÇÃO DE 15 EM 15 MINUTOS
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            const retorno= Atendente.associarHorarioAtendente(connection, data );
+            const retorno = Atendente.associarHorarioAtendente(connection, data);
             await connection.commit();
             return retorno;
         } catch (error) {
@@ -88,7 +91,7 @@ class AtendenteController {
 
             if (!atendenteExistente.length)
                 throw new Error("Atendente não encontrado");
-            
+
             const atendenteExcluido = await atendenteModel.delete(id, connection);
             connection.commit();
             return atendenteExcluido;
@@ -113,34 +116,71 @@ class AtendenteController {
         } catch (error) {
             await connection.rollback();
             throw error;
-        }finally{
+        } finally {
             connection.release();
         }
     }
 
-    static async definirHorario(data: any){
+
+    static async definirHorario(atendente_id: number, data: any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
+            console.log("ENTRA?", data);
 
-            const funcExiste= await Atendente.getAtendenteById(data.atendente_id, connection);
-            console.log("AQUI Ó",funcExiste);
-            if (!funcExiste || funcExiste.length === 0) {
+            const funcExiste = await Atendente.getAtendenteById(atendente_id, connection);
+            if (!Array.isArray(funcExiste) || funcExiste.length === 0) {
                 throw new Error("Atendente não encontrado");
             }
-              
 
-            const horario = await HorarioFuncionario.createExpediente(connection, data);
+            for (const item of data) {
+                const dadosExpediente = {
+                    atendente_id,
+                    data_hora_entrada: item.entrada,
+                    data_hora_saida: item.saida,
+                    dias_semana_id: item.dia_semana
+                };
+
+                console.log("dadosExpediente: ", dadosExpediente);
+                await HorarioFuncionario.createExpediente(connection, dadosExpediente);
+            }
+
+
+
+            const dataAtual = new Date();
+            for (let i = 0; i < 90; i++) {
+                const dia = addDays(dataAtual, i);
+
+                // Ajustando o cálculo do dia da semana para o seu mapeamento (1 = domingo, 7 = sábado)
+                const diaSemana = dia.getDay() === 0 ? 1 : dia.getDay()+1; // Converte domingo de 0 para 7
+
+                for (const item of data) {
+                    // Verifica se o dia da semana corresponde ao dia atual e se o atendente tem horário
+                    if (parseInt(item.dia_semana) === diaSemana && item.entrada !== '00:00') {
+                        const dados = {
+                            atendente_id,
+                            data_hora_entrada: item.entrada,
+                            data_hora_saida: item.saida,
+                            dias_semana_id: item.dia_semana
+                        };
+                        console.log("DADOS: ", dados);
+                        await HorarioFuncionario.gerarHorariosDiarios(connection, dados, dia);
+                    }
+                }
+            }
             
-            connection.commit();
-            return horario;
+
+
+            await connection.commit();
+            return true;
         } catch (error) {
             await connection.rollback();
             throw error;
-        }finally{
+        } finally {
             connection.release();
         }
     }
+
 }
 
 export default AtendenteController;

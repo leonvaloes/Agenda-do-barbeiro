@@ -1,25 +1,29 @@
-class unformatDate{
-    dateT:String;
-    date:Date;
+class unformatDate {
+    dateT: string;
+    date: Date;
 
-    constructor (){
+    constructor() {
         this.dateT = "";
     }
 
     FormatDate(date: Date) {
-        const ano = date.getUTCFullYear();
-        const mes = String(date.getUTCMonth() + 1).padStart(2, '0');
-        const dia = String(date.getUTCDate()).padStart(2, '0');
-        const hora = String(date.getUTCHours()).padStart(2, '0');
-        const minuto = String(date.getUTCMinutes()).padStart(2, '0');
-        const segundo = String(date.getUTCSeconds()).padStart(2, '0');
+        const ano = date.getFullYear();
+        const mes = String(date.getMonth() + 1).padStart(2, '0');
+        const dia = String(date.getDate()).padStart(2, '0');
+        const hora = String(date.getHours()).padStart(2, '0');
+        const minuto = String(date.getMinutes()).padStart(2, '0');
+        const segundo = String(date.getSeconds()).padStart(2, '0');
 
         this.dateT = `${ano}-${mes}-${dia} ${hora}:${minuto}:${segundo}`;
         return this.dateT;
     }
 
-    unformatDate(data:any){
-        this.date= new Date(data.replace(" ", "T") + "Z");
+    unformatDate(data: any) {
+        if (data instanceof Date) {
+            return data;
+        }
+
+        this.date = new Date(data.replace(" ", "T"));
         return this.date;
     }
 }

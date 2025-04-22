@@ -62,7 +62,7 @@ class Empresa extends User {
         }
     }
 
-
+    
     async adicionaAtendente(connection: any, cpf: string, empresaId: number) {
         const queryBusca = `SELECT id FROM atendente WHERE cpf = ?`;   
         try {

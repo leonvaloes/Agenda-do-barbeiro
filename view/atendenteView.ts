@@ -95,20 +95,12 @@ router.post('/expediente/:id', async (req, res) => {
     const atendente_id = parseInt(req.params.id);
     const horarios = req.body; // vetor de dias
   
-    console.log('Body recebido:', horarios);
+    console.log('Body recebido:', horarios[0]);
   
     try {
-      for (const item of horarios) {
-        const data = {
-          atendente_id,
-          data_hora_entrada: item.entrada,
-          data_hora_saida: item.saida,
-          dias_semana_id: parseInt(item.dia_semana)
-        };
-        console.log('Data formatada:', data);
-  
-        await AtendenteController.definirHorario(data);
-      }
+      
+        await AtendenteController.definirHorario(atendente_id, horarios);
+      
   
       res.json({ message: "Expedientes e horários criados com sucesso" });
     } catch (error) {

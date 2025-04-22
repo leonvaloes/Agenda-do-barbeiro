@@ -51,16 +51,11 @@ class Atendente extends User {
         }
     }
     
-    static async getAtendenteById(id: number, connection: any){
-        const query = `SELECT * FROM atendente WHERE id = ?`;
-        try {
-            const result: any = await connection.execute(query, [id]);
-            return result[0];
-        } catch (error) {
-            console.error('Erro ao buscar atendente:');
-            throw error;
-        }
-    }
+    static async getAtendenteById(id: number, connection: any) {
+        const [rows] = await connection.execute('SELECT * FROM atendente WHERE id = ?', [id]);
+        return rows;
+      }
+      
 
     static async listarAtendentes(connection: any){
         const query = `SELECT * FROM atendente`;
