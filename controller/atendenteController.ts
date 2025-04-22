@@ -145,17 +145,14 @@ class AtendenteController {
                 await HorarioFuncionario.createExpediente(connection, dadosExpediente);
             }
 
-
-
             const dataAtual = new Date();
             for (let i = 0; i < 90; i++) {
                 const dia = addDays(dataAtual, i);
 
-                // Ajustando o cálculo do dia da semana para o seu mapeamento (1 = domingo, 7 = sábado)
-                const diaSemana = dia.getDay() === 0 ? 1 : dia.getDay()+1; // Converte domingo de 0 para 7
+                const diaSemana = dia.getDay() === 0 ? 1 : dia.getDay()+1;
 
                 for (const item of data) {
-                    // Verifica se o dia da semana corresponde ao dia atual e se o atendente tem horário
+                    
                     if (parseInt(item.dia_semana) === diaSemana && item.entrada !== '00:00') {
                         const dados = {
                             atendente_id,
@@ -168,8 +165,6 @@ class AtendenteController {
                     }
                 }
             }
-            
-
 
             await connection.commit();
             return true;

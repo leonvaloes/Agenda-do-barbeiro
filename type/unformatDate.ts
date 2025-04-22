@@ -14,7 +14,7 @@ class unformatDate {
         const minuto = String(date.getMinutes()).padStart(2, '0');
         const segundo = String(date.getSeconds()).padStart(2, '0');
 
-        this.dateT = `${ano}-${mes}-${dia} ${hora}:${minuto}:${segundo}`;
+        this.dateT = `${ano}-${mes}-${dia} ${hora}:${minuto}`;
         return this.dateT;
     }
 
