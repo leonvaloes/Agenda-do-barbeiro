@@ -49,17 +49,6 @@ class HorarioFuncionario {
 
 
     static async gerarHorariosDiarios(connection: any, dados: any, dataAtual: Date) {
-        if (!dados.data_hora_entrada || !dados.data_hora_saida) {
-            throw new Error("Horário de entrada ou saída inválido");
-        }
-    
-        if (!(dataAtual instanceof Date) || isNaN(dataAtual.getTime())) {
-            throw new Error("Data inválida ao gerar horários");
-        }
-    
-        if (dados.atendente_id == null) {
-            throw new Error("ID do atendente inválido");
-        }
     
         const atendente_id = dados.atendente_id;
     
@@ -106,7 +95,7 @@ class HorarioFuncionario {
     }
 
 
-    static async marcarComoOcupado(funcionarioId: number, dataHora: Date, connection: any) {// teoricamente certo
+    static async marcarComoOcupado(funcionarioId: number, dataHora: Date, connection: any) {//certo
         const formatador = new unformatDate();
         const dataHoraFormatada = formatador.FormatDate(dataHora);
 

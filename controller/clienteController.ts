@@ -7,6 +7,8 @@ import { NotificacaoEmail } from "../models/agendamentoNotificacaoObserver/notif
 import { NotificacaoWhatsapp } from "../models/agendamentoNotificacaoObserver/NotificacaoWhatsapp";
 import HorarioFuncionario from "../models/horariosFuncionario";
 import unformatDate from "../type/unformatDate";
+import { before } from "node:test";
+import { isBefore } from "date-fns";
 
 class ClienteController {
 
@@ -95,7 +97,7 @@ class ClienteController {
 
             const formatador = new unformatDate();
             dataEhora = await formatador.unformatDate(dataEhora);
-    
+
             const servico = await Servico.getServicoById(serv_id, connection);
             if (!servico) {
                 throw new Error("Serviço não encontrado");
@@ -106,20 +108,38 @@ class ClienteController {
                 console.log(horarioValido);
                 throw new Error("Horário indisponível para agendamento.");
             }
-            
-            console.log("data do criar item ",dataEhora);
+
             const itemId = await Cliente.createItem(atendente_id, serv_id, dataEhora, connection);
             const agendamento = new Agendamento(cliente_id, itemId);
-    
+
             agendamento.adicionarObservador(new NotificacaoEmail());
             agendamento.adicionarObservador(new NotificacaoWhatsapp());
             await agendamento.create(connection);
-            await HorarioFuncionario.marcarComoOcupado(atendente_id, dataEhora, connection);
-    
+
+            //############ ocupar tempo de serviço
+            const tempoServico = servico.tempo_medio; // em minutos
+            console.log("tempoServico:", tempoServico);
+
+            let dataEhoraFim = new Date(dataEhora);
+            dataEhoraFim.setMinutes(dataEhoraFim.getMinutes() + tempoServico);
+
+            let auxDataHora = new Date(dataEhora);
+
+            console.log("Início:", auxDataHora.toISOString());
+            console.log("Fim:", dataEhoraFim.toISOString());
+
+            while (auxDataHora < dataEhoraFim) {
+                console.log("Marca ocupado em:", auxDataHora.toISOString());
+                await HorarioFuncionario.marcarComoOcupado(atendente_id, new Date(auxDataHora), connection);
+                auxDataHora.setMinutes(auxDataHora.getMinutes() + 15);
+            }
+
+
+
             await connection.commit();
             console.log("Agendamento criado e notificações preparadas.");
             return agendamento;
-    
+
         } catch (error) {
             await connection.rollback();
             throw error;
