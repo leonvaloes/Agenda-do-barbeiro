@@ -62,14 +62,20 @@ class AtendenteController {
     static async listarAtendentesDoServico(id: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
+            console.log("servico id: ", id)
             const atendentes = await Atendente.listarAtendentesDoServico(id, connection);
             const dadosAtendentes = [];
+
+            for (const atendente of atendentes) {
+                console.log("atendente (user_id):", atendente.atendente_user_id);
+            }
+
             if (atendentes && atendentes.length > 0) {
                 for (const atendente of atendentes) {
-                    const dataAtendente = await Atendente.getUserAtendentes(atendente.atendentes_user_id, connection);
+                    const dataAtendente = await Atendente.getUserAtendentes(atendente.atendente_user_id, connection);
                     dadosAtendentes.push(dataAtendente);
                 }
-                return dadosAtendentes;
+                return dadosAtendentes[0];
             }
 
             throw new Error("Nenhum atendente encontrado");
@@ -125,8 +131,8 @@ class AtendenteController {
             await connection.beginTransaction();
             const AtendenteModel = new Atendente("", "", "", 0);
             const servico = await Servico.create(connection, data);
-            const empresaId= await Atendente.getEmpresa(atendenteId,connection);
-            if(empresaId){
+            const empresaId = await Atendente.getEmpresa(atendenteId, connection);
+            if (empresaId) {
                 await AtendenteModel.Associar(connection, servico, atendenteId, empresaId.empresa_id);
             }
             else

@@ -110,8 +110,8 @@ class Atendente extends User {
             WHERE atendente_serv.serv_id = ?;`
         ;
         try {
-            const result: any = await connection.execute(query,[id]);
-            return result[0];
+            const [result]= await connection.execute(query,[id]);
+            return result;
         } catch (error) {
             console.error('Erro ao listar atendentes:', error);
             throw error;

@@ -102,11 +102,12 @@ router.post('/expediente/:id', async (req, res) => {
     }
 });
 
-router.post('/getAtendServ', async (req, res) => {
-    const servico_id = req.body.id;
+
+router.get('/getAtendServ/:id', async (req, res) => {
+    const servico_id = req.params.id;
     try {
-        await AtendenteController.listarAtendentesDoServico(servico_id);
-        res.json({ message: "Atendentes listados com sucesso!" });
+        const result= await AtendenteController.listarAtendentesDoServico(servico_id);
+        res.json(result);
     } catch (error) {
         console.log("errou", error);
         res.status(500).json({ error: error.message });
