@@ -68,6 +68,22 @@ router.post('/criar-servico/:id', async (req, res) => {
     }
 });
 
+router.get('/buscaHora', async (req,res)=>{
+    try{
+        const id = Number(req.body.id);
+        const data= req.body.date;
+        console.log("id e data: ", id, data);
+        await atendenteController.getTimeForDate(id,data);
+
+        res.status(201).send({
+            message: "Horario buscado com sucesso!",
+            id
+        });
+    }catch(e){
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+})
+
 router.post('/proxEstado/:id', async (req, res) => {
     try {
         const agendamentoId = req.params.id;

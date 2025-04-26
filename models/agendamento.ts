@@ -89,6 +89,16 @@ class Agendamento {
     }
   }
 
+  static async getAgendamentos(id:number, connection:any){
+    const query=`SELECT * FROM agendamento INNER JOIN item ON agendamento.item_id = item.id WHERE atendente_id=?`
+    try{
+      const [result] = await connection.execute(query, [id]);
+      console.log(result);
+    }catch(e){
+      throw e;
+    }
+  }
+
   adicionarObservador(obs: IObservadorAgendamento) {
     this.observadores.push(obs);
   }

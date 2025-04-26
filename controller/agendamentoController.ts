@@ -3,12 +3,10 @@ import Agendamento from '../models/agendamento';
 import { LogEstadoSistema } from '../models/agendamentoNotificacaoObserver/logEstado';
 import { NotificacaoAtendente } from '../models/agendamentoNotificacaoObserver/notificacaoAtendente';
 import { NotificacaoCliente } from '../models/agendamentoNotificacaoObserver/notificacaoCliente';
-import { NotificacaoEmail } from '../models/agendamentoNotificacaoObserver/notificacaoEmail';
 import { NotificacaoEstabelecimento } from '../models/agendamentoNotificacaoObserver/notificacaoEstabelecimento';
-import { NotificacaoWhatsapp } from '../models/agendamentoNotificacaoObserver/NotificacaoWhatsapp';
-import HorarioFuncionario from '../models/horariosFuncionario';
+import Atendente from '../models/atendente';
 import Item from '../models/item';
-import Notificacao from '../models/Notificacao';
+
 class AgendamentoController {
 
     async avancarEstado(agendamentoId: number) {
@@ -88,6 +86,23 @@ class AgendamentoController {
         } catch (error) {
             console.error('Erro ao cancelar agendamento:', error);
             throw error;
+        } finally {
+            connection.release();
+        }
+    }
+
+    static async getAgendamentos(atendenteId: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            const [existe] = await Atendente.getAtendenteById(atendenteId, connection);
+            if (existe.length <= 0)
+                throw new Error(`Atendente não encontrado`);
+            const agendamentos = await Agendamento.getAgendamentos(atendenteId, connection);
+            return agendamentos;
+
+        }catch(e){
+            console.error("Erro ao buscar agendamentos", e);
+            throw e;
         } finally {
             connection.release();
         }

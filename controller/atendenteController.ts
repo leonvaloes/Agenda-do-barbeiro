@@ -4,6 +4,7 @@ import associarHorariosAtendenteDto from '../DTO/associarHorariosAtedentesDto';
 import Atendente from '../models/atendente';
 import HorarioFuncionario from '../models/horariosFuncionario';
 import Servico from "../models/servicos";
+import unformatDate from '../type/unformatDate';
 
 
 class AtendenteController {
@@ -182,6 +183,26 @@ class AtendenteController {
         }
     }
 
+
+    async getTimeForDate(atendenteId:number, date:string){
+        const connection= await DatabaseManager.getInstance().getConnection();
+        try{
+            const existe= await Atendente.getAtendenteById(atendenteId, connection);
+            if(!existe && existe.length<=0)
+                throw new Error("Atendente não encontrado");
+            
+            const formatador= new unformatDate;
+            const dateF= formatador.unformatDate(date);
+            const [result]= await Atendente.getTimesForDate(atendenteId ,date, connection);
+            console.log(result);
+
+        }catch(e){
+            console.error("Erro ao buscar data e exibir horarios");
+            throw e;
+        }finally{
+            connection.release();
+        }
+    }
 }
 
 export default AtendenteController;

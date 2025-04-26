@@ -3,15 +3,15 @@ import User from "./user";
 
 class Atendente extends User {
     cpf: string;
-    atendente_user_id:number;
-  
-    constructor(nome: string, cpf: string, senha: string, atendente_user_id:number) {
-      super(nome, senha);
-      this.cpf = cpf;
-      this.atendente_user_id= atendente_user_id;
+    atendente_user_id: number;
+
+    constructor(nome: string, cpf: string, senha: string, atendente_user_id: number) {
+        super(nome, senha);
+        this.cpf = cpf;
+        this.atendente_user_id = atendente_user_id;
     }
-    
-    async createAtendente(connection:any){
+
+    async createAtendente(connection: any) {
         this.atendente_user_id = await User.cadastrarUser(this.nome, this.senha, connection);
         const query = `INSERT INTO atendente (cpf, atendente_user_id) VALUES ( ?, ?)`;
         const values = [this.cpf, this.atendente_user_id];
@@ -22,8 +22,8 @@ class Atendente extends User {
             throw error;
         }
     }
-    
-    
+
+
     async delete(id: number, connection: any) {
         const query = `DELETE FROM atendente WHERE id = ?`;
         try {
@@ -50,14 +50,26 @@ class Atendente extends User {
             throw error;
         }
     }
-    
+
     static async getAtendenteById(id: number, connection: any) {
         const [rows] = await connection.execute('SELECT * FROM atendente WHERE id = ?', [id]);
         return rows;
-      }
-      
+    }
 
-    static async listarAtendentes(connection: any){
+    static async getTimesForDate(id:number, date:string, connection:any){
+        const query=`SELECT * FROM horario_atendente WHERE atendente_id=? AND DATE(data_hora) = ? AND ocupado=0`
+        try{
+            console.log("aqui chega");
+            const [result]=await connection.execute(query,[id, date]);
+            console.log("aqui tbm chega: ",result);
+            return result;
+        }catch(e){
+
+        }
+    }
+
+
+    static async listarAtendentes(connection: any) {
         const query = `SELECT * FROM atendente`;
         try {
             const result: any = await connection.execute(query);
@@ -69,24 +81,24 @@ class Atendente extends User {
     }
 
     async Associar(connection: any, servicoId: number, atendenteId: number) {
-        try {    
+        try {
             if (!atendenteId || !servicoId) {
                 throw new Error("ID do atendente ou serviço não fornecido.");
             }
-            
+
             const queryAssociacao = `INSERT INTO atendente_serv (atendente_id, serv_id) VALUES (?, ?)`;
             await connection.execute(queryAssociacao, [atendenteId, servicoId]);
-    
+
             console.log("Serviço associado ao atendente com sucesso!");
-    
+
             return servicoId;
         } catch (error) {
             console.error("Erro ao associar serviço ao atendente:", error);
             throw error;
         }
     }
-    
-    async getAllServ(connection:any, atendente_id){
+
+    async getAllServ(connection: any, atendente_id) {
         const query = `SELECT serv_id FROM atendente_serv WHERE atendente_id = ?`;
         try {
             const [result] = await connection.execute(query, [atendente_id]);
@@ -97,7 +109,7 @@ class Atendente extends User {
         }
     }
 
-    static async associarHorarioAtendente(connection:any, data:associarHorariosAtendenteDto){
+    static async associarHorarioAtendente(connection: any, data: associarHorariosAtendenteDto) {
         const query = `INSERT INTO horario_atendente (atendente_id, data_hora, ocupado) VALUES (?, ?, ?)`;
         try {
             for (const dia in data.horarios) {
@@ -118,7 +130,7 @@ class Atendente extends User {
         }
     }
 
-    
+
 }
 
 export default Atendente;
