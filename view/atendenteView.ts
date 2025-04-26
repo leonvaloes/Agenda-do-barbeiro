@@ -1,8 +1,6 @@
 import AtendenteController from '../controller/atendenteController'
 import AgendamentoController from '../controller/agendamentoController';
 import NotificacaoController from '../controller/notificacaoController';
-import HorarioFuncionario from '../models/horariosFuncionario';
-import UnformatDate from '../type/unformatDate';
 const notificacaoController = new NotificacaoController();
 const agendamentoController = new AgendamentoController();
 const atendenteController = new AtendenteController();
@@ -26,13 +24,21 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/BuscaServ', async (req, res) => {
+    try {
+        const id= req.body.id;
+        const servicos = await atendenteController.listarServicoEmpresa(id);
+        res.status(200).send(servicos);
+    } catch (e) {
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+});
 
 router.put('/:id', async (req, res) => {
     try {
         const updateAtend = await atendenteController.atualizaAtendente(req.params.id, req.body);
         if (!updateAtend)
             return res.status(404).send('Atendente não encontrado');
-
         res.status(201).send(updateAtend)
     } catch (e) {
         res.status(400).send(`Erro: ${e.message}`);
@@ -42,23 +48,18 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const deletedAtend = await atendenteController.deletarAtendente(req.params.id);
-
-        if (!deletedAtend) {
+        if (!deletedAtend) 
             return res.status(404).send(deletedAtend);
-        }
-
         res.status(201).send(deletedAtend)
     } catch (e) {
         res.status(400).send(`Erro: ${e.message}`);
     }
 })
 
-
 router.post('/criar-servico/:id', async (req, res) => {
     try {
         const atendenteId = Number(req.params.id);
         const servicoId = await atendenteController.criarServicoEAssociar(req.body, atendenteId);
-
         res.status(201).send({
             message: "Serviço criado e associado com sucesso!",
             servicoId
@@ -68,17 +69,13 @@ router.post('/criar-servico/:id', async (req, res) => {
     }
 });
 
-router.get('/buscaHora', async (req,res)=>{
+router.get('/getHours', async (req,res)=>{
     try{
         const id = Number(req.body.id);
         const data= req.body.date;
         console.log("id e data: ", id, data);
-        await atendenteController.getTimeForDate(id,data);
-
-        res.status(201).send({
-            message: "Horario buscado com sucesso!",
-            id
-        });
+        const horarios= await atendenteController.getTimeForDate(id,data);
+        res.status(201).send(horarios);
     }catch(e){
         res.status(400).send(`Erro: ${e.message}`);
     }
@@ -87,16 +84,12 @@ router.get('/buscaHora', async (req,res)=>{
 router.post('/proxEstado/:id', async (req, res) => {
     try {
         const agendamentoId = req.params.id;
-
         const result = await agendamentoController.avancarEstado(agendamentoId);
-
         res.status(200).send(result);
     } catch (e) {
         res.status(400).send(`Erro: ${e.message}`);
     }
 })
-
-
 
 router.post('/notificacao', async (req, res) => {
     try {
@@ -107,13 +100,9 @@ router.post('/notificacao', async (req, res) => {
     }
 });
 
-
 router.post('/expediente/:id', async (req, res) => {
-    const atendente_id = parseInt(req.params.id);
-    const horarios = req.body; // vetor de dias
-
-    console.log('Body recebido:', horarios);
-
+    const atendente_id = req.params.id;
+    const horarios = req.body;
     try {
         await AtendenteController.definirHorario(atendente_id, horarios);
         res.json({ message: "Expedientes e horários criados com sucesso" });
@@ -122,6 +111,18 @@ router.post('/expediente/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+router.post('/getAtendServ', async (req, res) => {
+    const servico_id = req.body.id;
+    try {
+        await AtendenteController.listarAtendentesDoServico(servico_id);
+        res.json({ message: "Atendentes listados com sucesso!" });
+    } catch (error) {
+        console.log("errou", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 
 

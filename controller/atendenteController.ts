@@ -4,7 +4,6 @@ import associarHorariosAtendenteDto from '../DTO/associarHorariosAtedentesDto';
 import Atendente from '../models/atendente';
 import HorarioFuncionario from '../models/horariosFuncionario';
 import Servico from "../models/servicos";
-import unformatDate from '../type/unformatDate';
 
 
 class AtendenteController {
@@ -51,8 +50,44 @@ class AtendenteController {
             const atendentes = await Atendente.listarAtendentes(connection);
             if (atendentes)
                 return atendentes;
-            else
-                throw new Error("Nenhum atendente encontrado");
+
+            throw new Error("Nenhum atendente encontrado");
+        } catch (error) {
+            throw error;
+        } finally {
+            connection.release();
+        }
+    }
+
+    async listarServicoEmpresa(id: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            const servicos = await Atendente.listarServicoAtendente(id, connection);
+            if (servicos)
+                return servicos;
+
+            throw new Error("Nenhum atendente encontrado");
+        } catch (error) {
+            throw error;
+        } finally {
+            connection.release();
+        }
+    }
+
+    static async listarAtendentesDoServico(id: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            const atendentes = await Atendente.listarAtendentesDoServico(id, connection);
+            const dadosAtendentes = [];
+            if (atendentes && atendentes.length > 0) {
+                for (const atendente of atendentes) {
+                    const dataAtendente = await Atendente.getUserAtendentes(atendente.atendentes_user_id, connection);
+                    dadosAtendentes.push(dataAtendente);
+                }
+                return dadosAtendentes;
+            }
+
+            throw new Error("Nenhum atendente encontrado");
         } catch (error) {
             throw error;
         } finally {
@@ -62,13 +97,10 @@ class AtendenteController {
 
     async atualizaAtendente(id: number, dados: any) { // certo
         const connection = await DatabaseManager.getInstance().getConnection();
-
         try {
             connection.beginTransaction();
-
             const atendenteModel = new Atendente("", "", "", 0);
             const atendenteExistente = await Atendente.getAtendenteById(id, connection);
-
             if (atendenteExistente.length && dados.nome != null && dados.cpf != null && dados.senha != null) {
                 const atendenteAtualizado = await atendenteModel.update(id, connection, dados);
                 connection.commit();
@@ -89,10 +121,8 @@ class AtendenteController {
             connection.beginTransaction();
             const atendenteModel = new Atendente("", "", "", 0);
             const atendenteExistente = await Atendente.getAtendenteById(id, connection);
-
             if (!atendenteExistente.length)
                 throw new Error("Atendente não encontrado");
-
             const atendenteExcluido = await atendenteModel.delete(id, connection);
             connection.commit();
             return atendenteExcluido;
@@ -109,9 +139,14 @@ class AtendenteController {
         try {
             await connection.beginTransaction();
             const AtendenteModel = new Atendente("", "", "", 0);
-
             const servico = await Servico.create(connection, data);
-            await AtendenteModel.Associar(connection, servico, atendenteId);
+            const empresaId= await Atendente.getEmpresa(atendenteId,connection);
+            if(empresaId){
+                await AtendenteModel.Associar(connection, servico, atendenteId, empresaId.empresa_id);
+            }
+            else
+                throw new Error("É necessario associar o atendente a empresa!");
+
             connection.commit();
             return servico.id;
         } catch (error) {
@@ -122,57 +157,45 @@ class AtendenteController {
         }
     }
 
-
     static async definirHorario(atendente_id: number, data: any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            console.log("ENTRA?", data);
-
             const funcExiste = await Atendente.getAtendenteById(atendente_id, connection);
-            if (!Array.isArray(funcExiste) || funcExiste.length === 0) {
+            if (!Array.isArray(funcExiste) || funcExiste.length === 0)
                 throw new Error("Atendente não encontrado");
-            }
 
             for (const item of data) {
                 const dadosExpediente = {
                     atendente_id,
                     data_hora_entrada: item.entrada,
-
-                    data_hora_almoco:item.almoco || null,
-                    tempo_almoco:item.tempo_almoco || null,
-
+                    data_hora_almoco: item.almoco || null,
+                    tempo_almoco: item.tempo_almoco || null,
                     data_hora_saida: item.saida,
                     dias_semana_id: item.dia_semana
                 };
-
                 console.log("dadosExpediente: ", dadosExpediente);
                 await HorarioFuncionario.createExpediente(connection, dadosExpediente);
             }
-
             const dataAtual = new Date();
             for (let i = 0; i < 90; i++) {
                 const dia = addDays(dataAtual, i);
-
-                const diaSemana = dia.getDay() === 0 ? 1 : dia.getDay()+1;
-
+                const diaSemana = dia.getDay() === 0 ? 1 : dia.getDay() + 1;
                 for (const item of data) {
-                    
+
                     if (parseInt(item.dia_semana) === diaSemana && item.entrada !== '00:00') {
                         const dados = {
                             atendente_id,
                             data_hora_entrada: item.entrada,
-                            data_hora_almoco:item.intervalo || null,
-                            tempo_almoco:item.tempo || null,
+                            data_hora_almoco: item.intervalo || null,
+                            tempo_almoco: item.tempo || null,
                             data_hora_saida: item.saida,
                             dias_semana_id: item.dia_semana
                         };
-                        console.log("DADOS: ", dados);
                         await HorarioFuncionario.gerarHorariosDiarios(connection, dados, dia);
                     }
                 }
             }
-
             await connection.commit();
             return true;
         } catch (error) {
@@ -183,23 +206,18 @@ class AtendenteController {
         }
     }
 
-
-    async getTimeForDate(atendenteId:number, date:string){
-        const connection= await DatabaseManager.getInstance().getConnection();
-        try{
-            const existe= await Atendente.getAtendenteById(atendenteId, connection);
-            if(!existe && existe.length<=0)
+    async getTimeForDate(atendenteId: number, date: string) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            const existe = await Atendente.getAtendenteById(atendenteId, connection);
+            if (!existe && existe.length <= 0)
                 throw new Error("Atendente não encontrado");
-            
-            const formatador= new unformatDate;
-            const dateF= formatador.unformatDate(date);
-            const [result]= await Atendente.getTimesForDate(atendenteId ,date, connection);
+            const [result] = await Atendente.getTimesForDate(atendenteId, date, connection);
             console.log(result);
-
-        }catch(e){
+        } catch (e) {
             console.error("Erro ao buscar data e exibir horarios");
             throw e;
-        }finally{
+        } finally {
             connection.release();
         }
     }

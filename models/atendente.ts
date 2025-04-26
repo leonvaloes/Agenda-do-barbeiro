@@ -23,7 +23,6 @@ class Atendente extends User {
         }
     }
 
-
     async delete(id: number, connection: any) {
         const query = `DELETE FROM atendente WHERE id = ?`;
         try {
@@ -43,7 +42,6 @@ class Atendente extends User {
         const query = `UPDATE atendente SET nome = ?, cpf = ?, senha = ? WHERE id = ?`;
         try {
             await connection.execute(query, [data.nome, data.cpf, data.senha, id]);
-            // Retorna os dados atualizados
             return { id, ...data };
         } catch (error) {
             console.error('Erro ao atualizar atendente:', error);
@@ -56,18 +54,29 @@ class Atendente extends User {
         return rows;
     }
 
-    static async getTimesForDate(id:number, date:string, connection:any){
-        const query=`SELECT * FROM horario_atendente WHERE atendente_id=? AND DATE(data_hora) = ? AND ocupado=0`
+    static async getEmpresa(id:number, connection:any){
+        const query=`SELECT empresa_id FROM atendente WHERE atendente.id=?`
         try{
-            console.log("aqui chega");
-            const [result]=await connection.execute(query,[id, date]);
-            console.log("aqui tbm chega: ",result);
-            return result;
+            console.log("id: ",id);
+            const result= await connection.execute(query,[id]);
+            console.log("result: ",result[0][0]);
+            return result[0][0];
         }catch(e){
-
+            throw e;
         }
     }
 
+    static async getTimesForDate(id: number, date: string, connection: any) {
+        const query = `SELECT * FROM horario_atendente WHERE atendente_id=? AND DATE(data_hora) = ? AND ocupado=0`
+        try {
+            const [result] = await connection.execute(query, [id, date]);
+            console.log(result);
+            return result;
+        } catch (e) {
+            console.error("Erro ao listar horarios disponieis");
+            throw e;
+        }
+    }
 
     static async listarAtendentes(connection: any) {
         const query = `SELECT * FROM atendente`;
@@ -80,17 +89,56 @@ class Atendente extends User {
         }
     }
 
-    async Associar(connection: any, servicoId: number, atendenteId: number) {
+    static async getUserAtendentes(id:number, connection:any){
+        const query = `SELECT *
+            FROM user
+            WHERE user.id = ?`
+        ;
         try {
-            if (!atendenteId || !servicoId) {
+            const result: any = await connection.execute(query,[id]);
+            return result[0];
+        } catch (error) {
+            console.error('Erro ao listar atendentes:', error);
+            throw error;
+        }
+    }
+
+    static async listarAtendentesDoServico(id:number, connection: any) {
+        const query = `SELECT *
+            FROM atendente
+            JOIN atendente_serv ON atendente.id = atendente_serv.atendente_id
+            WHERE atendente_serv.serv_id = ?;`
+        ;
+        try {
+            const result: any = await connection.execute(query,[id]);
+            return result[0];
+        } catch (error) {
+            console.error('Erro ao listar atendentes:', error);
+            throw error;
+        }
+    }
+
+    static async listarServicoAtendente(id:number, connection: any) {
+        const query = `SELECT *
+            FROM servicos
+            JOIN atendente_serv ON servicos.id = atendente_serv.serv_id
+            WHERE atendente_serv.atendente_id = ?;`
+        ;
+        try {
+            const result: any = await connection.execute(query,[id]);
+            return result[0];
+        } catch (error) {
+            console.error('Erro ao listar servicos:', error);
+            throw error;
+        }
+    }
+
+    async Associar(connection: any, servicoId: number, atendenteId: number, empresaId:number) {
+        try {
+            if (!atendenteId || !servicoId)
                 throw new Error("ID do atendente ou serviço não fornecido.");
-            }
-
-            const queryAssociacao = `INSERT INTO atendente_serv (atendente_id, serv_id) VALUES (?, ?)`;
-            await connection.execute(queryAssociacao, [atendenteId, servicoId]);
-
-            console.log("Serviço associado ao atendente com sucesso!");
-
+            const queryAssociacao = `INSERT INTO atendente_serv (atendente_id, serv_id, empresa_id) VALUES (?, ?, ?)`;
+            await connection.execute(queryAssociacao, [atendenteId, servicoId, empresaId]);
             return servicoId;
         } catch (error) {
             console.error("Erro ao associar serviço ao atendente:", error);
@@ -129,8 +177,6 @@ class Atendente extends User {
             throw error;
         }
     }
-
-
 }
 
 export default Atendente;
