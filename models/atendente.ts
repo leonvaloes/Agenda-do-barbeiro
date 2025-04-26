@@ -118,21 +118,6 @@ class Atendente extends User {
         }
     }
 
-    static async listarServicoAtendente(id:number, connection: any) {
-        const query = `SELECT *
-            FROM servicos
-            JOIN atendente_serv ON servicos.id = atendente_serv.serv_id
-            WHERE atendente_serv.atendente_id = ?;`
-        ;
-        try {
-            const result: any = await connection.execute(query,[id]);
-            return result[0];
-        } catch (error) {
-            console.error('Erro ao listar servicos:', error);
-            throw error;
-        }
-    }
-
     async Associar(connection: any, servicoId: number, atendenteId: number, empresaId:number) {
         try {
             if (!atendenteId || !servicoId)

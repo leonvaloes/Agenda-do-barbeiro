@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors'); // Importe o cors
 const Routes = require('./routes/routes');
 import DatabaseManager from './config/database';
 
@@ -23,6 +24,11 @@ class Server {
 
     // Método para configurar middlewares
     setupMiddlewares() {
+        this.app.use(cors()); // Permite CORS para todas as origens
+
+        // Se você quiser restringir o CORS a uma origem específica, como 'http://localhost:3001'
+        // this.app.use(cors({ origin: 'http://localhost:3001' }));
+
         this.app.use(express.json()); // Middleware para parsing de JSON
 
         // Middleware para logs
@@ -31,6 +37,7 @@ class Server {
             next();
         });
     }
+
     // Método para configurar as rotas
     setupRoutes() {
         new Routes(this.app); // Chamando as rotas

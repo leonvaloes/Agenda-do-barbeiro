@@ -96,6 +96,21 @@ class EmpresaController {
             connection.release();
         }
     }
+
+    async listarServicoEmpresa(id: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            const servicos = await Empresa.listarServicoEmpresa(id, connection);
+            if (servicos)
+                return servicos;
+
+            throw new Error("Nenhum atendente encontrado");
+        } catch (error) {
+            throw error;
+        } finally {
+            connection.release();
+        }
+    }
 }
 
 export default EmpresaController;

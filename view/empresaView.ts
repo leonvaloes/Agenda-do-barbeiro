@@ -66,4 +66,14 @@ router.post('/:empresaId/funcionario', async (req, res) => {
     }
 });
 
+router.get('/listServ/:id', async (req, res) => {
+    try {
+        const id= req.params.id;
+        const servicos = await empresaController.listarServicoEmpresa(id);
+        res.status(200).send(servicos);
+    } catch (e) {
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+});
+
 export = router;

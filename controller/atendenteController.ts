@@ -59,21 +59,6 @@ class AtendenteController {
         }
     }
 
-    async listarServicoEmpresa(id: number) {
-        const connection = await DatabaseManager.getInstance().getConnection();
-        try {
-            const servicos = await Atendente.listarServicoAtendente(id, connection);
-            if (servicos)
-                return servicos;
-
-            throw new Error("Nenhum atendente encontrado");
-        } catch (error) {
-            throw error;
-        } finally {
-            connection.release();
-        }
-    }
-
     static async listarAtendentesDoServico(id: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {

@@ -24,16 +24,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/BuscaServ', async (req, res) => {
-    try {
-        const id= req.body.id;
-        const servicos = await atendenteController.listarServicoEmpresa(id);
-        res.status(200).send(servicos);
-    } catch (e) {
-        res.status(400).send(`Erro: ${e.message}`);
-    }
-});
-
 router.put('/:id', async (req, res) => {
     try {
         const updateAtend = await atendenteController.atualizaAtendente(req.params.id, req.body);
