@@ -32,6 +32,20 @@ abstract class User {
         }
     }
 
+    static async getUserById(id:number, connection:any){
+        const query=`SELECT * FROM user WHERE id=?`
+        try{
+            const result= await connection.execute(query,[id]);
+            if(result && result.length>0){
+                console.log("User: ", result);
+                return result;
+            }
+            throw new Error("Usuario não encontrado");
+        }catch(e){
+            throw e;
+        }
+    }
+
     generateToken(): string {
         const secret = process.env.JWT_SECRET;
 

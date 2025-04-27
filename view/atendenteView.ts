@@ -1,6 +1,7 @@
 import AtendenteController from '../controller/atendenteController'
 import AgendamentoController from '../controller/agendamentoController';
 import NotificacaoController from '../controller/notificacaoController';
+import { SimpleConsoleLogger } from 'typeorm';
 const notificacaoController = new NotificacaoController();
 const agendamentoController = new AgendamentoController();
 const atendenteController = new AtendenteController();
@@ -59,13 +60,14 @@ router.post('/criar-servico/:id', async (req, res) => {
     }
 });
 
-router.get('/getHours', async (req,res)=>{
+router.post('/getHours/:id', async (req,res)=>{
     try{
-        const id = Number(req.body.id);
-        const data= req.body.date;
+        const id = Number(req.params.id);
+        const data= req.body.data;
+
         console.log("id e data: ", id, data);
         const horarios= await atendenteController.getTimeForDate(id,data);
-        res.status(201).send(horarios);
+        res.status(200).send(horarios);
     }catch(e){
         res.status(400).send(`Erro: ${e.message}`);
     }
@@ -107,6 +109,18 @@ router.get('/getAtendServ/:id', async (req, res) => {
     const servico_id = req.params.id;
     try {
         const result= await AtendenteController.listarAtendentesDoServico(servico_id);
+        res.json(result);
+    } catch (error) {
+        console.log("errou", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.get('/getIdAtendente/:id', async (req, res) => {
+    const userId = req.params.id;
+    try {
+        const result= await AtendenteController.getIdAtendente(userId);
+        console.log("reslt view: ", result);
         res.json(result);
     } catch (error) {
         console.log("errou", error);

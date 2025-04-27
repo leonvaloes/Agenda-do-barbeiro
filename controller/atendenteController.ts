@@ -75,6 +75,7 @@ class AtendenteController {
                     const dataAtendente = await Atendente.getUserAtendentes(atendente.atendente_user_id, connection);
                     dadosAtendentes.push(dataAtendente);
                 }
+                
                 return dadosAtendentes[0];
             }
 
@@ -197,14 +198,26 @@ class AtendenteController {
         }
     }
 
+    static async getIdAtendente(userId:number){
+        const connection= await DatabaseManager.getInstance().getConnection();
+        try{
+            const result= await Atendente.getIdAtendente(userId,connection);
+            return result;
+        }catch(e){
+            throw e;
+        }finally{
+
+        }
+    }
+
     async getTimeForDate(atendenteId: number, date: string) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             const existe = await Atendente.getAtendenteById(atendenteId, connection);
             if (!existe && existe.length <= 0)
                 throw new Error("Atendente não encontrado");
-            const [result] = await Atendente.getTimesForDate(atendenteId, date, connection);
-            console.log(result);
+            const result = await Atendente.getTimesForDate(atendenteId, date, connection);
+            return result;
         } catch (e) {
             console.error("Erro ao buscar data e exibir horarios");
             throw e;

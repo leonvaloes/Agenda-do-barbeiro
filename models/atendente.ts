@@ -66,11 +66,20 @@ class Atendente extends User {
         }
     }
 
+    static async getIdAtendente(id:number,connection:any){
+        const query=`SELECT id FROM atendente WHERE atendente_user_id = ?`
+        try{
+            const result= await connection.execute(query,[id]);
+            return result[0][0];
+        }catch(e){
+            throw e
+        }
+    }
+
     static async getTimesForDate(id: number, date: string, connection: any) {
         const query = `SELECT * FROM horario_atendente WHERE atendente_id=? AND DATE(data_hora) = ? AND ocupado=0`
         try {
             const [result] = await connection.execute(query, [id, date]);
-            console.log(result);
             return result;
         } catch (e) {
             console.error("Erro ao listar horarios disponieis");
