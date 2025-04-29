@@ -99,6 +99,28 @@ class Empresa extends User {
         }
     }
 
+    static async getFuncionarios(id: number, connection: any) {
+        const query = `SELECT * FROM atendente WHERE empresa_id = ?`;
+        try {
+            const result: any = await connection.execute(query, [id]);
+            return result[0];
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+    static async getUserById(id:number, connection:any) {
+        const query = `SELECT * FROM user WHERE id = ?`;
+        try {
+            const result = await connection.execute(query, [id]);
+            console.log("model: ",result[0])
+            return result[0];
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default Empresa;

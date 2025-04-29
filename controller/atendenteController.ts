@@ -62,7 +62,6 @@ class AtendenteController {
     static async listarAtendentesDoServico(id: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            console.log("servico id: ", id)
             const atendentes = await Atendente.listarAtendentesDoServico(id, connection);
             const dadosAtendentes = [];
 
@@ -75,7 +74,6 @@ class AtendenteController {
                     const dataAtendente = await Atendente.getUserAtendentes(atendente.atendente_user_id, connection);
                     dadosAtendentes.push(dataAtendente);
                 }
-                
                 return dadosAtendentes[0];
             }
 

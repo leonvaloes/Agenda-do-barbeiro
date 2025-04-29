@@ -48,7 +48,15 @@ router.put('/:id', async (req, res)=>{
     }
 })
 
-
+router.get('/getFunc/:id', async (req, res) => {
+    try {
+        const id= req.params.id;
+        const funcionarios = await empresaController.getFunc(id);
+        res.status(200).send(funcionarios);
+    } catch (e) {
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+});
 
 router.post('/:empresaId/funcionario', async (req, res) => {
     try {
@@ -75,5 +83,33 @@ router.get('/listServ/:id', async (req, res) => {
         res.status(400).send(`Erro: ${e.message}`);
     }
 });
+
+router.get('/:id', async (req,res)=>{
+    try{
+        const id= req.params.id;
+        const empresa= await empresaController.buscarEmpresa(id);
+        if(empresa)
+            res.status(200).send(empresa);
+        else
+            res.status(404).send("Empresa não encontrada!");
+    }catch(e){
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+})
+
+router.get('/getUser/:id', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        const empresa = await empresaController.getEmpresaByUserId(id);
+
+        if (empresa && empresa.length > 0)
+            res.status(200).send(empresa);
+        else
+            res.status(404).send("Empresa não encontrada!");
+    } catch (e) {
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+});
+
 
 export = router;
