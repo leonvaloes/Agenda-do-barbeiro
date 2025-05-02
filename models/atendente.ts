@@ -17,7 +17,7 @@ class Atendente extends User {
 
     async createAtendente(connection: any) {
         this.atendente_user_id = await User.cadastrarUser(this.nome,this.email,this.telefone, this.senha, connection);
-        const query = `INSERT INTO atendente (cpf,empresa_id, atendente_user_id) VALUES (?, ?, ?)`;
+        const query = `INSERT INTO atendente (cpf, empresa_id, atendente_user_id) VALUES (?, ?, ?)`;
         const values = [this.cpf, this.empresa_id, this.atendente_user_id];
         try {
             const result = await connection.execute(query, values);

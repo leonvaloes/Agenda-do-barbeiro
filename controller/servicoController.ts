@@ -30,16 +30,19 @@ class ServicoController {
     }
     
 
-    async atualizarServico(id:number, dados:number) {
+    async atualizarServico(id:number, dados:any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
+            
 
             const servico= await Servico.getServicoById(id, connection);
             if(!servico){
                 throw new Error("Serviço não encontrado");
             }
-            const retorno = await servico.update(connection, dados, id);
+            console.log(id);
+            console.log(dados);
+            const retorno = await Servico.update(connection, dados, id);
             connection.commit();
             return retorno;
         } catch (error) {

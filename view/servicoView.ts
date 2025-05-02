@@ -13,8 +13,9 @@ router.post('/',async(req,res)=>{
 })
 
 router.put('/:id',async(req,res)=>{
+    const id= req.params.id;
     try{
-        const updateServic= await servicoController.atualizarServico(req.params.id,req.body)
+        const updateServic= await servicoController.atualizarServico(id,req.body)
         if(!updateServic)
             return res.status(404).send(updateServic);
         

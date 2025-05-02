@@ -49,10 +49,10 @@ class Servicos{
         }
     }
 
-    static async update(connection: any, data: Servicos, id:number) {
-        const query = `UPDATE servicos SET nome = ?, descricao = ?, valor = ?, tempoMedio = ? WHERE id = ?`;
+    static async update(connection: any, data: any, id:number) {
+        const query = `UPDATE servicos SET nome = ?, descricao = ?, valor = ?, tempo_medio = ? WHERE id = ?`;
         try {
-            const result = await connection.execute(query, [data.nome, data.descricao, data.valor, data.tempoMedio, data.id]);
+            const result = await connection.execute(query, [data.nome, data.descricao, data.valor, data.tempo_medio, id]);
             return result;
         } catch (error) {
             throw error;
