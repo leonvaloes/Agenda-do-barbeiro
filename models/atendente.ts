@@ -6,13 +6,13 @@ class Atendente extends User {
     atendente_user_id: number;
 
     constructor(nome: string, cpf: string, senha: string, atendente_user_id: number) {
-        super(nome, senha);
+        super(nome, senha, "ATENDENTE");    
         this.cpf = cpf;
         this.atendente_user_id = atendente_user_id;
     }
 
     async createAtendente(connection: any) {
-        this.atendente_user_id = await User.cadastrarUser(this.nome, this.senha, connection);
+        this.atendente_user_id = await User.cadastrarUser(this.nome, this.senha,  "ATENDENTE", connection);
         const query = `INSERT INTO atendente (cpf, atendente_user_id) VALUES ( ?, ?)`;
         const values = [this.cpf, this.atendente_user_id];
         try {

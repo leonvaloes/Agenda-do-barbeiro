@@ -13,6 +13,9 @@ class Routes {
     }
 
     setupRoutes() {
+        this.app.use('/ping', (req, res) => {
+            res.send('pong');
+        });
         this.app.use('/atendente', atendenteView);
         this.app.use('/cliente', clienteView);
         this.app.use('/empresa', empresaView);

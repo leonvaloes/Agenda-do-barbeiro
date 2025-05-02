@@ -22,7 +22,8 @@ import create_dias_semana from './019_create_dias_semana';
 import alter_expediente from './020_alter_expediente';
 import create_horario_atendente from './021_create_horario_atendente';
 import alter_horario_atendente from './022_alter_horario_atendente';
-
+import create_role from './023_create_role';
+import alter_user_role from './024_alter_user_role';
 class Migrations {
     async up() {
         console.log('Migrations running...');
@@ -54,6 +55,9 @@ class Migrations {
             await new alter_expediente().up(connection);
             await new create_horario_atendente().up(connection);
             await new alter_horario_atendente().up(connection);
+
+            await new create_role().up(connection);
+            await new alter_user_role().up(connection)
 
             console.log('Migrations finished!');
             connection.release();
@@ -92,6 +96,7 @@ class Migrations {
             await new createCliente().down(connection);
             await new createAtendente().down(connection);
             await new createEmpresa().down(connection);
+            await new create_role().down(connection);
 
             console.log('Migrations finished!');
             connection.release();

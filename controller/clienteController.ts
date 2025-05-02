@@ -7,8 +7,6 @@ import { NotificacaoEmail } from "../models/agendamentoNotificacaoObserver/notif
 import { NotificacaoWhatsapp } from "../models/agendamentoNotificacaoObserver/NotificacaoWhatsapp";
 import HorarioFuncionario from "../models/horariosFuncionario";
 import unformatDate from "../type/unformatDate";
-import { before } from "node:test";
-import { isBefore } from "date-fns";
 
 class ClienteController {
 

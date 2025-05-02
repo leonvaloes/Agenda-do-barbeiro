@@ -10,7 +10,7 @@ class Empresa extends User {
     empresa_user_id: number;
 
     constructor(nome: string, email: string, cnpj: string, cidade: string, endereco: string, estado: string, telefone: string, senha: string, empresa_user_id: number) {
-        super(nome, senha);
+        super(nome, senha, "EMPRESA");
         this.email = email;
         this.cnpj = cnpj;
         this.cidade = cidade;
@@ -21,7 +21,7 @@ class Empresa extends User {
     }
 
     async create(connection: any) {
-        this.empresa_user_id = await User.cadastrarUser(this.nome, this.senha, connection);
+        this.empresa_user_id = await User.cadastrarUser(this.nome, this.senha, "EMPRESA", connection);
         const query = `INSERT INTO empresa (email, cnpj, cidade, endereco, estado, telefone, empresa_user_id) VALUES ( ?, ?, ?, ?, ?, ?, ?)`;
         const values = [this.email, this.cnpj, this.cidade, this.endereco, this.estado, this.telefone, this.empresa_user_id];
         try {

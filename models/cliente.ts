@@ -7,14 +7,14 @@ class Cliente extends User {
     cliente_user_id: number;
 
     constructor(nome: string, cpf: string, senha: string, cidade: string, cliente_user_id: number) {
-        super(nome, senha);
+        super(nome, senha,"CLIENTE");
         this.cpf = cpf;
         this.cidade = cidade;
         this.cliente_user_id = cliente_user_id;
     }
 
     async createCliente(connection: any) {
-        this.cliente_user_id = await User.cadastrarUser(this.nome, this.senha, connection);
+        this.cliente_user_id = await User.cadastrarUser(this.nome, this.senha, "CLIENTE", connection);
         const query = `INSERT INTO cliente ( cpf, cidade, cliente_user_id) VALUES (?, ?, ?)`;
         const values = [this.cpf,  this.cidade, this.cliente_user_id];
         try {
