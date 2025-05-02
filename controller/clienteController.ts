@@ -19,7 +19,7 @@ class ClienteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            const cliente = new Cliente(clienteData.nome, clienteData.cpf, clienteData.senha, clienteData.cidade, 0);
+            const cliente = new Cliente(clienteData.nome, clienteData.email, clienteData.telefone, clienteData.cpf, clienteData.senha, clienteData.cidade, 0);
             await cliente.createCliente(connection);
             await connection.commit();
 
@@ -36,7 +36,7 @@ class ClienteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-            const clienteModel = new Cliente("", "", "", "", 0);
+            const clienteModel = new Cliente("", "", "", "","","", 0);
             const clienteExistente = await Cliente.getClienteById(id, connection);
 
             if (!clienteExistente)
@@ -58,7 +58,7 @@ class ClienteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-            const clienteModel = new Cliente("", "", "", "", 0);
+            const clienteModel = new Cliente("", "", "", "","","", 0);
             const clienteExistente = await Cliente.getClienteById(id, connection);
 
             if (!clienteExistente) {

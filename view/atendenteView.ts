@@ -1,7 +1,6 @@
 import AtendenteController from '../controller/atendenteController'
 import AgendamentoController from '../controller/agendamentoController';
 import NotificacaoController from '../controller/notificacaoController';
-import { SimpleConsoleLogger } from 'typeorm';
 const notificacaoController = new NotificacaoController();
 const agendamentoController = new AgendamentoController();
 const atendenteController = new AtendenteController();

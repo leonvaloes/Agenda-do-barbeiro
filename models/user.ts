@@ -6,11 +6,15 @@ dotenv.config(); // Carrega variáveis do .env
 abstract class User {
     id?: number;
     nome: string;
+    email:string;
+    telefone:string;
     senha: string;
     role_name: string;
     
-    constructor(nome: string, senha: string, role_name: string) {
+    constructor(nome: string, email:string, telefone:string, senha: string, role_name: string) {
         this.nome = nome;
+        this.email = email;
+        this.telefone = telefone;
         this.senha = senha;
         this.role_name = role_name;
     }
@@ -43,7 +47,10 @@ abstract class User {
         }
     }
 
-    static async cadastrarUser(nome: string, senha: string, role_name : string, connection: any): Promise<number> {
+    logout(): void {
+    }
+    
+    static async cadastrarUser(nome:string,email:string, telefone:string, senha:string, role_name : string, connection: any): Promise<number> {
         try {
             const role = await Roles.getRoleByName(role_name, connection);
     
@@ -54,7 +61,7 @@ abstract class User {
             const roleId = role[0].id; 
             const [result]: any = await connection.execute(
                 `INSERT INTO user (nome, senha, role_id) VALUES (?, ?, ?)`,
-                [nome, senha, roleId]
+                [nome, email, telefone, senha]
             );
     
             console.log("User cadastrado com sucesso");

@@ -10,20 +10,18 @@ class Empresa extends User {
     empresa_user_id: number;
 
     constructor(nome: string, email: string, cnpj: string, cidade: string, endereco: string, estado: string, telefone: string, senha: string, empresa_user_id: number) {
-        super(nome, senha, "EMPRESA");
-        this.email = email;
+        super(nome,email,telefone,senha,"EMPRESA");
         this.cnpj = cnpj;
         this.cidade = cidade;
         this.endereco = endereco;
         this.estado = estado;
-        this.telefone = telefone;
         this.empresa_user_id = empresa_user_id;
     }
 
     async create(connection: any) {
-        this.empresa_user_id = await User.cadastrarUser(this.nome, this.senha, "EMPRESA", connection);
-        const query = `INSERT INTO empresa (email, cnpj, cidade, endereco, estado, telefone, empresa_user_id) VALUES ( ?, ?, ?, ?, ?, ?, ?)`;
-        const values = [this.email, this.cnpj, this.cidade, this.endereco, this.estado, this.telefone, this.empresa_user_id];
+        this.empresa_user_id = await User.cadastrarUser(this.nome,this.email, this.telefone, this.senha, "EMPRESA", connection);
+        const query = `INSERT INTO empresa (cnpj, cidade, endereco, estado, empresa_user_id) VALUES ( ?, ?, ?, ?, ?)`;
+        const values = [this.cnpj, this.cidade, this.endereco, this.estado, this.empresa_user_id];
         try {
             const result = await connection.execute(query, values);
             return result;
@@ -43,7 +41,7 @@ class Empresa extends User {
     }
 
     static async update(id: number, data: Empresa, connection: any) {
-        const query = `UPDATE empresa SET  email = ?, cnpj = ?, cidade = ?, endereco = ?, estado = ?, telefone = ? WHERE id = ?`;
+        const query = `UPDATE empresa SET cnpj = ?, cidade = ?, endereco = ?, estado = ? WHERE id = ?`;
         try {
             await connection.execute(query, [data.email, data.cnpj, data.cidade, data.endereco, data.estado, data.telefone, id]);
             return { id, ...data };
@@ -61,7 +59,6 @@ class Empresa extends User {
             throw error;
         }
     }
-
 
     async adicionaAtendente(connection: any, cpf: string, empresaId: number) {
         const queryBusca = `SELECT id FROM atendente WHERE cpf = ?`;
@@ -95,6 +92,27 @@ class Empresa extends User {
             return result[0];
         } catch (error) {
             console.error('Erro ao listar servicos e:', error);
+            throw error;
+        }
+    }
+
+    static async getFuncionarios(id: number, connection: any) {
+        const query = `SELECT * FROM atendente WHERE empresa_id = ?`;
+        try {
+            const result: any = await connection.execute(query, [id]);
+            return result[0];
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async getUserById(id:number, connection:any) {
+        const query = `SELECT * FROM user WHERE id = ?`;
+        try {
+            const result = await connection.execute(query, [id]);
+            console.log("model: ",result[0])
+            return result[0];
+        } catch (error) {
             throw error;
         }
     }
