@@ -6,10 +6,14 @@ dotenv.config(); // Carrega variáveis do .env
 abstract class User {
     id?: number;
     nome: string;
+    email:string;
+    telefone:string;
     senha: string;
     
-    constructor(nome: string, senha: string) {
+    constructor(nome: string, email:string, telefone:string, senha: string) {
         this.nome = nome;
+        this.email = email;
+        this.telefone = telefone;
         this.senha = senha;
     }
 
@@ -65,16 +69,13 @@ abstract class User {
         return jwt.sign(payload, secret, { expiresIn: '1h' });
     }
     logout(): void {
-
     }
     
-    static async cadastrarUser(nome:string, senha:string ,connection: any): Promise<any> {
-        const query = `INSERT INTO user (nome, senha) VALUES (?, ?)`;
-        const values = [nome, senha];
-        
-        const teste=await connection.query(query, values);
-        console.log(teste[0].insertId);
-        return teste[0].insertId;
+    static async cadastrarUser(nome:string,email:string, telefone:string, senha:string ,connection: any): Promise<any> {
+        const query = `INSERT INTO user (nome, email, telefone, senha) VALUES (?, ?, ?, ?)`;
+        const values = [nome, email, telefone, senha];
+        const result=await connection.query(query, values);
+        return result[0].insertId;
     }
 }
 

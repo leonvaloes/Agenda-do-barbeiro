@@ -3,17 +3,19 @@ import User from "./user";
 
 class Atendente extends User {
     cpf: string;
+    email:string;
+    telefone:string;
     atendente_user_id: number;
 
-    constructor(nome: string, cpf: string, senha: string, atendente_user_id: number) {
-        super(nome, senha);
+    constructor(nome: string, email:string, telefone:string, cpf: string, senha: string, atendente_user_id: number) {
+        super(nome,email,telefone,senha);
         this.cpf = cpf;
         this.atendente_user_id = atendente_user_id;
     }
 
     async createAtendente(connection: any) {
-        this.atendente_user_id = await User.cadastrarUser(this.nome, this.senha, connection);
-        const query = `INSERT INTO atendente (cpf, atendente_user_id) VALUES ( ?, ?)`;
+        this.atendente_user_id = await User.cadastrarUser(this.nome,this.email,this.telefone, this.senha, connection);
+        const query = `INSERT INTO atendente (cpf, atendente_user_id) VALUES (?, ?)`;
         const values = [this.cpf, this.atendente_user_id];
         try {
             const result = await connection.execute(query, values);

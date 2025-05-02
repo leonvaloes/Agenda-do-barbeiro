@@ -83,16 +83,16 @@ class EmpresaController {
         }
     }
 
-    async getEmpresaByUserId(id:number){
-        const connection= await DatabaseManager.getInstance().getConnection();
-        try{
-            const result= await Empresa.getUserById(id,connection);
-            if(!result.length){
+    async getEmpresaByUserId(id: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            const result = await Empresa.getUserById(id, connection);
+            if (!result.length) {
                 throw new Error("Empresa não encontrada");
             }
             console.log(result[0])
             return result;
-        }catch(e){
+        } catch (e) {
             throw e;
         }
     }
@@ -148,13 +148,14 @@ class EmpresaController {
         try {
             const funcionarios = await Empresa.getFuncionarios(id, connection);
             const dadosFuncionarios = [];
-            if (funcionarios && funcionarios.length > 0)
-            {
-                for(const func of funcionarios){
+            if (funcionarios && funcionarios.length > 0) {
+                for (const func of funcionarios) {
                     const dados = await Atendente.getUserAtendentes(func.atendente_user_id, connection);
-                    dadosFuncionarios.push(dados[0]);
+                    dadosFuncionarios.push({
+                        ...dados[0],
+                        cpf: func.cpf
+                    });
                 }
-                console.log("DADOS AQUI : ",dadosFuncionarios);
                 return dadosFuncionarios;
             }
             throw new Error("Nenhum atendente encontrado");

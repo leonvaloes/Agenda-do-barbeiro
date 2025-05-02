@@ -13,11 +13,11 @@ class AtendenteController {
         this.atendente = Atendente;
     }
 
-    async createAtendente(atendenteData: any) { //CERTO
+    async createAtendente(atendenteData: any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            const atendente = new Atendente(atendenteData.nome, atendenteData.cpf, atendenteData.senha, 0);
+            const atendente = new Atendente(atendenteData.nome,atendenteData.email, atendenteData.telefone, atendenteData.cpf, atendenteData.senha, 0);
             await atendente.createAtendente(connection);
             await connection.commit();
             return atendente;
@@ -29,7 +29,7 @@ class AtendenteController {
         }
     }
 
-    async associarHorario(data: associarHorariosAtendenteDto) { //PRECISA FAZER A CRIAÇÃO DE 15 EM 15 MINUTOS
+    async associarHorario(data: associarHorariosAtendenteDto) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
@@ -89,7 +89,7 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-            const atendenteModel = new Atendente("", "", "", 0);
+            const atendenteModel = new Atendente("", "", "","","", 0);
             const atendenteExistente = await Atendente.getAtendenteById(id, connection);
             if (atendenteExistente.length && dados.nome != null && dados.cpf != null && dados.senha != null) {
                 const atendenteAtualizado = await atendenteModel.update(id, connection, dados);
@@ -109,7 +109,7 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-            const atendenteModel = new Atendente("", "", "", 0);
+            const atendenteModel = new Atendente("", "", "","","", 0);
             const atendenteExistente = await Atendente.getAtendenteById(id, connection);
             if (!atendenteExistente.length)
                 throw new Error("Atendente não encontrado");
@@ -128,11 +128,11 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            const AtendenteModel = new Atendente("", "", "", 0);
+            const atendenteModel = new Atendente("", "", "","","", 0);
             const servico = await Servico.create(connection, data);
             const empresaId = await Atendente.getEmpresa(atendenteId, connection);
             if (empresaId) {
-                await AtendenteModel.Associar(connection, servico, atendenteId, empresaId.empresa_id);
+                await atendenteModel.Associar(connection, servico, atendenteId, empresaId.empresa_id);
             }
             else
                 throw new Error("É necessario associar o atendente a empresa!");

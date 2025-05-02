@@ -8,7 +8,6 @@ router.post('/', async (req,res)=>{
         res.status(201).send(empresa);
     }catch(e){
         res.status(400).send(`Erro: ${e.message}`);
-
     }
 });
 
