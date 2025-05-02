@@ -5,18 +5,20 @@ class Atendente extends User {
     cpf: string;
     email:string;
     telefone:string;
+    empresa_id:number;
     atendente_user_id: number;
 
-    constructor(nome: string, email:string, telefone:string, cpf: string, senha: string, atendente_user_id: number) {
+    constructor(nome: string, email:string, telefone:string, cpf: string, senha: string, empresa_id:number, atendente_user_id: number) {
         super(nome,email,telefone,senha);
         this.cpf = cpf;
+        this.empresa_id=empresa_id;
         this.atendente_user_id = atendente_user_id;
     }
 
     async createAtendente(connection: any) {
         this.atendente_user_id = await User.cadastrarUser(this.nome,this.email,this.telefone, this.senha, connection);
-        const query = `INSERT INTO atendente (cpf, atendente_user_id) VALUES (?, ?)`;
-        const values = [this.cpf, this.atendente_user_id];
+        const query = `INSERT INTO atendente (cpf,empresa_id, atendente_user_id) VALUES (?, ?, ?)`;
+        const values = [this.cpf, this.empresa_id, this.atendente_user_id];
         try {
             const result = await connection.execute(query, values);
             return { id: result[0].insertId, ...result[0] };

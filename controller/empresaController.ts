@@ -153,7 +153,8 @@ class EmpresaController {
                     const dados = await Atendente.getUserAtendentes(func.atendente_user_id, connection);
                     dadosFuncionarios.push({
                         ...dados[0],
-                        cpf: func.cpf
+                        cpf: func.cpf,
+                        atendente_id: func.id
                     });
                 }
                 return dadosFuncionarios;

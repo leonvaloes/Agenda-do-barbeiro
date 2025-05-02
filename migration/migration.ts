@@ -63,28 +63,29 @@ class Migrations {
     }
 
     async down() {
-        console.log('Migrations running...');
+        console.log('Rolling back migrations...');
         try {
             console.log('Attempting to connect to the database...');
             const db = Database.getInstance();
             const connection = await db.getConnection();
-            console.log('Connected to the database.');
 
+            // Ordem inversa de up()
             await new alter_horario_atendente().down(connection);
             await new create_horario_atendente().down(connection);
             await new alter_expediente().down(connection);
             await new create_dias_semana().down(connection);
             await new create_expediente().down(connection);
+
             await new alterUserEmpresa().down(connection);
-            await new alterUserCliente().down(connection);
-            await new alterUserAtendente().down(connection)
-            await new alterUserNotificacao().down(connection);
-            await new createUser().down(connection);
-            await new createUserNotificacao().down(connection);
-            await new createNotificacao().down(connection);
+            await new alterUserAtendente().down(connection);
             await new alterAgendamento().down(connection);
             await new alterAtendente().down(connection);
             await new alterItem().down(connection);
+            await new alterUserCliente().down(connection);
+
+            await new createUserNotificacao().down(connection);
+            await new createNotificacao().down(connection);
+            await new createUser().down(connection);
             await new createItem().down(connection);
             await new createAgendamento().down(connection);
             await new createAtendenteServ().down(connection);
@@ -93,16 +94,16 @@ class Migrations {
             await new createAtendente().down(connection);
             await new createEmpresa().down(connection);
 
-            console.log('Migrations finished!');
+            console.log('Migrations rollback finished!');
             connection.release();
         } catch (error) {
-            console.error('Error during migrations:', error);
+            console.error('Error during rollback:', error);
         }
     }
 }
 
-// Lógica para escolher entre "up" ou "down"
-const command = process.argv[2]; // Pega o comando passado na linha de comando ("up" ou "down")
+// Executa o comando a partir da linha de comando
+const command = process.argv[2];
 
 if (command === 'up') {
     new Migrations().up();

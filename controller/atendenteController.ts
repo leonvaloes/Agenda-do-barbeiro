@@ -17,7 +17,7 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            const atendente = new Atendente(atendenteData.nome,atendenteData.email, atendenteData.telefone, atendenteData.cpf, atendenteData.senha, 0);
+            const atendente = new Atendente(atendenteData.nome,atendenteData.email, atendenteData.telefone, atendenteData.cpf, atendenteData.senha,atendenteData.empresa_id, 0);
             await atendente.createAtendente(connection);
             await connection.commit();
             return atendente;
@@ -89,7 +89,7 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-            const atendenteModel = new Atendente("", "", "","","", 0);
+            const atendenteModel = new Atendente("", "", "","","",0, 0);
             const atendenteExistente = await Atendente.getAtendenteById(id, connection);
             if (atendenteExistente.length && dados.nome != null && dados.cpf != null && dados.senha != null) {
                 const atendenteAtualizado = await atendenteModel.update(id, connection, dados);
@@ -109,7 +109,7 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-            const atendenteModel = new Atendente("", "", "","","", 0);
+            const atendenteModel = new Atendente("", "", "","","",0, 0);
             const atendenteExistente = await Atendente.getAtendenteById(id, connection);
             if (!atendenteExistente.length)
                 throw new Error("Atendente não encontrado");
@@ -128,7 +128,7 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            const atendenteModel = new Atendente("", "", "","","", 0);
+            const atendenteModel = new Atendente("", "", "","","",0, 0);
             const servico = await Servico.create(connection, data);
             const empresaId = await Atendente.getEmpresa(atendenteId, connection);
             if (empresaId) {
