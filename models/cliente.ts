@@ -25,7 +25,6 @@ class Cliente extends User {
         }
     }
 
-
     async delete(id: number, connection: any) {
         const query = `DELETE FROM cliente WHERE id = ?`;
         try {
