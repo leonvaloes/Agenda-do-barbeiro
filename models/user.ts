@@ -69,6 +69,17 @@ abstract class User {
         }
     }
 
+    static async updateUser(id: number, nome: string, email: string, telefone: string, connection: any): Promise<void> {
+        try {
+            await connection.execute(
+                `UPDATE user SET nome=?, email=?, telefone=? WHERE id=?`,
+                [nome, email, telefone, id]
+            );
+        } catch (e) {
+            throw e;
+        }
+    }
+
 }
 
 export default User;

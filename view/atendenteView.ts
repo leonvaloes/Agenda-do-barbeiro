@@ -26,10 +26,15 @@ router.get('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     try {
-        const updateAtend = await atendenteController.atualizaAtendente(req.params.id, req.body);
+        console.log(req.body);
+        
+        const id = req.params.id;
+        const { nome, email, telefone, cpf } = req.body;
+        console.log("nome: ", nome);
+        const updateAtend = await atendenteController.atualizaAtendente(id, nome, email, telefone, cpf);
         if (!updateAtend)
             return res.status(404).send('Atendente não encontrado');
-        res.status(201).send(updateAtend)
+        res.status(200).send(updateAtend)
     } catch (e) {
         res.status(400).send(`Erro: ${e.message}`);
     }

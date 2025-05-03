@@ -12,7 +12,7 @@ class AtendenteController {
     constructor() {
         this.atendente = Atendente;
     }
-
+    
     async createAtendente(atendenteData: any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
@@ -85,25 +85,30 @@ class AtendenteController {
         }
     }
 
-    async atualizaAtendente(id: number, dados: any) { // certo
+    async atualizaAtendente(id: number, nome: string, email: string, telefone: string, cpf: string) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            connection.beginTransaction();
-            const atendenteModel = new Atendente("", "", "","","",0, 0);
+            await connection.beginTransaction();
+    
             const atendenteExistente = await Atendente.getAtendenteById(id, connection);
-            if (atendenteExistente.length && dados.nome != null && dados.cpf != null && dados.senha != null) {
-                const atendenteAtualizado = await atendenteModel.update(id, connection, dados);
-                connection.commit();
-                return atendenteAtualizado;
-            }
-            return null;
+            if (!atendenteExistente.length)
+                throw new Error("Atendente não encontrado");
+    
+            const atendenteModel = new Atendente("", "", "", "", "", 0, 0);
+            await Atendente.update(id, nome, email, telefone, cpf, connection);
+    
+            const atendenteAtualizado = await Atendente.getAtendenteById(id, connection); // <-- retorna o novo estado
+    
+            await connection.commit();
+            return atendenteAtualizado;
         } catch (error) {
-            connection.rollback();
+            await connection.rollback();
             throw error;
         } finally {
             connection.release();
         }
     }
+    
 
     async deletarAtendente(id: number) { // CERTO
         const connection = await DatabaseManager.getInstance().getConnection();

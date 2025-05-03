@@ -42,17 +42,18 @@ class Atendente extends User {
         }
     }
 
-    async update(id: number, connection: any, data: any) {
-        const query = `UPDATE atendente SET nome = ?, cpf = ?, senha = ? WHERE id = ?`;
+    static async update(id: number, nome: string, email: string, telefone: string, cpf: string, connection: any) {
         try {
-            await connection.execute(query, [data.nome, data.cpf, data.senha, id]);
-            return { id, ...data };
+            User.updateUser(id, nome, email, telefone, connection) 
+
+            const queryAtendente = `UPDATE atendente SET cpf=? WHERE atendente_user_id=?`;
+            await connection.execute(queryAtendente, [cpf, id]);
         } catch (error) {
-            console.error('Erro ao atualizar atendente:', error);
+            console.error("Erro ao atualizar atendente:", error);
             throw error;
         }
     }
-
+    
     static async getAtendenteById(id: number, connection: any) {
         const [rows] = await connection.execute('SELECT * FROM atendente WHERE id = ?', [id]);
         return rows;
