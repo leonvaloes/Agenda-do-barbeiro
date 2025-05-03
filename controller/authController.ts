@@ -10,20 +10,23 @@ class AuthController {
         this.authController = AuthController;
     }
 
-    async login(nome: string, senha: string) {
+    async login(email: string, senha: string) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            const user = await User.getUserByNome(nome, connection);
-            if (!user) {
+            const user = await User.getUserByEmail(email, connection);
+            if (!user || user.length === 0) {
                 throw new Error("Usuário não encontrado");
             }
-            if (user.senha !== senha) {
+            console.log("user", user);
+            console.log("senha", senha);
+            
+            if (user.senha != senha) {
                 throw new Error("Senha incorreta");
             }
             const JWT = AuthModel.gerarToken(user.id, user.nome, user.role_name)
             connection.commit();
-            return ;
+            return JWT;
         } catch (error) {
             connection.rollback();
             throw error;

@@ -33,20 +33,18 @@ abstract class User {
         }
     }
 
-    static async getUserByNome(nome: string, connection: any) {
-        const query = `SELECT * FROM user WHERE nome=?`
+    static async getUserByEmail(email: string, connection: any) {
+        const query = `SELECT * FROM user WHERE email=?`
         try {
-            const result = await connection.execute(query, [nome]);
+            const result = await connection.execute(query, [email]);
             if (result && result.length > 0) {
-                console.log("User: ", result);
-                return result;
+                return result[0][0];
             }
             throw new Error("Usuario não encontrado");
         } catch (e) {
             throw e;
         }
     }
-
     logout(): void {
     }
 

@@ -3,6 +3,7 @@ import clienteView from '../view/clienteView';
 import empresaView from '../view/empresaView';
 import servicoView from '../view/servicoView';
 import agendamentoView from '../view/agendamentoView';
+import loginView from '../view/loginView';
 
 class Routes {
     app: any;
@@ -21,6 +22,7 @@ class Routes {
         this.app.use('/empresa', empresaView);
         this.app.use('/servicos', servicoView);
         this.app.use('/agendamento', agendamentoView);
+        this.app.use('/login', loginView);
     }
 }
 
