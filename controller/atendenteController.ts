@@ -4,6 +4,7 @@ import associarHorariosAtendenteDto from '../DTO/associarHorariosAtedentesDto';
 import Atendente from '../models/atendente';
 import HorarioFuncionario from '../models/horariosFuncionario';
 import Servico from "../models/servicos";
+import User from '../models/user';
 
 
 class AtendenteController {
@@ -114,11 +115,7 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-            const atendenteModel = new Atendente("", "", "","","",0, 0);
-            const atendenteExistente = await Atendente.getAtendenteById(id, connection);
-            if (!atendenteExistente.length)
-                throw new Error("Atendente não encontrado");
-            const atendenteExcluido = await atendenteModel.delete(id, connection);
+            const atendenteExcluido = await User.delete(id, connection);
             connection.commit();
             return atendenteExcluido;
         } catch (error) {

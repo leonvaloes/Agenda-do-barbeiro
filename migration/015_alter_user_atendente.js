@@ -17,7 +17,6 @@ class alterUserAtendente {
 
     async down(connection) {
         try {
-            // Remove a chave estrangeira com o nome correto
             await connection.execute(`
                 ALTER TABLE atendente
                 DROP FOREIGN KEY atendente_ibfk_1;

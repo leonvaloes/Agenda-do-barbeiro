@@ -14,27 +14,36 @@ class AuthController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
+    
             const user = await User.getUserByEmail(email, connection);
             if (!user || user.length === 0) {
                 throw new Error("Usuário não encontrado");
             }
-            console.log("user", user);
-            console.log("senha", senha);
-            
+    
             if (user.senha != senha) {
                 throw new Error("Senha incorreta");
             }
-            const JWT = AuthModel.gerarToken(user.id, user.nome, user.role_name)
-            connection.commit();
-            return JWT;
+
+            const role_name = await  User.buscarRole(user.role_id, connection)
+    
+            const JWT = await AuthModel.gerarToken(user.id, user.nome, role_name[0].nome);
+            await connection.commit();
+            
+            console.log("role_name: ",role_name[0]);
+
+            return {
+                token: JWT,
+                role: role_name[0].nome,
+                id:user.id
+            };
+    
         } catch (error) {
-            connection.rollback();
+            await connection.rollback();
             throw error;
         } finally {
             connection.release();
         }
-    }
-    
+    }    
 }
 
 export default AuthController;

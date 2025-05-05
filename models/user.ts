@@ -48,6 +48,26 @@ abstract class User {
     logout(): void {
     }
 
+
+    static async buscarRole(id:number, connection: any) {
+        const query = `SELECT nome FROM roles WHERE id=?`;
+        try {
+            const result: any = await connection.execute(query,[id]);
+            return result[0];
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async delete(id: number, connection: any){
+        try {
+            const result= await connection.execute(`DELETE FROM user WHERE id=?`, [id]);
+            return result;
+        } catch (e) {
+            throw e;
+        }
+    }
+
     static async cadastrarUser(nome: string, email: string, telefone: string, senha: string, role_name: string, connection: any): Promise<number> {
         try {
 

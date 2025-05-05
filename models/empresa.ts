@@ -10,7 +10,7 @@ class Empresa extends User {
     empresa_user_id: number;
 
     constructor(nome: string, email: string, cnpj: string, cidade: string, endereco: string, estado: string, telefone: string, senha: string, empresa_user_id: number) {
-        super(nome,email,telefone,senha,"EMPRESA");
+        super(nome, email, telefone, senha, "EMPRESA");
         this.cnpj = cnpj;
         this.cidade = cidade;
         this.endereco = endereco;
@@ -19,7 +19,7 @@ class Empresa extends User {
     }
 
     async create(connection: any) {
-        this.empresa_user_id = await User.cadastrarUser(this.nome,this.email, this.telefone, this.senha, "EMPRESA", connection);
+        this.empresa_user_id = await User.cadastrarUser(this.nome, this.email, this.telefone, this.senha, "EMPRESA", connection);
         const query = `INSERT INTO empresa (cnpj, cidade, endereco, estado, empresa_user_id) VALUES ( ?, ?, ?, ?, ?)`;
         const values = [this.cnpj, this.cidade, this.endereco, this.estado, this.empresa_user_id];
         try {
@@ -106,11 +106,15 @@ class Empresa extends User {
         }
     }
 
-    static async getUserById(id:number, connection:any) {
-        const query = `SELECT * FROM user WHERE id = ?`;
+    static async getUserById(id: number, connection: any) {
+        const query = `SELECT * 
+            FROM user 
+            JOIN empresa ON empresa.empresa_user_id = user.id 
+            WHERE user.id = ?;
+        `;
         try {
             const result = await connection.execute(query, [id]);
-            console.log("model: ",result[0])
+            console.log("model: ", result[0])
             return result[0];
         } catch (error) {
             throw error;

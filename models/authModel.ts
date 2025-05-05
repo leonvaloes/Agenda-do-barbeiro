@@ -11,9 +11,7 @@ class AuthModel {
         };
 
         const token = jwt.sign(payload, secret, { expiresIn });
-
         return token;
-
     }
 
     static async verificarToken(token) {

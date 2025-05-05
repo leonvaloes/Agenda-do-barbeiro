@@ -61,7 +61,7 @@ class ServicoController {
             if(!servico)
                 throw new Error("Serviço não encontrado");
             
-            const retorno = await servico.delete(connection, id);
+            const retorno = Servico.delete(connection, id);
             connection.commit();
             return retorno;
         } catch (error) {
