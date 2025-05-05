@@ -93,9 +93,9 @@ class AtendenteController {
             const atendenteExistente = await Atendente.getAtendenteById(id, connection);
             if (!atendenteExistente.length)
                 throw new Error("Atendente não encontrado");
-    
+            const UserId=atendenteExistente[0].atendente_user_id;
             const atendenteModel = new Atendente("", "", "", "", "", 0, 0);
-            await Atendente.update(id, nome, email, telefone, cpf, connection);
+            await Atendente.update(id, nome, email, telefone, cpf, UserId, connection);
     
             const atendenteAtualizado = await Atendente.getAtendenteById(id, connection); // <-- retorna o novo estado
     

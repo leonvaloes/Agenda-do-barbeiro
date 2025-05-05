@@ -42,9 +42,9 @@ class Atendente extends User {
         }
     }
 
-    static async update(id: number, nome: string, email: string, telefone: string, cpf: string, connection: any) {
+    static async update(id: number, nome: string, email: string, telefone: string, cpf: string, userId:number, connection: any) {
         try {
-            User.updateUser(id, nome, email, telefone, connection) 
+            User.updateUser(userId, nome, email, telefone, connection);
 
             const queryAtendente = `UPDATE atendente SET cpf=? WHERE atendente_user_id=?`;
             await connection.execute(queryAtendente, [cpf, id]);
