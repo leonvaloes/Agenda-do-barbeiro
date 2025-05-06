@@ -115,6 +115,20 @@ class Atendente extends User {
         }
     }
 
+    static async getInfoUser(id:number, connection:any){
+        const query = `SELECT *
+            FROM user
+            WHERE user.id = ?`
+        ;
+        try {
+            const result: any = await connection.execute(query,[id]);
+            return result[0];
+        } catch (error) {
+            console.error('Erro ao listar atendentes:', error);
+            throw error;
+        }
+    }
+
     static async listarAtendentesDoServico(id:number, connection: any) {
         const query = `SELECT *
             FROM atendente

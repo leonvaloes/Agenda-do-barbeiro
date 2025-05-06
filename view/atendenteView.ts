@@ -30,7 +30,6 @@ router.put('/:id', async (req, res) => {
         
         const id = req.params.id;
         const { nome, email, telefone, cpf } = req.body;
-        console.log("nome: ", nome);
         const updateAtend = await atendenteController.atualizaAtendente(id, nome, email, telefone, cpf);
         if (!updateAtend)
             return res.status(404).send('Atendente não encontrado');
@@ -56,7 +55,6 @@ router.post('/getHours/:id', async (req,res)=>{
         const id = Number(req.params.id);
         const data= req.body.data;
 
-        console.log("id e data: ", id, data);
         const horarios= await atendenteController.getTimeForDate(id,data);
         res.status(200).send(horarios);
     }catch(e){
@@ -111,12 +109,23 @@ router.get('/getIdAtendente/:id', async (req, res) => {
     const userId = req.params.id;
     try {
         const result= await AtendenteController.getIdAtendente(userId);
-        console.log("reslt view: ", result);
         res.json(result);
     } catch (error) {
         console.log("errou", error);
         res.status(500).json({ error: error.message });
     }
 });
+
+router.get('/getInfoUserByUserId/:id', async (req, res) => {
+    const userId = req.params.id;
+    try {
+        const result= await atendenteController.getInfoUserByIdUser(userId);
+        res.json(result);
+    } catch (error) {
+        console.log("erro", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 export = router;

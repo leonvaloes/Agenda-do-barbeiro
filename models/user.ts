@@ -24,7 +24,6 @@ abstract class User {
         try {
             const result = await connection.execute(query, [id]);
             if (result && result.length > 0) {
-                console.log("User: ", result);
                 return result;
             }
             throw new Error("Usuario não encontrado");
