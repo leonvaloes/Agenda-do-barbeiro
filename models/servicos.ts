@@ -12,10 +12,10 @@ class Servicos{
         this.tempoMedio = tempoMedio;
     }
 
-    static async create(connection: any, data: Servicos) {
+    static async create(connection: any, data: any) {
         const query = `INSERT INTO servicos (nome, descricao, valor, tempo_medio) VALUES (?, ?, ?, ?)`;
         try {
-            const [result]: any = await connection.execute(query, [data.nome, data.descricao, data.valor, data.tempoMedio]);
+            const [result]: any = await connection.execute(query, [data.nome, data.descricao, data.valor, data.tempo_medio]);
             
             if (!result.insertId) {
                 throw new Error("Erro ao obter ID do serviço criado");

@@ -46,4 +46,22 @@ router.delete('/:id',async(req,res)=>{
     }
 })
 
+router.post('/CriarEassociar', async (req, res) => {
+    const { descricao, funcionarios, nome, tempo_medio, valor } = req.body;
+    console.log("body: ", req.body);
+    try {
+        const servico = await servicoController.criarEassociar({
+            descricao,
+            nome,
+            tempo_medio,
+            valor,
+            funcionarios
+        });
+        res.status(201).send(servico);
+    } catch (e) {
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+});
+
+
 export = router;

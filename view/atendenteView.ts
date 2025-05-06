@@ -51,19 +51,6 @@ router.delete('/:id', async (req, res) => {
     }
 })
 
-router.post('/criar-servico/:id', async (req, res) => {
-    try {
-        const atendenteId = Number(req.params.id);
-        const servicoId = await atendenteController.criarServicoEAssociar(req.body, atendenteId);
-        res.status(201).send({
-            message: "Serviço criado e associado com sucesso!",
-            servicoId
-        });
-    } catch (e) {
-        res.status(400).send(`Erro: ${e.message}`);
-    }
-});
-
 router.post('/getHours/:id', async (req,res)=>{
     try{
         const id = Number(req.params.id);
@@ -131,10 +118,5 @@ router.get('/getIdAtendente/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
-
-
-
-
 
 export = router;

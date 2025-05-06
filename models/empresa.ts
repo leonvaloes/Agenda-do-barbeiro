@@ -82,11 +82,12 @@ class Empresa extends User {
     }
 
     static async listarServicoEmpresa(id: number, connection: any) {
-        const query = `SELECT *
-            FROM servicos
-            JOIN atendente_serv ON servicos.id = atendente_serv.serv_id
-            WHERE atendente_serv.empresa_id = ?;`
-            ;
+        const query = `
+            SELECT DISTINCT s.*
+            FROM servicos s
+            JOIN atendente_serv a ON s.id = a.serv_id
+            WHERE a.empresa_id = ?;
+        `;
         try {
             const result: any = await connection.execute(query, [id]);
             return result[0];

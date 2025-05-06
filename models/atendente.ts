@@ -62,9 +62,7 @@ class Atendente extends User {
     static async getEmpresa(id:number, connection:any){
         const query=`SELECT empresa_id FROM atendente WHERE atendente.id=?`
         try{
-            console.log("id: ",id);
             const result= await connection.execute(query,[id]);
-            console.log("result: ",result[0][0]);
             return result[0][0];
         }catch(e){
             throw e;
@@ -75,7 +73,7 @@ class Atendente extends User {
         const query=`SELECT id FROM atendente WHERE atendente_user_id = ?`
         try{
             const result= await connection.execute(query,[id]);
-            return result[0][0];
+            return result[0][0].id;
         }catch(e){
             throw e
         }

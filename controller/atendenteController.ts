@@ -13,12 +13,12 @@ class AtendenteController {
     constructor() {
         this.atendente = Atendente;
     }
-    
+
     async createAtendente(atendenteData: any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            const atendente = new Atendente(atendenteData.nome,atendenteData.email, atendenteData.telefone, atendenteData.cpf, atendenteData.senha,atendenteData.empresa_id, 0);
+            const atendente = new Atendente(atendenteData.nome, atendenteData.email, atendenteData.telefone, atendenteData.cpf, atendenteData.senha, atendenteData.empresa_id, 0);
             await atendente.createAtendente(connection);
             await connection.commit();
             return atendente;
@@ -51,7 +51,6 @@ class AtendenteController {
             const atendentes = await Atendente.listarAtendentes(connection);
             if (atendentes)
                 return atendentes;
-
             throw new Error("Nenhum atendente encontrado");
         } catch (error) {
             throw error;
@@ -66,10 +65,6 @@ class AtendenteController {
             const atendentes = await Atendente.listarAtendentesDoServico(id, connection);
             const dadosAtendentes = [];
 
-            for (const atendente of atendentes) {
-                console.log("atendente (user_id):", atendente.atendente_user_id);
-            }
-
             if (atendentes && atendentes.length > 0) {
                 for (const atendente of atendentes) {
                     const dataAtendente = await Atendente.getUserAtendentes(atendente.atendente_user_id, connection);
@@ -77,7 +72,6 @@ class AtendenteController {
                 }
                 return dadosAtendentes[0];
             }
-
             throw new Error("Nenhum atendente encontrado");
         } catch (error) {
             throw error;
@@ -90,16 +84,14 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-    
+
             const atendenteExistente = await Atendente.getAtendenteById(id, connection);
             if (!atendenteExistente.length)
                 throw new Error("Atendente não encontrado");
-            const UserId=atendenteExistente[0].atendente_user_id;
+            const UserId = atendenteExistente[0].atendente_user_id;
             const atendenteModel = new Atendente("", "", "", "", "", 0, 0);
             await Atendente.update(id, nome, email, telefone, cpf, UserId, connection);
-    
-            const atendenteAtualizado = await Atendente.getAtendenteById(id, connection); // <-- retorna o novo estado
-    
+            const atendenteAtualizado = await Atendente.getAtendenteById(id, connection); 
             await connection.commit();
             return atendenteAtualizado;
         } catch (error) {
@@ -109,9 +101,8 @@ class AtendenteController {
             connection.release();
         }
     }
-    
 
-    async deletarAtendente(id: number) { // CERTO
+    async deletarAtendente(id: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
@@ -126,19 +117,21 @@ class AtendenteController {
         }
     }
 
-    async criarServicoEAssociar(data: any, atendenteId: number) { // CERTO
+    async criarServicoEAssociar(data: any, funcionarios: []) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            const atendenteModel = new Atendente("", "", "","","",0, 0);
+            const atendenteModel = new Atendente("", "", "", "", "", 0, 0);
             const servico = await Servico.create(connection, data);
-            const empresaId = await Atendente.getEmpresa(atendenteId, connection);
-            if (empresaId) {
-                await atendenteModel.Associar(connection, servico, atendenteId, empresaId.empresa_id);
+            for (const atendenteId of funcionarios) 
+                {
+                const idAtendente=await Atendente.getIdAtendente(atendenteId,connection);
+                const empresaId = await Atendente.getEmpresa(idAtendente, connection);
+                if (!empresaId) {
+                    throw new Error("É necessário associar o atendente a empresa!");
+                }
+                await atendenteModel.Associar(connection, servico, idAtendente, empresaId.empresa_id);
             }
-            else
-                throw new Error("É necessario associar o atendente a empresa!");
-
             connection.commit();
             return servico.id;
         } catch (error) {
@@ -166,7 +159,6 @@ class AtendenteController {
                     data_hora_saida: item.saida,
                     dias_semana_id: item.dia_semana
                 };
-                console.log("dadosExpediente: ", dadosExpediente);
                 await HorarioFuncionario.createExpediente(connection, dadosExpediente);
             }
             const dataAtual = new Date();
@@ -198,14 +190,14 @@ class AtendenteController {
         }
     }
 
-    static async getIdAtendente(userId:number){
-        const connection= await DatabaseManager.getInstance().getConnection();
-        try{
-            const result= await Atendente.getIdAtendente(userId,connection);
+    static async getIdAtendente(userId: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            const result = await Atendente.getIdAtendente(userId, connection);
             return result;
-        }catch(e){
+        } catch (e) {
             throw e;
-        }finally{
+        } finally {
 
         }
     }
