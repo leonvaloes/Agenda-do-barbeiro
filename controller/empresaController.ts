@@ -14,7 +14,7 @@ class EmpresaController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            const empresaModel = new Empresa(dados.nome, dados.email, dados.cnpj, dados.cidade, dados.endereco, dados.estado, dados.telefone, dados.senha, dados.empresa_user_id);
+            const empresaModel = new Empresa(dados.nome, dados.nome_fantasia, dados.email, dados.cnpj, dados.cidade, dados.endereco, dados.estado, dados.telefone, dados.senha, dados.empresa_user_id);
             await empresaModel.create(connection);
             connection.commit();
             return empresaModel;
@@ -31,7 +31,7 @@ class EmpresaController {
         try {
             connection.beginTransaction();
 
-            const empresaModel = new Empresa("", "", "", "", "", "", "", "", 0);
+            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "", 0);
             const empresaExistente = await empresaModel.buscaEmpresa(id, connection);
 
             if (!empresaExistente.length) {
@@ -51,7 +51,7 @@ class EmpresaController {
     async deletarEmpresa(id: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const empresaModel = new Empresa("", "", "", "", "", "", "", "", 0);
+            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "", 0);
             const empresaExistente = await empresaModel.buscaEmpresa(id, connection);
             if (!empresaExistente.length) {
                 return null;
@@ -70,7 +70,7 @@ class EmpresaController {
     async buscarEmpresa(id: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const empresaModel = new Empresa("", "", "", "", "", "", "", "", 0);
+            const empresaModel = new Empresa("","", "", "", "", "", "", "", "", 0);
             const empresaExistente = await empresaModel.buscaEmpresa(id, connection);
             if (!empresaExistente.length) {
                 return null;
@@ -116,7 +116,7 @@ class EmpresaController {
         try {
             await connection.beginTransaction();
 
-            const empresaModel = new Empresa("", "", "", "", "", "", "", "", 0);
+            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "", 0);
             const retorno = empresaModel.adicionaAtendente(connection, cpf, empresaId);
             connection.commit();
             return retorno;
@@ -165,6 +165,21 @@ class EmpresaController {
         } finally {
             connection.release();
         }
+    }
+
+    async getEmpresaByName(nome:string){
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try{
+            const empresa = await Empresa.getEmpresaByName(nome, connection);
+            if(empresa && empresa.length > 0)
+                return empresa;
+            throw new Error("Nenhuma empresa encontrada");
+        }catch(error){
+            throw error;
+        }finally{
+            connection.release();
+        }
+
     }
 }
 

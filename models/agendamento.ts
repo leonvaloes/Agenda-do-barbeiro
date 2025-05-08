@@ -89,12 +89,29 @@ class Agendamento {
     }
   }
 
-  static async getAgendamentos(id:number, connection:any){
-    const query=`SELECT * FROM agendamento INNER JOIN item ON agendamento.item_id = item.id WHERE atendente_id=?`
-    try{
+  static async getAgendamentos(id: number, connection: any) {
+    const query = `
+      SELECT 
+    agendamento.*, 
+    servicos.id AS servico_id, 
+    servicos.nome AS nome_servico,
+    servicos.descricao,
+    servicos.tempo_medio,
+    item.data_hora, 
+    item.atendente_id, 
+    item.serv_id AS servico_item_id,
+    user.nome AS nome_atendente
+FROM agendamento
+INNER JOIN item ON agendamento.item_id = item.id 
+INNER JOIN servicos ON item.serv_id = servicos.id
+INNER JOIN atendente ON item.atendente_id = atendente.id
+INNER JOIN user ON atendente.atendente_user_id = user.id
+WHERE atendente.id = ?`
+    try {
       const [result] = await connection.execute(query, [id]);
       console.log(result);
-    }catch(e){
+      return result;
+    } catch (e) {
       throw e;
     }
   }
