@@ -3,6 +3,7 @@ const cors = require('cors'); // Importe o cors
 const Routes = require('./routes/routes');
 import DatabaseManager from './config/database';
 import cookieParser from 'cookie-parser';
+import { authMiddleware } from './middleware/authMiddleware';
 
 
 class Server {
@@ -30,11 +31,10 @@ class Server {
             origin: 'http://localhost:3001', // ajuste para sua origem
             credentials: true // necessário para aceitar cookies
         }));
-    
         this.app.use(express.json());
     
         this.app.use(cookieParser()); // Aqui você adiciona o cookie-parser
-    
+        
         this.app.use((req, res, next) => {
             console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
             next();
