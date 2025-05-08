@@ -218,11 +218,11 @@ class AtendenteController {
         }
     }
 
-    async getInfoUserByIdUser(atendenteId: number){
+    async getInfoUserByIdUser(atendenteId: number)
+    {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             const result = await Atendente.getInfoUser(atendenteId, connection);
-            console.log("result aqui: ",result);
             return result;
         } catch (e) {
             throw e;

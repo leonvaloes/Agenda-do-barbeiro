@@ -2,8 +2,9 @@ import EmpresaController from '../controller/empresaController'
 const empresaController= new EmpresaController();
 const router = require('express').Router();
 
-router.post('/', async (req,res)=>{
+router.post('/', async (req, res)=>{
     try{
+        console.log("bodyzin: ",req.body)
         const empresa = await empresaController.criarEmpresa(req.body);
         res.status(201).send(empresa);
     }catch(e){
@@ -109,6 +110,19 @@ router.get('/getUser/:id', async (req, res) => {
         res.status(400).send(`Erro: ${e.message}`);
     }
 });
+
+router.get('/getEmpresaByName/:nome_fantasia', async (req,res)=>{
+    try{
+        const nome_fantasia= req.params.nome_fantasia;
+        const empresa= await empresaController.getEmpresaByName(nome_fantasia);
+        if(empresa)
+            res.status(200).send(empresa);
+        else 
+            res.status(404).send("Empresa não encontrada!");
+    }catch(e){
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+})
 
 
 export = router;

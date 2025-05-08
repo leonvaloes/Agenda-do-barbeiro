@@ -1,6 +1,7 @@
 import User from "./user";
 
 class Empresa extends User {
+    nome_fantasia: string;
     email: string;
     cnpj: string;
     cidade: string;
@@ -9,8 +10,9 @@ class Empresa extends User {
     telefone: string;
     empresa_user_id: number;
 
-    constructor(nome: string, email: string, cnpj: string, cidade: string, endereco: string, estado: string, telefone: string, senha: string, empresa_user_id: number) {
+    constructor(nome: string, nome_fantasia:string , email: string, cnpj: string, cidade: string, endereco: string, estado: string, telefone: string, senha: string, empresa_user_id: number) {
         super(nome, email, telefone, senha, "EMPRESA");
+        this.nome_fantasia = nome_fantasia;
         this.cnpj = cnpj;
         this.cidade = cidade;
         this.endereco = endereco;
@@ -20,8 +22,8 @@ class Empresa extends User {
 
     async create(connection: any) {
         this.empresa_user_id = await User.cadastrarUser(this.nome, this.email, this.telefone, this.senha, "EMPRESA", connection);
-        const query = `INSERT INTO empresa (cnpj, cidade, endereco, estado, empresa_user_id) VALUES ( ?, ?, ?, ?, ?)`;
-        const values = [this.cnpj, this.cidade, this.endereco, this.estado, this.empresa_user_id];
+        const query = `INSERT INTO empresa (nome_fantasia, cnpj, cidade, endereco, estado, empresa_user_id) VALUES ( ?, ?, ?, ?, ?, ?)`;
+        const values = [this.nome_fantasia, this.cnpj, this.cidade, this.endereco, this.estado, this.empresa_user_id];
         try {
             const result = await connection.execute(query, values);
             return result;
@@ -41,9 +43,9 @@ class Empresa extends User {
     }
 
     static async update(id: number, data: Empresa, connection: any) {
-        const query = `UPDATE empresa SET cnpj = ?, cidade = ?, endereco = ?, estado = ? WHERE id = ?`;
+        const query = `UPDATE empresa SET nome_fantasia=?, cnpj = ?, cidade = ?, endereco = ?, estado = ? WHERE id = ?`;
         try {
-            await connection.execute(query, [data.email, data.cnpj, data.cidade, data.endereco, data.estado, data.telefone, id]);
+            await connection.execute(query, [data.nome_fantasia, data.email, data.cnpj, data.cidade, data.endereco, data.estado, data.telefone, id]);
             return { id, ...data };
         } catch (error) {
             throw error;
@@ -56,6 +58,17 @@ class Empresa extends User {
             const result: any = await connection.execute(query, [id]);
             return result[0];
         } catch (error) {
+            throw error;
+        }
+    }
+
+    static async getEmpresaByName(nome:string, connection: any){
+        const query = `SELECT * FROM empresa WHERE nome_fantasia = ?`;
+        try{
+            const result: any = await connection.execute(query, [nome]);
+            console.log(result[0]);
+            return result[0];
+        }catch(error){
             throw error;
         }
     }

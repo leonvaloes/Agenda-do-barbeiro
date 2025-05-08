@@ -98,8 +98,8 @@ class AgendamentoController {
             if (existe.length <= 0)
                 throw new Error(`Atendente não encontrado`);
             const agendamentos = await Agendamento.getAgendamentos(atendenteId, connection);
+            console.log("RETORNO: ",agendamentos);
             return agendamentos;
-
         }catch(e){
             console.error("Erro ao buscar agendamentos", e);
             throw e;
