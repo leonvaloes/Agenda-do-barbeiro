@@ -4,7 +4,7 @@ import empresaView from '../view/empresaView';
 import servicoView from '../view/servicoView';
 import agendamentoView from '../view/agendamentoView';
 import loginView from '../view/loginView';
-
+import authMiddleware from '../middleware/authMiddleware';
 class Routes {
     app: any;
 
@@ -17,7 +17,7 @@ class Routes {
         this.app.use('/ping', (req, res) => {
             res.send('pong');
         });
-        this.app.use('/atendente', atendenteView);
+        this.app.use('/atendente', authMiddleware ,atendenteView);
         this.app.use('/cliente', clienteView);
         this.app.use('/empresa', empresaView);
         this.app.use('/servicos', servicoView);
