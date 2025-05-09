@@ -70,7 +70,7 @@ class AtendenteController {
                     const dataAtendente = await Atendente.getUserAtendentes(atendente.atendente_user_id, connection);
                     dadosAtendentes.push(dataAtendente);
                 }
-                return dadosAtendentes[0];
+                return dadosAtendentes;
             }
             throw new Error("Nenhum atendente encontrado");
         } catch (error) {
