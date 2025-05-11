@@ -17,7 +17,7 @@ class Routes {
         this.app.use('/ping', (req, res) => {
             res.send('pong');
         });
-        this.app.use('/atendente', authMiddleware ,atendenteView);
+        this.app.use('/atendente' ,atendenteView);
         this.app.use('/cliente', clienteView);
         this.app.use('/empresa', empresaView);
         this.app.use('/servicos', servicoView);

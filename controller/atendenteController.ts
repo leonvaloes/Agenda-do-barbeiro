@@ -6,7 +6,6 @@ import HorarioFuncionario from '../models/horariosFuncionario';
 import Servico from "../models/servicos";
 import User from '../models/user';
 
-
 class AtendenteController {
     atendente: typeof Atendente;
 
@@ -206,6 +205,7 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             const existe = await Atendente.getAtendenteById(atendenteId, connection);
+            console.log(existe);
             if (!existe && existe.length <= 0)
                 throw new Error("Atendente não encontrado");
             const result = await Atendente.getTimesForDate(atendenteId, date, connection);

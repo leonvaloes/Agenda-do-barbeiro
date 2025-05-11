@@ -54,11 +54,11 @@ router.post('/getHours/:id', async (req,res)=>{
     try{
         const id = Number(req.params.id);
         const data= req.body.data;
-
+        console.log(data)
         const horarios= await atendenteController.getTimeForDate(id,data);
         res.status(200).send(horarios);
     }catch(e){
-        res.status(400).send(`Erro: ${e.message}`);
+        res.status(400).send(`Erro aa: ${e.message}`);
     }
 })
 
@@ -66,6 +66,15 @@ router.post('/proxEstado/:id', async (req, res) => {
     try {
         const agendamentoId = req.params.id;
         const result = await agendamentoController.avancarEstado(agendamentoId);
+        res.status(200).send(result);
+    } catch (e) {
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+})
+router.post('/cancelarAgendamento/:id', async (req, res) => {
+    try {
+        const agendamentoId = req.params.id;
+        const result = await agendamentoController.cancelarAgendamento(agendamentoId);
         res.status(200).send(result);
     } catch (e) {
         res.status(400).send(`Erro: ${e.message}`);

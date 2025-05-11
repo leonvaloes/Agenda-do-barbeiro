@@ -110,7 +110,8 @@ INNER JOIN atendente ON item.atendente_id = atendente.id
 INNER JOIN user ON atendente.atendente_user_id = user.id
 INNER JOIN cliente ON agendamento.cliente_id = cliente.id
 INNER JOIN user AS cliente_user ON cliente.cliente_user_id = cliente_user.id
-WHERE atendente.id = ?`
+WHERE atendente.id = ?
+ORDER BY item.data_hora DESC;`
 
     try {
       const [result] = await connection.execute(query, [id]);
@@ -120,6 +121,78 @@ WHERE atendente.id = ?`
       throw e;
     }
   }
+
+  static async getAgendamentosDoDia(id: number, connection: any) {
+  const query = `
+    SELECT 
+      agendamento.*, 
+      servicos.id AS servico_id, 
+      servicos.nome AS nome_servico,
+      servicos.descricao,
+      servicos.tempo_medio,
+      item.data_hora, 
+      item.atendente_id, 
+      item.serv_id AS servico_item_id,
+      user.nome AS nome_atendente,
+      cliente_user.nome AS nome_cliente,
+      cliente_user.email AS email_cliente
+    FROM agendamento
+    INNER JOIN item ON agendamento.item_id = item.id 
+    INNER JOIN servicos ON item.serv_id = servicos.id
+    INNER JOIN atendente ON item.atendente_id = atendente.id
+    INNER JOIN user ON atendente.atendente_user_id = user.id
+    INNER JOIN cliente ON agendamento.cliente_id = cliente.id
+    INNER JOIN user AS cliente_user ON cliente.cliente_user_id = cliente_user.id
+    WHERE atendente.id = ?
+      AND DATE(item.data_hora) = CURDATE()
+      AND agendamento.estado != 'concluído'
+      AND agendamento.estado != 'cancelado'
+  `;
+
+  try {
+    const [result] = await connection.execute(query, [id]);
+    return result;
+  } catch (e) {
+    throw e;
+  }
+}
+
+static async getProximosAgendamentos(id: number, connection: any) {
+  const query = `
+    SELECT 
+      agendamento.*, 
+      servicos.id AS servico_id, 
+      servicos.nome AS nome_servico,
+      servicos.descricao,
+      servicos.tempo_medio,
+      item.data_hora, 
+      item.atendente_id, 
+      item.serv_id AS servico_item_id,
+      user.nome AS nome_atendente,
+      cliente_user.nome AS nome_cliente,
+      cliente_user.email AS email_cliente
+    FROM agendamento
+    INNER JOIN item ON agendamento.item_id = item.id 
+    INNER JOIN servicos ON item.serv_id = servicos.id
+    INNER JOIN atendente ON item.atendente_id = atendente.id
+    INNER JOIN user ON atendente.atendente_user_id = user.id
+    INNER JOIN cliente ON agendamento.cliente_id = cliente.id
+    INNER JOIN user AS cliente_user ON cliente.cliente_user_id = cliente_user.id
+    WHERE atendente.id = ?
+      AND DATE(item.data_hora) > CURDATE()
+      AND agendamento.estado != 'concluído'
+      AND agendamento.estado != 'cancelado'
+  `;
+
+  try {
+    const [result] = await connection.execute(query, [id]);
+    return result;
+  } catch (e) {
+    throw e;
+  }
+}
+
+
 
   adicionarObservador(obs: IObservadorAgendamento) {
     this.observadores.push(obs);

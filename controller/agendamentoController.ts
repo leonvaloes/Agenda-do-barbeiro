@@ -98,7 +98,38 @@ class AgendamentoController {
             if (existe.length <= 0)
                 throw new Error(`Atendente não encontrado`);
             const agendamentos = await Agendamento.getAgendamentos(atendenteId, connection);
-            console.log("RETORNO: ",agendamentos);
+            return agendamentos;
+        }catch(e){
+            console.error("Erro ao buscar agendamentos", e);
+            throw e;
+        } finally {
+            connection.release();
+        }
+    }
+
+    static async getProximosAgendamentos(atendenteId: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            const [existe] = await Atendente.getAtendenteById(atendenteId, connection);
+            if (existe.length <= 0)
+                throw new Error(`Atendente não encontrado`);
+            const agendamentos = await Agendamento.getProximosAgendamentos(atendenteId, connection);
+            return agendamentos;
+        }catch(e){
+            console.error("Erro ao buscar agendamentos", e);
+            throw e;
+        } finally {
+            connection.release();
+        }
+    }
+
+    static async getAgendamentosDoDia(atendenteId: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            const [existe] = await Atendente.getAtendenteById(atendenteId, connection);
+            if (existe.length <= 0)
+                throw new Error(`Atendente não encontrado`);
+            const agendamentos = await Agendamento.getAgendamentosDoDia(atendenteId, connection);
             return agendamentos;
         }catch(e){
             console.error("Erro ao buscar agendamentos", e);
