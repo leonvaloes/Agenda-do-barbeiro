@@ -5,6 +5,7 @@ import { NotificacaoAtendente } from '../models/agendamentoNotificacaoObserver/n
 import { NotificacaoCliente } from '../models/agendamentoNotificacaoObserver/notificacaoCliente';
 import { NotificacaoEstabelecimento } from '../models/agendamentoNotificacaoObserver/notificacaoEstabelecimento';
 import Atendente from '../models/atendente';
+import Empresa from '../models/empresa';
 import Item from '../models/item';
 
 class AgendamentoController {
@@ -138,6 +139,20 @@ class AgendamentoController {
             connection.release();
         }
     }
+
+    static async getAgendamentosByEmpresa(EmpresaId:number) {
+        const connection= await DatabaseManager.getInstance().getConnection();
+        try {
+            const agendamentos = await Agendamento.getAgendamentosByEmpresa(EmpresaId, connection);
+            console.log("agendamentos: ",agendamentos)
+            return agendamentos;
+        }catch(e){
+            console.error("Erro ao buscar agendamentos", e);
+            throw e;
+        } finally {
+            connection.release();
+        }
+    }   
 }
 
 export default AgendamentoController;

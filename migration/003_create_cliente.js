@@ -6,7 +6,7 @@ class create_cliente {
         CREATE TABLE IF NOT EXISTS cliente (
             id INT AUTO_INCREMENT PRIMARY KEY,
             cpf VARCHAR(20) UNIQUE NOT NULL,
-            cidade VARCHAR(255)NOT NULL
+            cidade VARCHAR(255)
         )`);
         console.log('Tabela cliente criada!');
     }

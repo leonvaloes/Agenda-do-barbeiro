@@ -3,7 +3,7 @@ import User from "./user";
 
 class Cliente extends User {
     cpf: string;
-    cidade: string;
+    cidade?: string;
     cliente_user_id: number;
 
     constructor(nome: string, email:string, telefone:string, cpf: string, senha: string, cidade: string, cliente_user_id: number) {
@@ -16,7 +16,7 @@ class Cliente extends User {
     async createCliente(connection: any) {
         this.cliente_user_id = await User.cadastrarUser(this.nome, this.email, this.telefone, this.senha, "CLIENTE", connection);
         const query = `INSERT INTO cliente ( cpf, cidade, cliente_user_id) VALUES (?, ?, ?)`;
-        const values = [this.cpf,  this.cidade, this.cliente_user_id];
+        const values = [this.cpf,  this.cidade || null, this.cliente_user_id];
         try {
             const result = await connection.execute(query, values);
             return result;
@@ -48,12 +48,28 @@ class Cliente extends User {
         }
     }
 
-
     static async getClienteById(id: number, connection: any) {
         const query = `SELECT * FROM cliente WHERE id = ?`;
         try {
             const [result] = await connection.execute(query, [id]);
             return result.length>0 ? result[0] : null;
+        } catch (error) {
+            console.error('Erro ao buscar cliente:', error);
+            throw error;
+        }
+    }
+
+    static async getClienteByUserId(id: number, connection: any) {
+        const query = `
+        SELECT *,
+        cliente.id AS cliente_id
+        FROM cliente 
+        INNER JOIN user ON cliente.cliente_user_id = user.id
+        WHERE cliente_user_id = ?`;
+        try {
+            const result = await connection.execute(query, [id]);
+            console.log("result MODEL: ",result[0], "id: ", id);
+            return result[0];
         } catch (error) {
             console.error('Erro ao buscar cliente:', error);
             throw error;
@@ -76,7 +92,6 @@ class Cliente extends User {
         const formatador = new unformatDate();
 
         const dataHoraFormatada = formatador.FormatDate(dataEhora);
-        
         const query = `INSERT INTO item (atendente_id, serv_id, data_hora) VALUES (?, ?, ?)`;
         const values = [atendente_id, serv_id, dataHoraFormatada];
     
@@ -103,6 +118,8 @@ class Cliente extends User {
             throw error;
         }
     }
+
+
 
 }
 

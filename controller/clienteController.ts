@@ -7,6 +7,7 @@ import { NotificacaoEmail } from "../models/agendamentoNotificacaoObserver/notif
 import { NotificacaoWhatsapp } from "../models/agendamentoNotificacaoObserver/NotificacaoWhatsapp";
 import HorarioFuncionario from "../models/horariosFuncionario";
 import unformatDate from "../type/unformatDate";
+import User from "../models/user";
 
 class ClienteController {
 
@@ -22,7 +23,6 @@ class ClienteController {
             const cliente = new Cliente(clienteData.nome, clienteData.email, clienteData.telefone, clienteData.cpf, clienteData.senha, clienteData.cidade, 0);
             await cliente.createCliente(connection);
             await connection.commit();
-
             return cliente;
         } catch (error) {
             await connection.rollback();
@@ -38,7 +38,6 @@ class ClienteController {
             connection.beginTransaction();
             const clienteModel = new Cliente("", "", "", "","","", 0);
             const clienteExistente = await Cliente.getClienteById(id, connection);
-
             if (!clienteExistente)
                 throw new Error("Cliente não encontrado");
 
@@ -53,18 +52,15 @@ class ClienteController {
         }
     }
 
-
     async deletarCliente(id: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
             const clienteModel = new Cliente("", "", "", "","","", 0);
             const clienteExistente = await Cliente.getClienteById(id, connection);
-
             if (!clienteExistente) {
                 throw new Error("Cliente não encontrado");
             }
-
             const clienteExcluido = await clienteModel.delete(id, connection);
             connection.commit();
             return clienteExcluido;
@@ -92,60 +88,52 @@ class ClienteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-
             const formatador = new unformatDate();
             dataEhora = await formatador.unformatDate(dataEhora);
-
             const servico = await Servico.getServicoById(serv_id, connection);
             if (!servico) {
                 throw new Error("Serviço não encontrado");
             }
-
             const horarioValido = await Agendamento.validarDisponibilidade(atendente_id, dataEhora, connection);
             if (!horarioValido) {
                 console.log(horarioValido);
                 throw new Error("Horário indisponível para agendamento.");
             }
-
             const itemId = await Cliente.createItem(atendente_id, serv_id, dataEhora, connection);
             const agendamento = new Agendamento(cliente_id, itemId);
-
             agendamento.adicionarObservador(new NotificacaoEmail());
             agendamento.adicionarObservador(new NotificacaoWhatsapp());
             await agendamento.create(connection);
-
-
-
-            
             //############ ocupar tempo de serviço
             const tempoServico = servico.tempo_medio;
-            console.log("tempoServico:", tempoServico);
-
             let dataEhoraFim = new Date(dataEhora);
             dataEhoraFim.setMinutes(dataEhoraFim.getMinutes() + tempoServico);
-
             let auxDataHora = new Date(dataEhora);
-
-            console.log("Início:", auxDataHora.toISOString());
-            console.log("Fim:", dataEhoraFim.toISOString());
-
             while (auxDataHora < dataEhoraFim) {
-                console.log("Marca ocupado em:", auxDataHora.toISOString());
                 await HorarioFuncionario.marcarComoOcupado(atendente_id, new Date(auxDataHora), connection);
                 auxDataHora.setMinutes(auxDataHora.getMinutes() + 15);
             }
-
-
-
             await connection.commit();
-            console.log("Agendamento criado e notificações preparadas.");
             return agendamento;
-
         } catch (error) {
             await connection.rollback();
             throw error;
         } finally {
             connection.release();
+        }
+    }
+
+    async getClienteByUserId(UserId: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            const result = await Cliente.getClienteByUserId(UserId, connection);
+            console.log("RESULT CONTROLLER",result);
+            if (!result.length) {
+                throw new Error("Cliente não encontrado");
+            }
+            return result;
+        } catch (e) {
+            throw e;
         }
     }
 

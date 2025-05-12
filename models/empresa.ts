@@ -128,7 +128,20 @@ class Empresa extends User {
         `;
         try {
             const result = await connection.execute(query, [id]);
-            console.log("model: ", result[0])
+            return result[0];
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async getEmpresaByUserId(id: number, connection: any) {
+        const query = `SELECT * 
+            FROM empresa 
+            WHERE empresa_user_id = ?;
+        `;
+        try {
+            const result = await connection.execute(query, [id]);
+            console.log("model: ", result)
             return result[0];
         } catch (error) {
             throw error;

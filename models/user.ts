@@ -77,7 +77,7 @@ abstract class User {
             const roleId = role[0].id;
             const [result]: any = await connection.execute(
                 `INSERT INTO user (nome, email, telefone, senha, role_id) VALUES (?, ?, ?, ?, ?)`,
-                [nome, email, telefone, senha, roleId]
+                [nome, email, telefone || null, senha, roleId]
             );
 
             return result.insertId;

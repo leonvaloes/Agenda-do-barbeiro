@@ -77,6 +77,19 @@ router.put('/cancelarAgendamento/:id', async (req, res) => {
     } catch (e) {
         res.status(400).send(`Erro: ${e.message}`);
     }
-})
+});
+
+router.get('/:id', async (req, res) => {
+    try {
+        const UserId = req.params.id;
+
+        const result= await clienteController.getClienteByUserId(UserId);
+        console.log("RESULT VIEW",result);
+        res.status(200).send(result);
+    } catch (e) {
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+});
+
 
 export = router;

@@ -90,7 +90,6 @@ class EmpresaController {
             if (!result.length) {
                 throw new Error("Empresa não encontrada");
             }
-            console.log(result[0])
             return result;
         } catch (e) {
             throw e;
