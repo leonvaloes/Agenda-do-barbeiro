@@ -188,6 +188,19 @@ class Atendente extends User {
             throw error;
         }
     }
+
+    static async deleteExpediente(id: number, connection: any) {
+    const query1 = `DELETE FROM expediente WHERE atendente_id = ?`;
+    const query2 = `DELETE FROM horario_atendente WHERE atendente_id = ?`;
+
+    try {
+        await connection.execute(query1, [id]);
+        await connection.execute(query2, [id]);
+    } catch (e) {
+        throw e;
+    }
+}
+
 }
 
 export default Atendente;
