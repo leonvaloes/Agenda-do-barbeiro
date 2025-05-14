@@ -105,6 +105,8 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
+            const atendenteId=await Atendente.getIdAtendente(id, connection);
+            await Atendente.deleteExpediente(atendenteId, connection);
             const atendenteExcluido = await User.delete(id, connection);
             connection.commit();
             return atendenteExcluido;

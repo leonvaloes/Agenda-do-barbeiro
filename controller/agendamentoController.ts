@@ -142,6 +142,7 @@ class AgendamentoController {
             connection.release();
         }
     }
+    
 
     static async getAgendamentosByEmpresa(EmpresaId:number) {
         const connection= await DatabaseManager.getInstance().getConnection();
@@ -155,6 +156,20 @@ class AgendamentoController {
         } finally {
             connection.release();
         }
+    }   
+
+    static async getAgendamentosDaSemana(empresaId: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            const agendamentos = await Agendamento.getAgendamentosPorSemanaByEmpresa(empresaId, connection);
+            return agendamentos;
+        }catch(e){
+            console.error("Erro ao buscar agendamentos", e);
+            throw e;
+        } finally {
+            connection.release();
+        }
+    }
     }   
 
     static async editAgendamentos(agendamentoId:number, clienteId:number, atendenteId:number, servicoId:number, dataHora:any){
