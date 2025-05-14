@@ -45,4 +45,16 @@ router.get('/getAgendamentosByEmpresa/:id', async (req, res) => {
     }
 });
 
+router.put('/editAgendamentos/:id', async (req, res) => {
+    try{
+        const id = req.params.id;
+        const { cliente_id, atendente_id, serv_id, data_hora } = req.body;
+        console.log("idzinho: ",id);
+        const result = await AgendamentoController.editAgendamentos(id, cliente_id, atendente_id, serv_id, data_hora);
+
+    } catch (e:any) {
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+})
+
 export default router;

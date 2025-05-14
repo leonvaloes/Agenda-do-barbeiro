@@ -222,7 +222,26 @@ ORDER BY item.data_hora DESC;`
       throw e;
     }
   }
-
+  static async getAgendamentosById(id: number, connection: any) {
+    const query = `
+      SELECT * FROM agendamento WHERE id = ?`;
+    try {
+      const [result] = await connection.execute(query, [id]);
+      console.log("RESULT MODEL: ", result);
+      return result;
+    } catch (e) {
+      throw e;
+    }
+  }
+  
+  static async atualizarAgendamento(id: number, clienteId: number, itemId: number, connection: any) {
+    const query = `UPDATE agendamento SET cliente_id = ?, item_id = ? WHERE id = ?`;
+    try {
+      return await connection.execute(query, [clienteId, itemId, id]);
+    } catch (error) {
+      throw error;
+    }
+  }
 
 
   adicionarObservador(obs: IObservadorAgendamento) {
