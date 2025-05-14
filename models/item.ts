@@ -19,6 +19,7 @@ class Item {
         const [rows]: any = await connection.execute(query, [id]);
         return rows.length > 0 ? rows[0].user_id : null;
     }
+    
     static async getServicoIdPorItem(id: number, connection: any): Promise<number | null> {
         const query = `
             SELECT s.id as servico_id
