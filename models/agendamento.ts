@@ -216,7 +216,7 @@ WHERE atendente.empresa_id = ?
 ORDER BY item.data_hora DESC;`
     try {
       const [result] = await connection.execute(query, [id]);
-      console.log("RESULT MODEL: ",result);
+      console.log("RESULT MODEL: ", result);
       return result;
     } catch (e) {
       throw e;
@@ -249,7 +249,37 @@ ORDER BY item.data_hora DESC;`
     ORDER BY item.data_hora DESC;`
     try {
       const [result] = await connection.execute(query, [id]);
-      console.log("RESULT MODEL: ",result);
+      console.log("RESULT MODEL: ", result);
+      return result;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static async getAgendamentosByCliente(id: number, connection: any) {
+    const query = `
+      SELECT 
+    agendamento.*, 
+    servicos.id AS servico_id, 
+    servicos.nome AS nome_servico,
+    servicos.descricao,
+    servicos.tempo_medio,
+    item.data_hora, 
+    item.atendente_id, 
+    item.serv_id AS servico_item_id,
+    user.nome AS nome_atendente,
+    empresa.id AS empresa_id,
+    empresa.nome_fantasia AS nome_empresa
+FROM agendamento
+INNER JOIN item ON agendamento.item_id = item.id 
+INNER JOIN servicos ON item.serv_id = servicos.id
+INNER JOIN atendente ON item.atendente_id = atendente.id
+INNER JOIN user ON atendente.atendente_user_id = user.id
+INNER JOIN empresa ON atendente.empresa_id = empresa.id
+WHERE agendamento.cliente_id = 2
+ORDER BY item.data_hora DESC;`
+    try {
+      const [result] = await connection.execute(query, [id]);
       return result;
     } catch (e) {
       throw e;
