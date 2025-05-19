@@ -96,7 +96,6 @@ class ClienteController {
             }
             const horarioValido = await Agendamento.validarDisponibilidade(atendente_id, dataEhora, connection);
             if (!horarioValido) {
-                console.log(horarioValido);
                 throw new Error("Horário indisponível para agendamento.");
             }
             const itemId = await Cliente.createItem(atendente_id, serv_id, dataEhora, connection);
@@ -104,6 +103,7 @@ class ClienteController {
             agendamento.adicionarObservador(new NotificacaoEmail());
             agendamento.adicionarObservador(new NotificacaoWhatsapp());
             await agendamento.create(connection);
+            
             //############ ocupar tempo de serviço
             const tempoServico = servico.tempo_medio;
             let dataEhoraFim = new Date(dataEhora);

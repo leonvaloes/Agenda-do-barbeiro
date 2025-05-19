@@ -270,14 +270,14 @@ ORDER BY item.data_hora DESC;`
     user.nome AS nome_atendente,
     empresa.id AS empresa_id,
     empresa.nome_fantasia AS nome_empresa
-FROM agendamento
-INNER JOIN item ON agendamento.item_id = item.id 
-INNER JOIN servicos ON item.serv_id = servicos.id
-INNER JOIN atendente ON item.atendente_id = atendente.id
-INNER JOIN user ON atendente.atendente_user_id = user.id
-INNER JOIN empresa ON atendente.empresa_id = empresa.id
-WHERE agendamento.cliente_id = 2
-ORDER BY item.data_hora DESC;`
+    FROM agendamento
+    INNER JOIN item ON agendamento.item_id = item.id 
+    INNER JOIN servicos ON item.serv_id = servicos.id
+    INNER JOIN atendente ON item.atendente_id = atendente.id
+    INNER JOIN user ON atendente.atendente_user_id = user.id
+    INNER JOIN empresa ON atendente.empresa_id = empresa.id
+    WHERE agendamento.cliente_id = ?
+    ORDER BY item.data_hora DESC;`
     try {
       const [result] = await connection.execute(query, [id]);
       return result;
@@ -293,6 +293,19 @@ ORDER BY item.data_hora DESC;`
       const [result] = await connection.execute(query, [id]);
       console.log("RESULT MODEL: ", result);
       return result;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static async getItemByAgendamento(id: number, connection: any) {
+    const query = `
+      SELECT data_hora FROM item WHERE id = (
+        SELECT item_id FROM agendamento WHERE id = ?
+      )`;
+    try {
+      const [result] = await connection.execute(query, [id]);
+      return result[0].data_hora;
     } catch (e) {
       throw e;
     }

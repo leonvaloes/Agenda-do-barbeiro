@@ -66,7 +66,6 @@ class Empresa extends User {
         const query = `SELECT * FROM empresa WHERE nome_fantasia = ?`;
         try{
             const result: any = await connection.execute(query, [nome]);
-            console.log(result[0]);
             return result[0];
         }catch(error){
             throw error;
@@ -79,8 +78,7 @@ class Empresa extends User {
             const [rows]: any = await connection.execute(queryBusca, [cpf]);
 
             if (rows.length > 0) {
-                const atendente = rows[0]; // Primeiro resultado
-                console.log("Empresa: ", empresaId);
+                const atendente = rows[0];
 
                 const queryUpdate = `UPDATE atendente SET empresa_id = ? WHERE cpf = ?`;
                 await connection.execute(queryUpdate, [empresaId, cpf]);
@@ -141,10 +139,19 @@ class Empresa extends User {
         `;
         try {
             const result = await connection.execute(query, [id]);
-            console.log("model: ", result)
             return result[0];
         } catch (error) {
             throw error;
+        }
+    }
+
+    static async reagendar(itemId:number, novaData:any, connection:any){
+        const query="UPDATE item SET data_hora = ? WHERE id = ?"
+        try{
+            const result= await connection.execute(query,[novaData,itemId]);
+            return result
+        }catch(e){
+            console.log(e);
         }
     }
 

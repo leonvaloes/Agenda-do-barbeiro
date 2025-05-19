@@ -5,6 +5,7 @@ import Atendente from '../models/atendente';
 import HorarioFuncionario from '../models/horariosFuncionario';
 import Servico from "../models/servicos";
 import User from '../models/user';
+import unformatDate from '../type/unformatDate';
 
 class AtendenteController {
     atendente: typeof Atendente;
@@ -18,9 +19,16 @@ class AtendenteController {
         try {
             await connection.beginTransaction();
             const atendente = new Atendente(atendenteData.nome, atendenteData.email, atendenteData.telefone, atendenteData.cpf, atendenteData.senha, atendenteData.empresa_id, 0);
-            await atendente.createAtendente(connection);
+
+            // captura o retorno com o id do insert
+            const novoAtendente = await atendente.createAtendente(connection);
+
             await connection.commit();
-            return atendente;
+
+            console.log("novo: ", novoAtendente);
+
+            return novoAtendente;
+
         } catch (error) {
             await connection.rollback();
             throw error;
@@ -28,6 +36,7 @@ class AtendenteController {
             connection.release();
         }
     }
+
 
     async associarHorario(data: associarHorariosAtendenteDto) {
         const connection = await DatabaseManager.getInstance().getConnection();
@@ -90,7 +99,7 @@ class AtendenteController {
             const UserId = atendenteExistente[0].atendente_user_id;
             const atendenteModel = new Atendente("", "", "", "", "", 0, 0);
             await Atendente.update(id, nome, email, telefone, cpf, UserId, connection);
-            const atendenteAtualizado = await Atendente.getAtendenteById(id, connection); 
+            const atendenteAtualizado = await Atendente.getAtendenteById(id, connection);
             await connection.commit();
             return atendenteAtualizado;
         } catch (error) {
@@ -105,7 +114,7 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-            const atendenteId=await Atendente.getIdAtendente(id, connection);
+            const atendenteId = await Atendente.getIdAtendente(id, connection);
             await Atendente.deleteExpediente(atendenteId, connection);
             const atendenteExcluido = await User.delete(id, connection);
             connection.commit();
@@ -124,9 +133,8 @@ class AtendenteController {
             await connection.beginTransaction();
             const atendenteModel = new Atendente("", "", "", "", "", 0, 0);
             const servico = await Servico.create(connection, data);
-            for (const atendenteId of funcionarios) 
-                {
-                const idAtendente=await Atendente.getIdAtendente(atendenteId,connection);
+            for (const atendenteId of funcionarios) {
+                const idAtendente = await Atendente.getIdAtendente(atendenteId, connection);
                 const empresaId = await Atendente.getEmpresa(idAtendente, connection);
                 if (!empresaId) {
                     throw new Error("É necessário associar o atendente a empresa!");
@@ -143,7 +151,7 @@ class AtendenteController {
         }
     }
 
-    static async definirHorario(atendente_id: number, data: any) {
+    static async definirHorario(atendente_id: number, dados: any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
@@ -151,7 +159,7 @@ class AtendenteController {
             if (!Array.isArray(funcExiste) || funcExiste.length === 0)
                 throw new Error("Atendente não encontrado");
 
-            for (const item of data) {
+            for (const item of dados) {
                 const dadosExpediente = {
                     atendente_id,
                     data_hora_entrada: item.entrada,
@@ -166,7 +174,7 @@ class AtendenteController {
             for (let i = 0; i < 90; i++) {
                 const dia = addDays(dataAtual, i);
                 const diaSemana = dia.getDay() === 0 ? 1 : dia.getDay() + 1;
-                for (const item of data) {
+                for (const item of dados) {
 
                     if (parseInt(item.dia_semana) === diaSemana && item.entrada !== '00:00') {
                         const dados = {
@@ -207,7 +215,6 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             const existe = await Atendente.getAtendenteById(atendenteId, connection);
-            console.log(existe);
             if (!existe && existe.length <= 0)
                 throw new Error("Atendente não encontrado");
             const result = await Atendente.getTimesForDate(atendenteId, date, connection);
@@ -220,8 +227,7 @@ class AtendenteController {
         }
     }
 
-    async getInfoUserByIdUser(atendenteId: number)
-    {
+    async getInfoUserByIdUser(atendenteId: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             const result = await Atendente.getInfoUser(atendenteId, connection);
@@ -232,6 +238,64 @@ class AtendenteController {
             connection.release();
         }
     }
+
+    async definirHorarioApartirDeData(atendente_id: number, dados: any, dataInicio: Date) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            await connection.beginTransaction();
+
+            const funcExiste = await Atendente.getAtendenteById(atendente_id, connection);
+            if (!Array.isArray(funcExiste) || funcExiste.length === 0)
+                throw new Error("Atendente não encontrado");
+
+            let ultimaData=await Atendente.BuscaUltimoAgendamento(funcExiste[0].id, connection);
+
+            const formatador= new unformatDate();
+            ultimaData=formatador.unformatDate(ultimaData.data_hora);
+
+            await Atendente.DeletaHorarios(funcExiste[0].id, ultimaData, connection);
+            
+            for (const item of dados) {
+                const dadosExpediente = {
+                    atendente_id,
+                    data_hora_entrada: item.entrada,
+                    data_hora_almoco: item.almoco || null,
+                    tempo_almoco: item.tempo_almoco || null,
+                    data_hora_saida: item.saida,
+                    dias_semana_id: item.dia_semana
+                };
+                await HorarioFuncionario.createExpediente(connection, dadosExpediente);
+            }
+
+            for (let i = 0; i < 90; i++) {
+                const dia = addDays(dataInicio, i);
+                const diaSemana = dia.getDay() === 0 ? 1 : dia.getDay() + 1;
+
+                for (const item of dados) {
+                    if (parseInt(item.dia_semana) === diaSemana && item.entrada !== '00:00') {
+                        const dadosDia = {
+                            atendente_id,
+                            data_hora_entrada: item.entrada,
+                            data_hora_almoco: item.intervalo || null,
+                            tempo_almoco: item.tempo || null,
+                            data_hora_saida: item.saida,
+                            dias_semana_id: item.dia_semana
+                        };
+                        await HorarioFuncionario.gerarHorariosDiarios(connection, dadosDia, dia);
+                    }
+                }
+            }
+
+            await connection.commit();
+            return true;
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
+    }
+
 }
 
 export default AtendenteController;

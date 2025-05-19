@@ -9,6 +9,7 @@ const router = require('express').Router();
 router.post('/', async (req, res) => {
     try {
         const atendente = await atendenteController.createAtendente(req.body);
+        console.log("pelo amor de Deus: ",atendente)
         res.status(201).send(atendente);
     } catch (e) {
         res.status(400).send(`Erro: ${e.message}`);
@@ -93,6 +94,8 @@ router.post('/notificacao', async (req, res) => {
 router.post('/expediente/:id', async (req, res) => {
     const atendente_id = req.params.id;
     const horarios = req.body;
+      console.log("Recebido no expediente:", req.body);
+
     try {
         await AtendenteController.definirHorario(atendente_id, horarios);
         res.json({ message: "Expedientes e horários criados com sucesso" });
@@ -135,6 +138,19 @@ router.get('/getInfoUserByUserId/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+
+router.post('/alterarExpediente/:id', async (req,res)=>{
+    try{
+        const atendenteId = req.params.id;
+        const { expediente, dataInicio } = req.body;
+
+        const result = await atendenteController.definirHorarioApartirDeData(atendenteId, expediente, dataInicio);
+        res.status(200).send(result);
+    }catch(e){
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+})
 
 
 export = router;

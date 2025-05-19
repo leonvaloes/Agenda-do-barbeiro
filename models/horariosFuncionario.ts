@@ -49,9 +49,7 @@ class HorarioFuncionario {
 
 
     static async gerarHorariosDiarios(connection: any, dados: any, dataAtual: Date) {
-
         const atendente_id = dados.atendente_id;
-
         const insertQuery = `
             INSERT INTO horario_atendente (data_hora, ocupado, atendente_id)
             VALUES (?, ?, ?)
@@ -61,8 +59,6 @@ class HorarioFuncionario {
             console.log(`Dia ${dados.dias_semana_id}: atendente não trabalha`);
             return;
         }
-
-
         let almocoHora = 0;
         let almocoMinuto = 0;
         let almoco = null;
@@ -85,20 +81,12 @@ class HorarioFuncionario {
             throw new Error("Horários de entrada ou saída inválidos");
         }
 
-        console.log("entradaHora:", entradaHora, entradaMinuto);
-        console.log("saidaHora:", saidaHora, saidaMinuto);
-
         let atual = setMinutes(setHours(new Date(dataAtual), entradaHora), entradaMinuto);
         const saida = setMinutes(setHours(new Date(dataAtual), saidaHora), saidaMinuto);
-
         const formatador = new unformatDate();
-
 
         while (isBefore(atual, saida)) {
             let horarioString = formatador.FormatDate(atual);
-            console.log("HoraString: ", horarioString);
-            console.log("atendenteId: ", atendente_id);
-
 
             if (dados.data_hora_almoco && horarioString == horarioAlmoco) {
                 for (let i = 0; i < dados.tempo_almoco; i += 15) {
@@ -135,18 +123,13 @@ class HorarioFuncionario {
         await connection.execute(query, [funcionarioId, dataHoraFormatada]);
     }
 
-    static async marcarComoLivre(agendamentoId: number, connection: any) {
+    static async marcarComoLivre(data_hora: Date, atendente_id:number, connection: any) {
         const query = `
             UPDATE horario_atendente
             SET ocupado = FALSE
-            WHERE (atendente_id, data_hora) = (
-                SELECT i.atendente_id, i.data_hora
-                FROM agendamento a
-                JOIN item i ON a.item_id = i.id
-                WHERE a.id = ?
-            );
+            WHERE data_hora = ? AND atendente_id = ?
         `;
-        await connection.execute(query, [agendamentoId]);
+        await connection.execute(query, [data_hora, atendente_id]);
     }
 
     static async listarDisponiveis(funcionarioId: number, connection: any) {

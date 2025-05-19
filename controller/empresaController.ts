@@ -1,6 +1,9 @@
 import DatabaseManager from "../config/database";
+import Agendamento from "../models/agendamento";
 import Atendente from "../models/atendente";
 import Empresa from '../models/empresa';
+import HorarioFuncionario from "../models/horariosFuncionario";
+import unformatDate from "../type/unformatDate";
 
 class EmpresaController {
 
@@ -70,7 +73,7 @@ class EmpresaController {
     async buscarEmpresa(id: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const empresaModel = new Empresa("","", "", "", "", "", "", "", "", 0);
+            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "", 0);
             const empresaExistente = await empresaModel.buscaEmpresa(id, connection);
             if (!empresaExistente.length) {
                 return null;
@@ -166,19 +169,67 @@ class EmpresaController {
         }
     }
 
-    async getEmpresaByName(nome:string){
+    async getEmpresaByName(nome: string) {
         const connection = await DatabaseManager.getInstance().getConnection();
-        try{
+        try {
             const empresa = await Empresa.getEmpresaByName(nome, connection);
-            if(empresa && empresa.length > 0)
+            if (empresa && empresa.length > 0)
                 return empresa;
             throw new Error("Nenhuma empresa encontrada");
-        }catch(error){
+        } catch (error) {
             throw error;
-        }finally{
+        } finally {
             connection.release();
         }
 
+    }
+
+    async reagendar(itemId: any, novaData: any, atendente_id: number, agendamento_id: number, servicos: any) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            console.log("nova datinha: ",novaData)
+            
+            await connection.beginTransaction();
+            const tempoServico = servicos.tempo_medio;
+            const formatador = new unformatDate();
+
+            // marcar livre antigo agendamento
+
+            let dataAntiga= await Agendamento.getItemByAgendamento(agendamento_id, connection);
+            
+            dataAntiga = await formatador.FormatDate(dataAntiga);
+            console.log("antiga data: ",dataAntiga);
+            await HorarioFuncionario.marcarComoLivre(dataAntiga, atendente_id, connection);
+            
+            let dataEhoraFim = new Date(dataAntiga);
+            dataEhoraFim.setMinutes(dataEhoraFim.getMinutes() + tempoServico);
+            
+            let auxDataHora = new Date(dataAntiga);
+            while (auxDataHora < dataEhoraFim) {
+                await HorarioFuncionario.marcarComoLivre(auxDataHora, atendente_id, connection);
+                auxDataHora.setMinutes(auxDataHora.getMinutes() + 15);
+            }
+
+            const result = await Empresa.reagendar(itemId, novaData, connection);
+
+
+            // marcar ocupado novo agendamento
+            novaData = await formatador.unformatDate(novaData);
+            await HorarioFuncionario.marcarComoOcupado(atendente_id, novaData, connection);
+            
+            dataEhoraFim = new Date(novaData);
+            dataEhoraFim.setMinutes(dataEhoraFim.getMinutes() + tempoServico);
+            auxDataHora = new Date(novaData);
+            while (auxDataHora < dataEhoraFim) {
+                await HorarioFuncionario.marcarComoOcupado(atendente_id, new Date(auxDataHora), connection);
+                auxDataHora.setMinutes(auxDataHora.getMinutes() + 15);
+            }
+            await connection.commit();
+
+            return result;
+        } catch (e) {
+            console.log(e);
+        }
     }
 }
 

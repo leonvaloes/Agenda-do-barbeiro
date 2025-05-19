@@ -35,6 +35,23 @@ router.get('/', async (req,res)=>{
     }
 });
 
+router.put('/reagendamento', async (req,res)=>{
+    try{
+        const itemId= req.body.item_id;
+        const novaData= req.body.nova_data;
+        const atendente_id= req.body.atendente_id;
+        const agendamento_id=req.body.agendamento_id
+        const servicos=req.body.servicos
+        console.log("itemId: ", itemId, "novaData: ", novaData)
+        const result= await empresaController.reagendar(itemId, novaData, atendente_id, agendamento_id, servicos);
+        if(result)
+            res.status(200).send(result);
+        else 
+            res.status(404).send("Erro aqui");
+    }catch(e){
+        console.log(e);
+    }
+})
 
 router.put('/:id', async (req, res)=>{
     try{
@@ -42,7 +59,7 @@ router.put('/:id', async (req, res)=>{
         if(empresa)
             res.status(200).send(empresa);
         else
-            res.status(404).send("Empresa não encontrada!");
+            res.status(404).send("Empresa nã encontrada!");
     }catch(e){
         res.status(400).send(`Erro: ${e.message}`);
     }
@@ -123,6 +140,8 @@ router.get('/getEmpresaByName/:nome_fantasia', async (req,res)=>{
         res.status(400).send(`Erro: ${e.message}`);
     }
 })
+
+
 
 
 export = router;
