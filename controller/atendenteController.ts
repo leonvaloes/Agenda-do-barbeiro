@@ -296,6 +296,28 @@ class AtendenteController {
         }
     }
 
+    async getExpediente(atendenteId:number){
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            const result = await Atendente.getExpediente(atendenteId, connection);
+            return result;
+        } catch (e) {
+            throw e;
+        } finally {
+            connection.release();
+        }
+    }
+
+    async ocuparDia(atendenteId:number, data:any){
+        const connection=await DatabaseManager.getInstance().getConnection();
+        try{
+            const result=await Atendente.ocuparDia(atendenteId, data, connection);
+            return result;
+        }catch(e){
+            throw e;
+        }
+    }
+
 }
 
 export default AtendenteController;

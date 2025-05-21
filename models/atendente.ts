@@ -214,34 +214,57 @@ class Atendente extends User {
     }
 
     static async BuscaUltimoAgendamento(atendente_id: number, connection: any) {
-    const query = `
+        const query = `
         SELECT i.*
         FROM item i
         JOIN agendamento a ON a.item_id = i.id
-        WHERE i.atendente_id = ?
+        WHERE i.atendente_id = ? AND a.estado!='cancelado'
         ORDER BY i.data_hora DESC
         LIMIT 1;
     `;
-    try {
-        const [rows] = await connection.execute(query, [atendente_id]);
-        return rows.length > 0 ? rows[0] : null;
-    } catch (e) {
-        console.error("Erro ao buscar último agendamento", e);
-        throw e;
+        try {
+            const [rows] = await connection.execute(query, [atendente_id]);
+            return rows.length > 0 ? rows[0] : null;
+        } catch (e) {
+            console.error("Erro ao buscar último agendamento", e);
+            throw e;
+        }
     }
-}
 
 
-    static async DeletaHorarios(atendente_id:number, data:any, connection:any){
-        const query=
+    static async DeletaHorarios(atendente_id: number, data: any, connection: any) {
+        const query =
             `DELETE FROM horario_atendente
             WHERE atendente_id = ?
             AND data_hora >= ?;`
-        try{
+        try {
             console.log("meu deus?", data)
-            await connection.execute(query,[atendente_id, data]);
-        }catch(e){
+            await connection.execute(query, [atendente_id, data]);
+        } catch (e) {
             console.error("Erro ao apagar horarios de agendamento");
+            throw e;
+        }
+    }
+
+    static async getExpediente(atendenteId: number, connection: any) {
+        const query = `SELECT * FROM expediente WHERE atendente_id = ?`;
+        try {
+            const [result] = await connection.execute(query, [atendenteId]);
+            return result;
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    static async ocuparDia(atendenteId: number, data: any, connection:any) {
+        const query = `
+            UPDATE horario_atendente
+            SET ocupado=1
+            WHERE atendente_id=? AND DATE(data_hora)=?`;
+        try {
+            console.log("data e id ", data, atendenteId);
+            await connection.execute(query, [atendenteId, data]);
+        } catch (e) {
             throw e;
         }
     }

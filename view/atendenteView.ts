@@ -150,6 +150,28 @@ router.post('/alterarExpediente/:id', async (req,res)=>{
     }catch(e){
         res.status(400).send(`Erro: ${e.message}`);
     }
+});
+
+router.get('/getExpediente/:id', async (req,res)=>{
+    try{
+        const atendenteId = req.params.id;
+        const result = await atendenteController.getExpediente(atendenteId);
+        res.status(200).send(result);
+    }catch(e)
+    {
+        res.status(400).send(`Erro: ${e.messge}`);
+    }
+})
+
+router.put('/ocuparData/:id',(req,res)=>{
+    try{
+        const atendenteId = req.params.id;
+        const data = req.body.data;
+        const result = atendenteController.ocuparDia(atendenteId, data);
+        res.status(200).send(result);
+    }catch(e){
+        res.status(400).send(`Erro: ${e.message}`);
+    }
 })
 
 
