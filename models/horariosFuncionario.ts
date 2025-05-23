@@ -15,36 +15,13 @@ class HorarioFuncionario {
         this.ocupado = ocupado;
     }
 
-
-    // static async criarHorario(funcionarioId: number, dataHora: any, connection: any) {
-    //     if (!(dataHora instanceof Date)) {
-    //         dataHora = new Date(dataHora);
-    //     }
-    //     const formatador = new unformatDate();
-    //     const dataHoraFormatada = formatador.FormatDate(dataHora);
-
-    //     const query = `
-    //         INSERT INTO horario_atendente (atendente_id, data_hora, ocupado)
-    //         VALUES (?, ?, FALSE)
-    //         ON DUPLICATE KEY UPDATE atendente_id = atendente_id
-    //     `;
-
-    //     console.log("funcionarioId:", funcionarioId);
-    //     console.log("dataHoraFormatada:", dataHoraFormatada);
-
-    //     const retorno = await connection.execute(query, [funcionarioId, dataHoraFormatada]);
-    //     console.log("retorno:", retorno);
-    // }
-
-
-
     static createExpediente(connection: any, data: any) { //CERTO, FAZ O EXPEDIENTE DO ATENDENTE
         const query = `
-            INSERT INTO expediente(data_hora_entrada, data_hora_saida, atendente_id, dias_semana_id)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO expediente(data_hora_entrada, data_hora_intervalo, tempo_intervalo, data_hora_saida, atendente_id, dias_semana_id)
+            VALUES (?, ?, ?, ?, ?, ?)
         `;
-
-        connection.execute(query, [data.data_hora_entrada, data.data_hora_saida, data.atendente_id, data.dias_semana_id]);
+        console.log("create expediente: ",data);
+        connection.execute(query, [data.data_hora_entrada, data.data_hora_intervalo, data.tempo_intervalo, data.data_hora_saida, data.atendente_id, data.dias_semana_id]);
     }
 
 

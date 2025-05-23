@@ -19,14 +19,9 @@ class AtendenteController {
         try {
             await connection.beginTransaction();
             const atendente = new Atendente(atendenteData.nome, atendenteData.email, atendenteData.telefone, atendenteData.cpf, atendenteData.senha, atendenteData.empresa_id, 0);
-
             // captura o retorno com o id do insert
             const novoAtendente = await atendente.createAtendente(connection);
-
             await connection.commit();
-
-            console.log("novo: ", novoAtendente);
-
             return novoAtendente;
 
         } catch (error) {
@@ -159,12 +154,13 @@ class AtendenteController {
             if (!Array.isArray(funcExiste) || funcExiste.length === 0)
                 throw new Error("Atendente não encontrado");
 
+            console.log("DADOS: ",dados);
             for (const item of dados) {
                 const dadosExpediente = {
                     atendente_id,
                     data_hora_entrada: item.entrada,
-                    data_hora_almoco: item.almoco || null,
-                    tempo_almoco: item.tempo_almoco || null,
+                    data_hora_intervalo: item.intervalo || null,
+                    tempo_intervalo: item.tempo || null,
                     data_hora_saida: item.saida,
                     dias_semana_id: item.dia_semana
                 };

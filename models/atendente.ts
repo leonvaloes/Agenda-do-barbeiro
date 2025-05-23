@@ -23,9 +23,6 @@ class Atendente extends User {
 
         try {
             const [result] = await connection.execute(query, values);
-
-            console.log("RESULTADO DO INSERT:", result); // <== log para debug
-
             return {
                 id: result.insertId,
                 cpf: this.cpf,
@@ -238,7 +235,6 @@ class Atendente extends User {
             WHERE atendente_id = ?
             AND data_hora >= ?;`
         try {
-            console.log("meu deus?", data)
             await connection.execute(query, [atendente_id, data]);
         } catch (e) {
             console.error("Erro ao apagar horarios de agendamento");
