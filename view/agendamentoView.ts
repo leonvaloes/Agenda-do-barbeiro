@@ -54,6 +54,18 @@ router.get('/getAgendamentosDaSemanaByEmpresa/:id', async (req, res) => {
     }
 });
 
+router.get('/getConcluidosSemanal/:id',async (req,res)=>{
+    try{
+        const id = req.params.id;
+        const result = await AgendamentoController.getConcluidosSemanal(id);        
+        console.log(result);
+
+        res.status(200).send(result);
+    }catch(e:any){
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+})
+
 
 router.get('/getAgendamentosByCliente/:id', async (req, res) => {
     try {
