@@ -63,6 +63,16 @@ class Atendente extends User {
         }
     }
 
+    static async getAtendenteByUser(id: number, connection: any) {
+        const query = `SELECT * FROM atendente WHERE atendente_user_id = ?`;
+        try {
+            const result = await connection.execute(query, [id]);
+            return result[0][0];
+        } catch (e) {
+            throw e;
+        }
+    }
+
     static async getAtendenteById(id: number, connection: any) {
         const [rows] = await connection.execute('SELECT * FROM atendente WHERE id = ?', [id]);
         return rows;

@@ -259,28 +259,56 @@ ORDER BY item.data_hora DESC;`
   static async getAgendamentosByCliente(id: number, connection: any) {
     const query = `
       SELECT 
-    agendamento.*, 
-    servicos.id AS servico_id, 
-    servicos.nome AS nome_servico,
-    servicos.descricao,
-    servicos.tempo_medio,
-    item.data_hora, 
-    item.atendente_id, 
-    item.serv_id AS servico_item_id,
-    user.nome AS nome_atendente,
-    empresa.id AS empresa_id,
-    empresa.nome_fantasia AS nome_empresa
-    FROM agendamento
-    INNER JOIN item ON agendamento.item_id = item.id 
-    INNER JOIN servicos ON item.serv_id = servicos.id
-    INNER JOIN atendente ON item.atendente_id = atendente.id
-    INNER JOIN user ON atendente.atendente_user_id = user.id
-    INNER JOIN empresa ON atendente.empresa_id = empresa.id
-    WHERE agendamento.cliente_id = ?
-    ORDER BY item.data_hora DESC;`
+        agendamento.*, 
+        servicos.id AS servico_id, 
+        servicos.nome AS nome_servico,
+        servicos.descricao,
+        servicos.tempo_medio,
+        item.data_hora, 
+        item.atendente_id, 
+        item.serv_id AS servico_item_id,
+        user.nome AS nome_atendente,
+        empresa.id AS empresa_id,
+        empresa.nome_fantasia AS nome_empresa
+      FROM agendamento
+      INNER JOIN item ON agendamento.item_id = item.id 
+      INNER JOIN servicos ON item.serv_id = servicos.id
+      INNER JOIN atendente ON item.atendente_id = atendente.id
+      INNER JOIN user ON atendente.atendente_user_id = user.id
+      INNER JOIN empresa ON atendente.empresa_id = empresa.id
+      WHERE agendamento.cliente_id = ?
+      ORDER BY item.data_hora DESC;`
     try {
       const [result] = await connection.execute(query, [id]);
       return result;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static async getRelatorioAtendente(id: number, dataInicio: any, dataFim: any, connection: any) {
+    const query = `
+      SELECT
+        agendamento.estado,
+        cliente_user.nome AS nome_cliente,
+        servicos.valor,
+        item.data_hora,
+        atendente_user.nome AS nome_atendente
+      FROM agendamento
+        INNER JOIN item ON agendamento.item_id = item.id
+        INNER JOIN servicos ON item.serv_id = servicos.id
+        INNER JOIN atendente ON item.atendente_id = atendente.id
+        INNER JOIN user AS atendente_user ON atendente.atendente_user_id = atendente_user.id
+        INNER JOIN cliente ON agendamento.cliente_id = cliente.id
+        INNER JOIN user AS cliente_user ON cliente.cliente_user_id = cliente_user.id
+        INNER JOIN empresa ON atendente.empresa_id = empresa.id
+      WHERE atendente.id = ?
+      AND item.data_hora BETWEEN ? AND ?
+      ORDER BY item.data_hora DESC;`
+
+    try {
+      const response = await connection.execute(query, [id, dataInicio, dataFim]);
+      return response[0];
     } catch (e) {
       throw e;
     }
@@ -291,7 +319,6 @@ ORDER BY item.data_hora DESC;`
       SELECT * FROM agendamento WHERE id = ?`;
     try {
       const [result] = await connection.execute(query, [id]);
-      console.log("RESULT MODEL: ", result);
       return result;
     } catch (e) {
       throw e;
@@ -310,7 +337,7 @@ ORDER BY item.data_hora DESC;`
       throw e;
     }
   }
-  
+
   static async atualizarAgendamento(id: number, clienteId: number, itemId: number, connection: any) {
     const query = `UPDATE agendamento SET cliente_id = ?, item_id = ? WHERE id = ?`;
     try {

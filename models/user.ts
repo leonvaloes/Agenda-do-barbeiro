@@ -99,6 +99,16 @@ abstract class User {
         }
     }
 
+    static async getUser(id:number, connection:any){
+        const query="SELECT * FROM user WHERE id=?"
+        try{
+            const response=await connection.execute(query, [id]);
+            return response[0];
+        }catch(e){
+            throw e;
+        }
+    }
+
 }
 
 export default User;

@@ -9,6 +9,7 @@ import Empresa from '../models/empresa';
 import HorarioFuncionario from '../models/horariosFuncionario';
 import Item from '../models/item';
 import Servicos from '../models/servicos';
+import User from '../models/user';
 import unformatDate from '../type/unformatDate';
 
 class AgendamentoController {
@@ -245,6 +246,33 @@ class AgendamentoController {
             console.error("Erro ao buscar agendamentos", e);
             throw e;
         } finally {
+            connection.release();
+        }
+    }
+
+    static async getRelatorio(userId:number, dataInicio:any, dataFim:any){
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try{
+            const dadosUser= await User.getUser(userId, connection);
+            if(!dadosUser){
+                throw new Error("Usuário não encontrado");
+            }
+            const Role= await User.buscarRole(dadosUser[0].role_id, connection);
+
+            if(Role[0].nome==="ATENDENTE"){
+                const atendente= await Atendente.getAtendenteByUser(userId,connection);
+                const agendamentos= await Agendamento.getRelatorioAtendente(atendente.id, dataInicio, dataFim, connection);
+                return agendamentos;
+            }else if(Role[0].nome==="EMPRESA"){
+                const agendamentos= await Agendamento.getAgendamentosByEmpresa(userId, connection);
+                return agendamentos;
+            }else{
+                throw new Error("Usuário não encontrado");
+            }
+
+        }catch(e){
+            throw e;
+        }finally{
             connection.release();
         }
     }
