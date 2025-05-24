@@ -80,7 +80,8 @@ router.put('/editAgendamentos/:id', async (req, res) => {
 router.get('/getRelatorio/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        const { dataInicio, dataFim } = req.body;
+        const { dataInicio, dataFim } = req.query;
+        console.log(dataInicio, dataFim, id);
         const result = await AgendamentoController.getRelatorio(id, dataInicio, dataFim);
         res.status(200).send(result);
     } catch (e: any) {
