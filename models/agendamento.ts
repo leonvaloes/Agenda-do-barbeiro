@@ -372,6 +372,21 @@ ORDER BY item.data_hora DESC;`
     }
   }
 
+  static async getAgendamentosAtendenteByData(id:number, data:any, connection:any){
+    const query=`
+    SELECT * 
+    FROM item
+    INNER JOIN agendamento ON item.id = agendamento.item_id
+    WHERE DATE(data_hora)=? 
+    AND atendente_id=? AND agendamento.estado!='cancelado' AND agendamento.estado!='concluído'`
+    try{
+      const response= await connection.execute(query, [data, id]);
+      return response[0];
+    } catch(e){
+      throw e;
+    }
+  }
+
   static async getAgendamentosById(id: number, connection: any) {
     const query = `
       SELECT * FROM agendamento WHERE id = ?`;

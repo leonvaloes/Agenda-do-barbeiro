@@ -6,6 +6,7 @@ import HorarioFuncionario from '../models/horariosFuncionario';
 import Servico from "../models/servicos";
 import User from '../models/user';
 import unformatDate from '../type/unformatDate';
+import Agendamento from '../models/agendamento';
 
 class AtendenteController {
     atendente: typeof Atendente;
@@ -307,8 +308,13 @@ class AtendenteController {
     async ocuparDia(atendenteId:number, data:any){
         const connection=await DatabaseManager.getInstance().getConnection();
         try{
-            const result=await Atendente.ocuparDia(atendenteId, data, connection);
-            return result;
+            const agendamentos= await Agendamento.getAgendamentosAtendenteByData(atendenteId, data, connection);
+            if(agendamentos.length>0){
+                throw new Error("Existe agendamentos ativos para este dia! ");
+            }else{
+                const result=await Atendente.ocuparDia(atendenteId, data, connection);
+                return result;
+            }
         }catch(e){
             throw e;
         }

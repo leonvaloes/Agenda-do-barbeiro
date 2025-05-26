@@ -70,7 +70,6 @@ router.get('/getConcluidosSemanal/:id',async (req,res)=>{
 router.get('/getAgendamentosByCliente/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        
         const result = await AgendamentoController.getAgendamentosByCliente(id);
         res.status(200).send(result);
     } catch (e: any) {
@@ -83,7 +82,6 @@ router.put('/editAgendamentos/:id', async (req, res) => {
         const id = req.params.id;
         const { cliente_id, atendente_id, serv_id, data_hora } = req.body;
         const result = await AgendamentoController.editAgendamentos(id, cliente_id, atendente_id, serv_id, data_hora);
-
     } catch (e:any) {
         res.status(400).send(`Erro: ${e.message}`);
     }
@@ -93,7 +91,6 @@ router.get('/getRelatorio/:id', async (req, res) => {
     try {
         const id = req.params.id;
         const { dataInicio, dataFim } = req.query;
-        console.log(dataInicio, dataFim, id);
         const result = await AgendamentoController.getRelatorio(id, dataInicio, dataFim);
         res.status(200).send(result);
     } catch (e: any) {

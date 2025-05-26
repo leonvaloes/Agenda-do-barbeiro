@@ -11,8 +11,6 @@ class ServicoController {
         this.servico = Servico;
     }
 
-
-
     async criarServico(dados: any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
@@ -22,9 +20,8 @@ class ServicoController {
             if (!servicoId) {
                 throw new Error("Erro ao criar serviço");
             }
-
             connection.commit();
-            return servicoId; // Retorna o ID do serviço criado
+            return servicoId;
         } catch (error) {
             connection.rollback();
             throw error;
@@ -33,19 +30,14 @@ class ServicoController {
         }
     }
 
-
     async atualizarServico(id: number, dados: any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             connection.beginTransaction();
-
-
             const servico = await Servico.getServicoById(id, connection);
             if (!servico) {
                 throw new Error("Serviço não encontrado");
             }
-            console.log(id);
-            console.log(dados);
             const retorno = await Servico.update(connection, dados, id);
             connection.commit();
             return retorno;
@@ -57,24 +49,18 @@ class ServicoController {
         }
     }
 
-
     async criarEassociar(data: any) {
         const { descricao, nome, tempo_medio, valor, funcionarios } = data;
         const atendenteController = new AtendenteController();
-
         try {
             const servicosCriados = [];
             const dados = { descricao, nome, tempo_medio, valor };
-
-            const servico = await atendenteController.criarServicoEAssociar(dados, data.funcionarios);
-
+            await atendenteController.criarServicoEAssociar(dados, data.funcionarios);
             return servicosCriados;
         } catch (e) {
             throw e;
         }
     }
-
-
 
     async deletarServico(id) {
         const connection = await DatabaseManager.getInstance().getConnection();
@@ -103,6 +89,18 @@ class ServicoController {
         } catch (error) {
             throw error;
         } finally {
+            connection.release();
+        }
+    }
+
+    async getEmpresa(id:number){
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try{
+            const empresa = await Servico.getEmpresa(id, connection);
+            return empresa;
+        }catch(e){
+            throw e;
+        }finally{
             connection.release();
         }
     }

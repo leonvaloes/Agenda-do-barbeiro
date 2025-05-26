@@ -12,19 +12,25 @@ router.post('/',async(req,res)=>{
     }
 })
 
-router.put('/:id',async(req,res)=>{
-    const id= req.params.id;
-    try{
-        const updateServic= await servicoController.atualizarServico(id,req.body)
-        if(!updateServic)
-            return res.status(404).send(updateServic);
-        
-        res.status(200).send("Serviço Atualizado com sucesso")
-    }catch(e){
-        res.status(400).send(`Erro: ${e.message}`);
+// router.put('/:id',async(req,res)=>{
+//     const id= req.params.id;
+//     const { funcionarios, ...dadosServ } = req.body;
 
-    }
-})
+//     console.log(dadosServ);
+//     console.log(funcionarios);
+//     try{
+//         const updateServic= await servicoController.atualizarServico(id, dadosServ);
+//         if(!updateServic)
+//             return res.status(404).send(updateServic);
+//         else{
+//             const updateAtendenteServ= await 
+//         }
+//         res.status(200).send("Serviço Atualizado com sucesso")
+//     }catch(e){
+//         res.status(400).send(`Erro: ${e.message}`);
+
+//     }
+// }) 
 
 router.get('/',async(req,res)=>{
     try{
@@ -48,7 +54,6 @@ router.delete('/:id',async(req,res)=>{
 
 router.post('/CriarEassociar', async (req, res) => {
     const { descricao, funcionarios, nome, tempo_medio, valor } = req.body;
-    console.log("body: ", req.body);
     try {
         const servico = await servicoController.criarEassociar({
             descricao,
@@ -62,6 +67,16 @@ router.post('/CriarEassociar', async (req, res) => {
         res.status(400).send(`Erro: ${e.message}`);
     }
 });
+
+router.get('/getEmpresa/:id', async (req,res)=>{
+    try{
+        const id= req.params.id;
+        const servico= await servicoController.getEmpresa(id);
+        res.status(200).send(servico);
+    }catch(e){
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+})
 
 
 export = router;

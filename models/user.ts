@@ -89,11 +89,10 @@ abstract class User {
     }
 
     static async updateUser(id: number, nome: string, email: string, telefone: string, connection: any): Promise<void> {
+        const query=`UPDATE user SET nome=?, email=?, telefone=? WHERE id=?`
         try {
-            await connection.execute(
-                `UPDATE user SET nome=?, email=?, telefone=? WHERE id=?`,
-                [nome, email, telefone, id]
-            );
+            console.log(id, nome, email, telefone);
+            await connection.execute(query,[nome, email, telefone, id]);
         } catch (e) {
             throw e;
         }

@@ -11,7 +11,8 @@ class create_empresa {
             cnpj VARCHAR(20) UNIQUE,
             cidade VARCHAR(255) NOT NULL,
             endereco VARCHAR(255) NOT NULL,
-            estado VARCHAR(255) NOT NULL
+            estado VARCHAR(255) NOT NULL,
+            cep VARCHAR(10) NOT NULL
         )`);
         console.log('Tabela empresa criada!');
     }

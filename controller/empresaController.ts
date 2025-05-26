@@ -3,6 +3,7 @@ import Agendamento from "../models/agendamento";
 import Atendente from "../models/atendente";
 import Empresa from '../models/empresa';
 import HorarioFuncionario from "../models/horariosFuncionario";
+import User from "../models/user";
 import unformatDate from "../type/unformatDate";
 
 class EmpresaController {
@@ -17,7 +18,8 @@ class EmpresaController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            const empresaModel = new Empresa(dados.nome, dados.nome_fantasia, dados.email, dados.cnpj, dados.cidade, dados.endereco, dados.estado, dados.telefone, dados.senha, dados.empresa_user_id);
+            const empresaModel = new Empresa(dados.nome_fantasia, dados.nome_fantasia, dados.email, dados.cnpj, dados.cidade, dados.endereco, dados.estado, dados.telefone, dados.senha, dados.cep, dados.empresa_user_id);
+            console.log(empresaModel);
             await empresaModel.create(connection);
             connection.commit();
             return empresaModel;
@@ -34,13 +36,15 @@ class EmpresaController {
         try {
             connection.beginTransaction();
 
-            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "", 0);
-            const empresaExistente = await empresaModel.buscaEmpresa(id, connection);
-
+            const empresaExistente = await Empresa.buscaEmpresa(id, connection);
             if (!empresaExistente.length) {
                 return null;
             }
-            const empresaAtualizada = await Empresa.update(id, dados, connection);
+            console.log(dados.UserId, dados.nome_fantasia, dados.email, dados.telefone);
+            await User.updateUser(dados.UserId, dados.nome_fantasia, dados.email, dados.telefone, connection);
+
+            const empresaAtualizada = await Empresa.updateDadosEmpresa(id, dados, connection);
+
             connection.commit();
             return empresaAtualizada;
         } catch (error) {
@@ -54,8 +58,8 @@ class EmpresaController {
     async deletarEmpresa(id: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "", 0);
-            const empresaExistente = await empresaModel.buscaEmpresa(id, connection);
+            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "","", 0);
+            const empresaExistente = await Empresa.buscaEmpresa(id, connection);
             if (!empresaExistente.length) {
                 return null;
             }
@@ -73,8 +77,8 @@ class EmpresaController {
     async buscarEmpresa(id: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "", 0);
-            const empresaExistente = await empresaModel.buscaEmpresa(id, connection);
+            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "","", 0);
+            const empresaExistente = await Empresa.buscaEmpresa(id, connection);
             if (!empresaExistente.length) {
                 return null;
             }
@@ -118,7 +122,7 @@ class EmpresaController {
         try {
             await connection.beginTransaction();
 
-            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "", 0);
+            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "", "", 0);
             const retorno = empresaModel.adicionaAtendente(connection, cpf, empresaId);
             connection.commit();
             return retorno;

@@ -4,7 +4,6 @@ const router = require('express').Router();
 
 router.post('/', async (req, res)=>{
     try{
-        console.log("bodyzin: ",req.body)
         const empresa = await empresaController.criarEmpresa(req.body);
         res.status(201).send(empresa);
     }catch(e){
@@ -25,7 +24,6 @@ router.delete('/:id', async (req, res)=>{
     }
 });
 
-
 router.get('/', async (req,res)=>{
     try{
         const empresas= await empresaController.listarEmpresas();
@@ -42,7 +40,6 @@ router.put('/reagendamento', async (req,res)=>{
         const atendente_id= req.body.atendente_id;
         const agendamento_id=req.body.agendamento_id
         const servicos=req.body.servicos
-        console.log("itemId: ", itemId, "novaData: ", novaData)
         const result= await empresaController.reagendar(itemId, novaData, atendente_id, agendamento_id, servicos);
         if(result)
             res.status(200).send(result);
@@ -83,7 +80,6 @@ router.post('/:empresaId/funcionario', async (req, res) => {
         if (!cpf) {
             return res.status(400).send("CPF do funcionário é obrigatório.");
         }
-
         await empresaController.adicionarFuncionario(cpf, empresaId);
         res.status(200).send("Funcionário adicionado à empresa com sucesso!");
     } catch (e) {

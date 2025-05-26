@@ -163,11 +163,11 @@ router.get('/getExpediente/:id', async (req,res)=>{
     }
 })
 
-router.put('/ocuparData/:id',(req,res)=>{
+router.put('/ocuparData/:id', async (req,res)=>{
     try{
         const atendenteId = req.params.id;
         const data = req.body.data;
-        const result = atendenteController.ocuparDia(atendenteId, data);
+        const result = await atendenteController.ocuparDia(atendenteId, data);
         res.status(200).send(result);
     }catch(e){
         res.status(400).send(`Erro: ${e.message}`);

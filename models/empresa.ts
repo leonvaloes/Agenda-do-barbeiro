@@ -8,9 +8,10 @@ class Empresa extends User {
     endereco: string;
     estado: string;
     telefone: string;
+    cep:string;
     empresa_user_id: number;
 
-    constructor(nome: string, nome_fantasia:string , email: string, cnpj: string, cidade: string, endereco: string, estado: string, telefone: string, senha: string, empresa_user_id: number) {
+    constructor(nome: string, nome_fantasia:string , email: string, cnpj: string, cidade: string, endereco: string, estado: string, telefone: string, senha: string,cep:string, empresa_user_id: number ) {
         super(nome, email, telefone, senha, "EMPRESA");
         this.nome_fantasia = nome_fantasia;
         this.cnpj = cnpj;
@@ -18,12 +19,14 @@ class Empresa extends User {
         this.endereco = endereco;
         this.estado = estado;
         this.empresa_user_id = empresa_user_id;
+        this.cep=cep;
     }
 
     async create(connection: any) {
-        this.empresa_user_id = await User.cadastrarUser(this.nome, this.email, this.telefone, this.senha, "EMPRESA", connection);
-        const query = `INSERT INTO empresa (nome_fantasia, cnpj, cidade, endereco, estado, empresa_user_id) VALUES ( ?, ?, ?, ?, ?, ?)`;
-        const values = [this.nome_fantasia, this.cnpj, this.cidade, this.endereco, this.estado, this.empresa_user_id];
+        this.empresa_user_id = await User.cadastrarUser(this.nome_fantasia, this.email, this.telefone, this.senha, "EMPRESA", connection);
+        const query = `INSERT INTO empresa (nome_fantasia, cnpj, cidade, endereco, estado, cep, empresa_user_id) VALUES ( ?, ?, ?, ?, ?, ?, ?)`;
+        console.log(this.nome_fantasia, this.cnpj, this.cidade, this.endereco, this.estado, this.cep, this.empresa_user_id);
+        const values = [this.nome_fantasia, this.cnpj, this.cidade, this.endereco, this.estado, this.cep, this.empresa_user_id];
         try {
             const result = await connection.execute(query, values);
             return result;
@@ -42,17 +45,17 @@ class Empresa extends User {
         }
     }
 
-    static async update(id: number, data: Empresa, connection: any) {
-        const query = `UPDATE empresa SET nome_fantasia=?, cnpj = ?, cidade = ?, endereco = ?, estado = ? WHERE id = ?`;
+    static async updateDadosEmpresa(id: number, data: Empresa, connection: any) {
+        const query = `UPDATE empresa SET nome_fantasia=?, cnpj = ?, cidade=?, endereco=?, estado=? WHERE id = ?`;
         try {
-            await connection.execute(query, [data.nome_fantasia, data.email, data.cnpj, data.cidade, data.endereco, data.estado, data.telefone, id]);
+            await connection.execute(query, [data.nome_fantasia, data.cnpj, data.cidade, data.endereco, data.estado, id]);
             return { id, ...data };
         } catch (error) {
             throw error;
         }
     }
 
-    async buscaEmpresa(id: number, connection: any) {
+    static async buscaEmpresa(id: number, connection: any) {
         const query = `SELECT * FROM empresa WHERE id = ?`;
         try {
             const result: any = await connection.execute(query, [id]);
