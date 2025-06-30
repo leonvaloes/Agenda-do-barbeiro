@@ -28,7 +28,7 @@ class create_dias_semana {
             await connection.execute(`
                 DROP TABLE IF EXISTS dias_semana
             `);
-            console.log('Relação removida com sucesso!');
+            console.log('create_dias_semana removida com sucesso!');
         } catch (error) {
             console.error('Erro ao remover relação:', error);
         }

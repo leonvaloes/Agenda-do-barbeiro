@@ -12,25 +12,19 @@ router.post('/',async(req,res)=>{
     }
 })
 
-// router.put('/:id',async(req,res)=>{
-//     const id= req.params.id;
-//     const { funcionarios, ...dadosServ } = req.body;
+router.put('/:id',async(req,res)=>{
+    const id= req.params.id;
+    const { funcionarios, ...dadosServ } = req.body;
+    try{
+        const updateServic= await servicoController.atualizarServico(id, dadosServ);
+        if(!updateServic)
+            return res.status(404).send(updateServic);
+        res.status(200).send("Serviço Atualizado com sucesso")
+    }catch(e){
+        res.status(400).send(`Erro: ${e.message}`);
 
-//     console.log(dadosServ);
-//     console.log(funcionarios);
-//     try{
-//         const updateServic= await servicoController.atualizarServico(id, dadosServ);
-//         if(!updateServic)
-//             return res.status(404).send(updateServic);
-//         else{
-//             const updateAtendenteServ= await 
-//         }
-//         res.status(200).send("Serviço Atualizado com sucesso")
-//     }catch(e){
-//         res.status(400).send(`Erro: ${e.message}`);
-
-//     }
-// }) 
+    }
+}) 
 
 router.get('/',async(req,res)=>{
     try{
@@ -78,5 +72,29 @@ router.get('/getEmpresa/:id', async (req,res)=>{
     }
 })
 
+router.put('/deleteFuncServ/:id', async (req, res)=>{
+    try{
+        const Servid= req.params.id;
+        const EmpresaId= req.body.empresaId;
+        const funcionarios=req.body.funcionarios;
+        console.log("O que vem: ",funcionarios, EmpresaId, Servid);
+        const servico= await servicoController.deleteServFunc(Servid, EmpresaId, funcionarios);
+        res.status(200).send(servico);
+    }catch(e){
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+})
+
+router.put('/addFuncServ/:id', async (req, res)=>{
+    try{
+        const Servid= req.params.id;
+        const EmpresaId= req.body.empresaId;
+        const funcionarios=req.body.funcionarios;
+        const response= await servicoController.addFuncServ(Servid, EmpresaId, funcionarios);
+        res.status(200).send(response);
+    }catch(e){
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+})
 
 export = router;

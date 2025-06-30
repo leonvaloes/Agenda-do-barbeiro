@@ -7,8 +7,6 @@ class alterUserAtendente {
                 ADD CONSTRAINT fk_atendente_user FOREIGN KEY (atendente_user_id) REFERENCES user(id)
                 ON DELETE CASCADE;
             `);
-
-
             console.log('Relação adicionada com sucesso!');
         } catch (error) {
             console.error('Erro ao adicionar relação:', error);
@@ -17,9 +15,10 @@ class alterUserAtendente {
 
     async down(connection) {
         try {
+            // Remove a foreign key usando o nome definido (fk_atendente_user)
             await connection.execute(`
                 ALTER TABLE atendente
-                DROP FOREIGN KEY atendente_ibfk_1;
+                DROP FOREIGN KEY fk_atendente_user;
             `);
 
             // Agora remova a coluna
@@ -28,11 +27,11 @@ class alterUserAtendente {
                 DROP COLUMN atendente_user_id;
             `);
 
-            console.log('Relação removida com sucesso!');
+            console.log('alterUserAtendente removida com sucesso!');
         } catch (error) {
             console.error('Erro ao remover relação:', error);
         }
     }
-
 }
+
 export default alterUserAtendente;

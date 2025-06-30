@@ -134,6 +134,8 @@ class ClienteController {
             return result;
         } catch (e) {
             throw e;
+        }finally {
+            connection.release();
         }
     }
 

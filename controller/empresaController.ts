@@ -18,8 +18,7 @@ class EmpresaController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             await connection.beginTransaction();
-            const empresaModel = new Empresa(dados.nome_fantasia, dados.nome_fantasia, dados.email, dados.cnpj, dados.cidade, dados.endereco, dados.estado, dados.telefone, dados.senha, dados.cep, dados.empresa_user_id);
-            console.log(empresaModel);
+            const empresaModel = new Empresa(dados.nome_fantasia, dados.nome_fantasia, dados.descricao, dados.email, dados.cnpj, dados.cidade, dados.endereco, dados.estado, dados.telefone, dados.senha, dados.cep, dados.empresa_user_id);
             await empresaModel.create(connection);
             connection.commit();
             return empresaModel;
@@ -58,7 +57,7 @@ class EmpresaController {
     async deletarEmpresa(id: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "","", 0);
+            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "", "", "", 0);
             const empresaExistente = await Empresa.buscaEmpresa(id, connection);
             if (!empresaExistente.length) {
                 return null;
@@ -77,7 +76,7 @@ class EmpresaController {
     async buscarEmpresa(id: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "","", 0);
+            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "", "", "", 0);
             const empresaExistente = await Empresa.buscaEmpresa(id, connection);
             if (!empresaExistente.length) {
                 return null;
@@ -100,6 +99,8 @@ class EmpresaController {
             return result;
         } catch (e) {
             throw e;
+        } finally {
+            connection.release();
         }
     }
 
@@ -122,7 +123,7 @@ class EmpresaController {
         try {
             await connection.beginTransaction();
 
-            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "", "", 0);
+            const empresaModel = new Empresa("", "", "", "", "", "", "", "", "", "", "", 0);
             const retorno = empresaModel.adicionaAtendente(connection, cpf, empresaId);
             connection.commit();
             return retorno;
@@ -191,23 +192,23 @@ class EmpresaController {
     async reagendar(itemId: any, novaData: any, atendente_id: number, agendamento_id: number, servicos: any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            console.log("nova datinha: ",novaData)
-            
+            console.log("nova datinha: ", novaData)
+
             await connection.beginTransaction();
             const tempoServico = servicos.tempo_medio;
             const formatador = new unformatDate();
 
             // marcar livre antigo agendamento
 
-            let dataAntiga= await Agendamento.getItemByAgendamento(agendamento_id, connection);
-            
+            let dataAntiga = await Agendamento.getItemByAgendamento(agendamento_id, connection);
+
             dataAntiga = await formatador.FormatDate(dataAntiga);
-            console.log("antiga data: ",dataAntiga);
+            console.log("antiga data: ", dataAntiga);
             await HorarioFuncionario.marcarComoLivre(dataAntiga, atendente_id, connection);
-            
+
             let dataEhoraFim = new Date(dataAntiga);
             dataEhoraFim.setMinutes(dataEhoraFim.getMinutes() + tempoServico);
-            
+
             let auxDataHora = new Date(dataAntiga);
             while (auxDataHora < dataEhoraFim) {
                 await HorarioFuncionario.marcarComoLivre(auxDataHora, atendente_id, connection);
@@ -220,7 +221,7 @@ class EmpresaController {
             // marcar ocupado novo agendamento
             novaData = await formatador.unformatDate(novaData);
             await HorarioFuncionario.marcarComoOcupado(atendente_id, novaData, connection);
-            
+
             dataEhoraFim = new Date(novaData);
             dataEhoraFim.setMinutes(dataEhoraFim.getMinutes() + tempoServico);
             auxDataHora = new Date(novaData);
@@ -233,6 +234,8 @@ class EmpresaController {
             return result;
         } catch (e) {
             console.log(e);
+        } finally {
+            connection.release();
         }
     }
 }

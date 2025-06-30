@@ -23,7 +23,7 @@ class alter_agendamento {
                 DROP COLUMN item_id,
                 DROP COLUMN cliente_id;
             `);
-            console.log('Relação removida com sucesso!');
+            console.log('alter_agendamento removida com sucesso!');
         } catch (error) {
             console.error('Erro ao remover relação:', error);
         }

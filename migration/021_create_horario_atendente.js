@@ -21,7 +21,7 @@ class create_horario_atendente{
             await connection.execute(`
                 DROP TABLE IF EXISTS horario_atendente
             `);
-            console.log('Relação removida com sucesso!');
+            console.log('create_horario_atendente removida com sucesso!');
         } catch (error) {
             console.error('Erro ao remover relação:', error);
         }

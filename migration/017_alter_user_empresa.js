@@ -20,7 +20,7 @@ class alterUserEmpresa {
                 DROP FOREIGN KEY fk_empresa_user,
                 DROP COLUMN empresa_user_id;
             `);
-            console.log('Relação e coluna removidas com sucesso!');
+            console.log('alterUserEmpresa removida com sucesso!');
         } catch (error) {
             console.error('Erro ao remover relação ou coluna:', error);
         }

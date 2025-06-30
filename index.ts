@@ -10,51 +10,60 @@ class Server {
     app: any;
 
     constructor() {
-        this.app = express();
-        this.connectDatabase(); // Corrigido o nome do método
-        this.setupMiddlewares(); // Configura os middlewares
-        this.setupRoutes(); // Configura as rotas
+        try {
+            this.app = express();
+            this.connectDatabase(); // Corrigido o nome do método
+            this.setupMiddlewares(); // Configura os middlewares
+            this.setupRoutes(); // Configura as rotas
+        } catch (e) {
+            console.error('Erro ao inicializar o servidor:', e);
+        }
     }
 
     async connectDatabase() {
-        // Obtendo a instância e conexão com o banco de dados
-        const databaseManager = DatabaseManager.getInstance();
-        // O método `getConnection` deve ser utilizado para obter a conexão
-        const connection = databaseManager.getConnection();
-        // Aqui você pode adicionar algum código para verificar a conexão, se necessário
-        console.log("Banco de dados conectado!");
+        try {
+            const databaseManager = DatabaseManager.getInstance();
+            const connection = databaseManager.getConnection();
+            console.log("Banco de dados conectado!");
+        } catch (e) {
+            console.error('Erro ao conectar ao banco de dados:', e);
+        }
     }
 
-    // Método para configurar middlewares
     setupMiddlewares() {
         this.app.use(cors({
-            origin: 'http://localhost:3001', // ajuste para sua origem
-            credentials: true // necessário para aceitar cookies
+            origin: 'http://localhost:3001',
+            credentials: true
         }));
         this.app.use(express.json());
-    
-        this.app.use(cookieParser()); // Aqui você adiciona o cookie-parser
-        
+        this.app.use(cookieParser());
         this.app.use((req, res, next) => {
             console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
             next();
         });
     }
 
-    // Método para configurar as rotas
     setupRoutes() {
-        new Routes(this.app); // Chamando as rotas
+        new Routes(this.app);
     }
 
-    // Método para conectar ao banco de dados e iniciar o servidor
     start(port) {
-        const PORT = process.env.PORT || port;
-        this.app.listen(PORT, () => {
-            console.log(`Servidor rodando na porta ${PORT}`);
-        });
+        try {
+            const PORT = process.env.PORT || port;
+            this.app.listen(PORT, () => {
+                console.log(`Servidor rodando na porta ${PORT}`);
+            });
+        } catch (e) {
+            console.error('Erro ao iniciar o servidor:', e);
+        }
     }
 }
 
 // Inicia o servidor na porta 3000
-const server = new Server();
-server.start(3000);
+try{
+    const server = new Server();
+    server.start(3000);
+}catch(e){
+    console.error('Erro ao iniciar o servidor:', e);
+}
+

@@ -192,7 +192,7 @@ ORDER BY item.data_hora DESC;`
     }
   }
 
-   static async getConcluidosDaSemana(id: number, connection: any) {
+  static async getConcluidosDaSemana(id: number, connection: any) {
     const query = `
     SELECT 
       agendamento.*, 
@@ -372,17 +372,45 @@ ORDER BY item.data_hora DESC;`
     }
   }
 
-  static async getAgendamentosAtendenteByData(id:number, data:any, connection:any){
-    const query=`
+  static async getRelatorioEmpresa(empresaId: number,dataInicio:any, dataFim:any, connection: any) {
+    const query = `
+      SELECT
+          agendamento.estado,
+          cliente_user.nome AS nome_cliente,
+          servicos.valor,
+          item.data_hora,
+          atendente_user.nome AS nome_atendente
+      FROM agendamento
+          INNER JOIN item ON agendamento.item_id = item.id
+          INNER JOIN servicos ON item.serv_id = servicos.id
+          INNER JOIN atendente ON item.atendente_id = atendente.id
+          INNER JOIN user AS atendente_user ON atendente.atendente_user_id = atendente_user.id
+          INNER JOIN cliente ON agendamento.cliente_id = cliente.id
+          INNER JOIN user AS cliente_user ON cliente.cliente_user_id = cliente_user.id
+          INNER JOIN empresa ON atendente.empresa_id = empresa.id
+      WHERE empresa.id = ?
+        AND item.data_hora BETWEEN ? AND ?
+      ORDER BY item.data_hora DESC;
+    `
+    try {
+      const response= await connection.execute(query, [empresaId, dataInicio, dataFim]);
+      return response[0];
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static async getAgendamentosAtendenteByData(id: number, data: any, connection: any) {
+    const query = `
     SELECT * 
     FROM item
     INNER JOIN agendamento ON item.id = agendamento.item_id
     WHERE DATE(data_hora)=? 
     AND atendente_id=? AND agendamento.estado!='cancelado' AND agendamento.estado!='concluído'`
-    try{
-      const response= await connection.execute(query, [data, id]);
+    try {
+      const response = await connection.execute(query, [data, id]);
       return response[0];
-    } catch(e){
+    } catch (e) {
       throw e;
     }
   }

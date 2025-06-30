@@ -15,7 +15,7 @@ class alter_atendente {
         try {
             await connection.execute(`ALTER TABLE atendente DROP FOREIGN KEY fk_empresa_atendente;`);
             await connection.execute(`ALTER TABLE atendente DROP COLUMN empresa_id;`);
-            console.log('Relação removida com sucesso!');
+            console.log('alter_atendente removida com sucesso!');
         } catch (error) {
             console.error('Erro ao remover relação:', error);
         }

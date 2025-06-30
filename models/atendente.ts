@@ -268,7 +268,51 @@ class Atendente extends User {
             SET ocupado=1
             WHERE atendente_id=? AND DATE(data_hora)=?`;
         try {
-            console.log("data e id ", data, atendenteId);
+            await connection.execute(query, [atendenteId, data]);
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    static async dayoff(atendenteId: number, data: any, connection:any) {
+        const query = `
+            INSERT INTO dayoff (atendente_id, data)
+            VALUES (?, ?)`;
+        try {
+            await connection.execute(query, [atendenteId, data]);
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    static async getDaysOff(atendenteId: number, connection:any) {
+        const query = `
+            SELECT * FROM dayoff WHERE atendente_id=?`;
+        try {
+            const [result] = await connection.execute(query, [atendenteId]);
+            return result;
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    static async desocuparData(atendenteId: number, data: any, connection:any) {
+        const query = `
+            DELETE FROM dayoff WHERE atendente_id=? AND data=?`;
+        try {
+            await connection.execute(query, [atendenteId, data]);
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    static async liberarDatas(atendenteId: number, data: any, connection:any) {
+        const query = `
+            UPDATE horario_atendente
+            SET ocupado=0
+            WHERE atendente_id=? AND DATE(data_hora)=?
+        `
+        try {
             await connection.execute(query, [atendenteId, data]);
         } catch (e) {
             throw e;

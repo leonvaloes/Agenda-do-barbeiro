@@ -26,7 +26,7 @@ class alter_expediente {
                 DROP COLUMN atendente_id,
                 DROP COLUMN dias_semana_id
             `);
-            console.log('Relação removida com sucesso!');
+            console.log('alter_expediente removida com sucesso!');
         } catch (error) {
             console.error('Erro ao remover relação:', error);
         }

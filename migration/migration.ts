@@ -24,6 +24,7 @@ import create_horario_atendente from './021_create_horario_atendente';
 import alter_horario_atendente from './022_alter_horario_atendente';
 import create_role from './023_create_role';
 import alter_user_role from './024_alter_user_role';
+import create_dayoff from './025_create_dayoff';
 class Migrations {
     async up() {
         console.log('Migrations running...');
@@ -58,6 +59,7 @@ class Migrations {
 
             await new create_role().up(connection);
             await new alter_user_role().up(connection)
+            await new create_dayoff().up(connection);
 
             console.log('Migrations finished!');
             connection.release();
@@ -67,44 +69,47 @@ class Migrations {
     }
 
     async down() {
-        console.log('Rolling back migrations...');
-        try {
-            console.log('Attempting to connect to the database...');
-            const db = Database.getInstance();
-            const connection = await db.getConnection();
+    console.log('Rolling back migrations...');
+    try {
+        console.log('Attempting to connect to the database...');
+        const db = Database.getInstance();
+        const connection = await db.getConnection();
 
-            // Ordem inversa de up()
-            await new alter_horario_atendente().down(connection);
-            await new create_horario_atendente().down(connection);
-            await new alter_expediente().down(connection);
-            await new create_dias_semana().down(connection);
-            await new create_expediente().down(connection);
+        await new create_dayoff().down(connection);
+        await new alter_user_role().down(connection);
+        await new create_role().down(connection);
 
-            await new alterUserEmpresa().down(connection);
-            await new alterUserAtendente().down(connection);
-            await new alterAgendamento().down(connection);
-            await new alterAtendente().down(connection);
-            await new alterItem().down(connection);
-            await new alterUserCliente().down(connection);
+        await new alter_horario_atendente().down(connection);
+        await new create_horario_atendente().down(connection);
+        await new alter_expediente().down(connection);
+        await new create_dias_semana().down(connection);
+        await new create_expediente().down(connection);
 
-            await new createUserNotificacao().down(connection);
-            await new createNotificacao().down(connection);
-            await new createUser().down(connection);
-            await new createItem().down(connection);
-            await new createAgendamento().down(connection);
-            await new createAtendenteServ().down(connection);
-            await new createServicos().down(connection);
-            await new createCliente().down(connection);
-            await new createAtendente().down(connection);
-            await new createEmpresa().down(connection);
-            await new create_role().down(connection);
+        await new alterUserEmpresa().down(connection);
+        await new alterUserAtendente().down(connection);
+        await new alterAgendamento().down(connection);
+        await new alterAtendente().down(connection);
+        await new alterItem().down(connection);
+        await new alterUserCliente().down(connection);
 
-            console.log('Migrations rollback finished!');
-            connection.release();
-        } catch (error) {
-            console.error('Error during rollback:', error);
-        }
+        await new createUserNotificacao().down(connection);
+        await new createNotificacao().down(connection);
+        await new createUser().down(connection);
+        await new createItem().down(connection);
+        await new createAgendamento().down(connection);
+        await new createAtendenteServ().down(connection);
+        await new createServicos().down(connection);
+        await new createCliente().down(connection);
+        await new createAtendente().down(connection);
+        await new createEmpresa().down(connection);
+
+        console.log('Migrations rollback finished!');
+        connection.release();
+    } catch (error) {
+        console.error('Error during rollback:', error);
     }
+}
+
 }
 
 // Executa o comando a partir da linha de comando

@@ -20,7 +20,7 @@ class alter_item {
             DROP COLUMN serv_id;
         `);
         
-        console.log('Relação removida com sucesso!');
+        console.log('alter_item removida com sucesso!');
     }
 }
 

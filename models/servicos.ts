@@ -77,6 +77,26 @@ class Servicos{
         }
     }
 
+    static async deleteServFunc(connection: any, Servid: number, EmpresaId: number, funcionario: any) {
+        const query = `DELETE FROM atendente_serv WHERE serv_id = ? AND empresa_id = ? AND atendente_id = ?`;
+        try {
+            const result = await connection.execute(query, [Servid, EmpresaId, funcionario]);
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async addFuncServ(connection: any, Servid: number, EmpresaId: number, funcionario: any) {
+        const query = `INSERT INTO atendente_serv (serv_id, empresa_id, atendente_id) VALUES (?, ?, ?)`;
+        try {
+            const result = await connection.execute(query, [Servid, EmpresaId, funcionario]);
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default Servicos;

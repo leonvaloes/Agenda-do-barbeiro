@@ -1,5 +1,6 @@
 import DatabaseManager from "../config/database";
 import Atendente from "../models/atendente";
+import Empresa from "../models/empresa";
 import Servico from '../models/servicos';
 import AtendenteController from "./atendenteController";
 
@@ -49,6 +50,52 @@ class ServicoController {
         }
     }
 
+    async deleteServFunc(Servid: number, EmpresaId: number, funcionarios: any[]) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            await connection.beginTransaction();
+            const empresa = await Empresa.getEmpresaByUserId(EmpresaId, connection);
+
+            for (const funcionario of funcionarios) {
+                const atendente = await Atendente.getAtendenteByUser(funcionario.id, connection);
+                if (!atendente) {
+                    throw new Error("Atendente não encontrado");
+                }
+                await Servico.deleteServFunc(connection, Servid, empresa[0].id, atendente.id);
+            }
+
+            await connection.commit();
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
+    }
+
+    async addFuncServ(Servid: number, EmpresaId: number, funcionarios: any[]) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            await connection.beginTransaction();
+            const empresa = await Empresa.getEmpresaByUserId(EmpresaId, connection);
+            for (const funcionario of funcionarios) {
+                const atendente = await Atendente.getAtendenteByUser(funcionario, connection);
+                if (!atendente) {
+                    throw new Error("Atendente não encontrado");
+                }
+                await Servico.addFuncServ(connection, Servid, empresa[0].id, atendente.id);
+            }
+
+            await connection.commit();
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
+    }
+
+
     async criarEassociar(data: any) {
         const { descricao, nome, tempo_medio, valor, funcionarios } = data;
         const atendenteController = new AtendenteController();
@@ -93,14 +140,14 @@ class ServicoController {
         }
     }
 
-    async getEmpresa(id:number){
+    async getEmpresa(id: number) {
         const connection = await DatabaseManager.getInstance().getConnection();
-        try{
+        try {
             const empresa = await Servico.getEmpresa(id, connection);
             return empresa;
-        }catch(e){
+        } catch (e) {
             throw e;
-        }finally{
+        } finally {
             connection.release();
         }
     }

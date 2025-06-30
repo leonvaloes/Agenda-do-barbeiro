@@ -22,7 +22,7 @@ class alterUserCliente {
                 DROP COLUMN cliente_user_id;
             `);           
             
-            console.log('Relação e coluna removidas com sucesso!');
+            console.log('alterUserClienteremovidas com sucesso!');
         } catch (error) {
             console.error('Erro ao remover relação ou coluna:', error);
         }

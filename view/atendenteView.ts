@@ -26,9 +26,7 @@ router.get('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-    try {
-        console.log(req.body);
-        
+    try {        
         const id = req.params.id;
         const { nome, email, telefone, cpf } = req.body;
         const updateAtend = await atendenteController.atualizaAtendente(id, nome, email, telefone, cpf);
@@ -118,8 +116,9 @@ router.get('/getAtendServ/:id', async (req, res) => {
 });
 
 router.get('/getIdAtendente/:id', async (req, res) => {
-    const userId = req.params.id;
-    try {
+    const userId = req.params.id;    
+    try {    
+        debugger
         const result= await AtendenteController.getIdAtendente(userId);
         res.json(result);
     } catch (error) {
@@ -168,6 +167,27 @@ router.put('/ocuparData/:id', async (req,res)=>{
         const atendenteId = req.params.id;
         const data = req.body.data;
         const result = await atendenteController.ocuparDia(atendenteId, data);
+        res.status(200).send(result);
+    }catch(e){
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+})
+
+router.get('/getDayOff/:id', async (req, res)=>{
+    try{
+        const atendenteId = req.params.id;
+        const result = await atendenteController.getDayOff(atendenteId);
+        res.status(200).send(result);
+    }catch(e){
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+})
+
+router.delete('/desocuparData/:id', async (req,res)=>{
+    try{
+        const atendenteId = req.params.id;
+        const data = req.body.data;        
+        const result = await atendenteController.desocuparData(atendenteId, data);
         res.status(200).send(result);
     }catch(e){
         res.status(400).send(`Erro: ${e.message}`);

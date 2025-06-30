@@ -281,7 +281,8 @@ class AgendamentoController {
                 const agendamentos= await Agendamento.getRelatorioAtendente(atendente.id, dataInicio, dataFim, connection);
                 return agendamentos;
             }else if(Role[0].nome==="EMPRESA"){
-                const agendamentos= await Agendamento.getAgendamentosByEmpresa(userId, connection);
+                const empresa= await Empresa.getEmpresaByUserId(userId, connection);
+                const agendamentos= await Agendamento.getRelatorioEmpresa(empresa[0].id, dataInicio, dataFim, connection);
                 return agendamentos;
             }else{
                 throw new Error("Usuário não encontrado");
