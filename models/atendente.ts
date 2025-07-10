@@ -34,8 +34,6 @@ class Atendente extends User {
         }
     }
 
-
-
     async delete(id: number, connection: any) {
         const query = `DELETE FROM atendente WHERE id = ?`;
         try {
@@ -211,7 +209,6 @@ class Atendente extends User {
     static async deleteExpediente(id: number, connection: any) {
         const query1 = `DELETE FROM expediente WHERE atendente_id = ?`;
         const query2 = `DELETE FROM horario_atendente WHERE atendente_id = ?`;
-
         try {
             await connection.execute(query1, [id]);
             await connection.execute(query2, [id]);
@@ -237,7 +234,6 @@ class Atendente extends User {
             throw e;
         }
     }
-
 
     static async DeletaHorarios(atendente_id: number, data: any, connection: any) {
         const query =

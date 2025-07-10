@@ -9,7 +9,6 @@ const router = require('express').Router();
 router.post('/', async (req, res) => {
     try {
         const atendente = await atendenteController.createAtendente(req.body);
-        console.log("pelo amor de Deus: ",atendente)
         res.status(201).send(atendente);
     } catch (e) {
         res.status(400).send(`Erro: ${e.message}`);
@@ -26,7 +25,7 @@ router.get('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-    try {        
+    try {
         const id = req.params.id;
         const { nome, email, telefone, cpf } = req.body;
         const updateAtend = await atendenteController.atualizaAtendente(id, nome, email, telefone, cpf);
@@ -41,7 +40,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const deletedAtend = await atendenteController.deletarAtendente(req.params.id);
-        if (!deletedAtend) 
+        if (!deletedAtend)
             return res.status(404).send(deletedAtend);
         res.status(201).send(deletedAtend)
     } catch (e) {
@@ -49,14 +48,13 @@ router.delete('/:id', async (req, res) => {
     }
 })
 
-router.post('/getHours/:id', async (req,res)=>{
-    try{
+router.post('/getHours/:id', async (req, res) => {
+    try {
         const id = Number(req.params.id);
-        const data= req.body.data;
-        console.log(data)
-        const horarios= await atendenteController.getTimeForDate(id,data);
+        const data = req.body.data;
+        const horarios = await atendenteController.getTimeForDate(id, data);
         res.status(200).send(horarios);
-    }catch(e){
+    } catch (e) {
         res.status(400).send(`Erro aa: ${e.message}`);
     }
 })
@@ -70,6 +68,7 @@ router.post('/proxEstado/:id', async (req, res) => {
         res.status(400).send(`Erro: ${e.message}`);
     }
 })
+
 router.post('/cancelarAgendamento/:id', async (req, res) => {
     try {
         const agendamentoId = req.params.id;
@@ -92,8 +91,6 @@ router.post('/notificacao', async (req, res) => {
 router.post('/expediente/:id', async (req, res) => {
     const atendente_id = req.params.id;
     const horarios = req.body;
-      console.log("Recebido no expediente:", req.body);
-
     try {
         await AtendenteController.definirHorario(atendente_id, horarios);
         res.json({ message: "Expedientes e horários criados com sucesso" });
@@ -103,26 +100,34 @@ router.post('/expediente/:id', async (req, res) => {
     }
 });
 
+router.post('/atualizarExpediente/:id', async (req, res) => {
+    try {
+        const atendente_id= req.params.id;
+        const expediente= req.body;
+        AtendenteController.atualizarExpediente(atendente_id, expediente);
+        res.json({ message: "Expedientes atualizado com sucesso" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+})
 
 router.get('/getAtendServ/:id', async (req, res) => {
     const servico_id = req.params.id;
     try {
-        const result= await AtendenteController.listarAtendentesDoServico(servico_id);
+        const result = await AtendenteController.listarAtendentesDoServico(servico_id);
         res.json(result);
     } catch (error) {
-        console.log("errou", error);
         res.status(500).json({ error: error.message });
     }
 });
 
 router.get('/getIdAtendente/:id', async (req, res) => {
-    const userId = req.params.id;    
-    try {    
+    const userId = req.params.id;
+    try {
         debugger
-        const result= await AtendenteController.getIdAtendente(userId);
+        const result = await AtendenteController.getIdAtendente(userId);
         res.json(result);
     } catch (error) {
-        console.log("errou", error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -130,66 +135,62 @@ router.get('/getIdAtendente/:id', async (req, res) => {
 router.get('/getInfoUserByUserId/:id', async (req, res) => {
     const userId = req.params.id;
     try {
-        const result= await atendenteController.getInfoUserByIdUser(userId);
+        const result = await atendenteController.getInfoUserByIdUser(userId);
         res.json(result);
     } catch (error) {
-        console.log("erro", error);
         res.status(500).json({ error: error.message });
     }
 });
 
-
-router.post('/alterarExpediente/:id', async (req,res)=>{
-    try{
+router.post('/alterarExpediente/:id', async (req, res) => {
+    try {
         const atendenteId = req.params.id;
         const { expediente, dataInicio } = req.body;
-
         const result = await atendenteController.definirHorarioApartirDeData(atendenteId, expediente, dataInicio);
         res.status(200).send(result);
-    }catch(e){
+    } catch (e) {
         res.status(400).send(`Erro: ${e.message}`);
     }
 });
 
-router.get('/getExpediente/:id', async (req,res)=>{
-    try{
+router.get('/getExpediente/:id', async (req, res) => {
+    try {
         const atendenteId = req.params.id;
         const result = await atendenteController.getExpediente(atendenteId);
         res.status(200).send(result);
-    }catch(e)
-    {
+    } catch (e) {
         res.status(400).send(`Erro: ${e.messge}`);
     }
 })
 
-router.put('/ocuparData/:id', async (req,res)=>{
-    try{
+router.put('/ocuparData/:id', async (req, res) => {
+    try {
         const atendenteId = req.params.id;
         const data = req.body.data;
         const result = await atendenteController.ocuparDia(atendenteId, data);
         res.status(200).send(result);
-    }catch(e){
+    } catch (e) {
         res.status(400).send(`Erro: ${e.message}`);
     }
 })
 
-router.get('/getDayOff/:id', async (req, res)=>{
-    try{
+router.get('/getDayOff/:id', async (req, res) => {
+    try {
         const atendenteId = req.params.id;
         const result = await atendenteController.getDayOff(atendenteId);
         res.status(200).send(result);
-    }catch(e){
+    } catch (e) {
         res.status(400).send(`Erro: ${e.message}`);
     }
 })
 
-router.delete('/desocuparData/:id', async (req,res)=>{
-    try{
+router.delete('/desocuparData/:id', async (req, res) => {
+    try {
         const atendenteId = req.params.id;
-        const data = req.body.data;        
+        const data = req.body.data;
         const result = await atendenteController.desocuparData(atendenteId, data);
         res.status(200).send(result);
-    }catch(e){
+    } catch (e) {
         res.status(400).send(`Erro: ${e.message}`);
     }
 })

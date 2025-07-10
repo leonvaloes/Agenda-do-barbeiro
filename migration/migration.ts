@@ -25,6 +25,7 @@ import alter_horario_atendente from './022_alter_horario_atendente';
 import create_role from './023_create_role';
 import alter_user_role from './024_alter_user_role';
 import create_dayoff from './025_create_dayoff';
+import create_agendamentosPendentes from './026_create_agendamentosPendentes';
 class Migrations {
     async up() {
         console.log('Migrations running...');
@@ -60,6 +61,7 @@ class Migrations {
             await new create_role().up(connection);
             await new alter_user_role().up(connection)
             await new create_dayoff().up(connection);
+            await new create_agendamentosPendentes().up(connection);
 
             console.log('Migrations finished!');
             connection.release();
@@ -75,6 +77,7 @@ class Migrations {
         const db = Database.getInstance();
         const connection = await db.getConnection();
 
+        await new create_agendamentosPendentes().down(connection);
         await new create_dayoff().down(connection);
         await new alter_user_role().down(connection);
         await new create_role().down(connection);
