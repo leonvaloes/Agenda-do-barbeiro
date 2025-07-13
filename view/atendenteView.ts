@@ -184,6 +184,16 @@ router.get('/getDayOff/:id', async (req, res) => {
     }
 })
 
+router.get('/getRemarcarAgendamentos/:id', async (req,res)=>{
+    try {
+        const atendenteId = req.params.id;
+        const result = await atendenteController.getRemarcarAgendamentos(atendenteId);
+        res.status(200).send(result);
+    } catch (e) {
+        res.status(400).send(`Erro: ${e.message}`);
+    }
+})
+
 router.delete('/desocuparData/:id', async (req, res) => {
     try {
         const atendenteId = req.params.id;

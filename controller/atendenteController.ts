@@ -343,12 +343,24 @@ class AtendenteController {
                     }
                 }
             }
-
-            
+                    
             await connection.commit();
             return true;
         } catch (e) {
             await connection.rollback();
+        } finally {
+            connection.release();
+        }
+    }
+
+    async getRemarcarAgendamentos(atendenteId: number) {
+        const connection = await DatabaseManager.getInstance().getConnection();
+        try {
+            const result = await Agendamento.getRemarcarAgendamentos(atendenteId, connection);
+            console.log("result: ", result);
+            return result;
+        } catch (e) {
+            throw e;
         } finally {
             connection.release();
         }

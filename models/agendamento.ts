@@ -372,7 +372,7 @@ ORDER BY item.data_hora DESC;`
     }
   }
 
-  static async getRelatorioEmpresa(empresaId: number,dataInicio:any, dataFim:any, connection: any) {
+  static async getRelatorioEmpresa(empresaId: number, dataInicio: any, dataFim: any, connection: any) {
     const query = `
       SELECT
           agendamento.estado,
@@ -393,7 +393,7 @@ ORDER BY item.data_hora DESC;`
       ORDER BY item.data_hora DESC;
     `
     try {
-      const response= await connection.execute(query, [empresaId, dataInicio, dataFim]);
+      const response = await connection.execute(query, [empresaId, dataInicio, dataFim]);
       return response[0];
     } catch (e) {
       throw e;
@@ -445,6 +445,26 @@ ORDER BY item.data_hora DESC;`
       return await connection.execute(query, [clienteId, itemId, id]);
     } catch (error) {
       throw error;
+    }
+  }
+
+  static async getRemarcarAgendamentos(id: number, connection: any) {
+    const query = `
+      SELECT item.*
+      FROM item
+      WHERE item.atendente_id = ?
+        AND NOT EXISTS (
+          SELECT 1
+          FROM horario_atendente ha
+          WHERE ha.atendente_id = item.atendente_id
+            AND ha.data_hora = item.data_hora
+        )
+    `;
+    try {
+      const [result] = await connection.execute(query, [id]);
+      return result;
+    } catch (e) {
+      throw e;
     }
   }
 
