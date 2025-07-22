@@ -357,6 +357,7 @@ class AtendenteController {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
             const result = await Agendamento.getRemarcarAgendamentos(atendenteId, connection);
+
             console.log("result: ", result);
             return result;
         } catch (e) {

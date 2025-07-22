@@ -450,15 +450,27 @@ ORDER BY item.data_hora DESC;`
 
   static async getRemarcarAgendamentos(id: number, connection: any) {
     const query = `
-      SELECT item.*
+      SELECT 
+        item.id AS item_id,
+        item.data_hora AS data_hora,
+        servicos.tempo_medio AS tempo_medio,
+        user.nome AS nome_cliente, 
+        atendente.id AS atendente_id,    
+        agendamento.id AS id, 
+        servicos.nome AS nome_servico     
       FROM item
+      JOIN agendamento ON agendamento.item_id = item.id
+      JOIN cliente ON cliente.id = agendamento.cliente_id
+      JOIN servicos ON servicos.id = item.serv_id
+      JOIN user ON user.id = cliente.cliente_user_id
+      JOIN atendente ON atendente.id = item.atendente_id
       WHERE item.atendente_id = ?
         AND NOT EXISTS (
           SELECT 1
           FROM horario_atendente ha
           WHERE ha.atendente_id = item.atendente_id
             AND ha.data_hora = item.data_hora
-        )
+        );
     `;
     try {
       const [result] = await connection.execute(query, [id]);

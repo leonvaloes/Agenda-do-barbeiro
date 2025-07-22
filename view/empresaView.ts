@@ -39,8 +39,8 @@ router.put('/reagendamento', async (req,res)=>{
         const novaData= req.body.nova_data;
         const atendente_id= req.body.atendente_id;
         const agendamento_id=req.body.agendamento_id
-        const servicos=req.body.servicos
-        const result= await empresaController.reagendar(itemId, novaData, atendente_id, agendamento_id, servicos);
+        const tempo_medio=req.body.tempo_medio
+        const result= await empresaController.reagendar(itemId, novaData, atendente_id, agendamento_id, tempo_medio);
         if(result)
             res.status(200).send(result);
         else 

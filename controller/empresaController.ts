@@ -189,21 +189,17 @@ class EmpresaController {
 
     }
 
-    async reagendar(itemId: any, novaData: any, atendente_id: number, agendamento_id: number, servicos: any) {
+    async reagendar(itemId: any, novaData: any, atendente_id: number, agendamento_id: number, tempo_medio: any) {
         const connection = await DatabaseManager.getInstance().getConnection();
         try {
-            console.log("nova datinha: ", novaData)
-
             await connection.beginTransaction();
-            const tempoServico = servicos.tempo_medio;
+            const tempoServico = tempo_medio;
             const formatador = new unformatDate();
 
             // marcar livre antigo agendamento
-
             let dataAntiga = await Agendamento.getItemByAgendamento(agendamento_id, connection);
 
             dataAntiga = await formatador.FormatDate(dataAntiga);
-            console.log("antiga data: ", dataAntiga);
             await HorarioFuncionario.marcarComoLivre(dataAntiga, atendente_id, connection);
 
             let dataEhoraFim = new Date(dataAntiga);
@@ -216,7 +212,6 @@ class EmpresaController {
             }
 
             const result = await Empresa.reagendar(itemId, novaData, connection);
-
 
             // marcar ocupado novo agendamento
             novaData = await formatador.unformatDate(novaData);
